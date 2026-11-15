@@ -6,9 +6,8 @@ move-folders:
 # The Forever database ships as its own CurseForge project (ForeverDB, project 1807282).
 # The CurseForge app installs it with Command Center. Without it, Command Center still works
 # (Questie and your own recordings only).
-# TODO: put ForeverDB's CurseForge slug here, then uncomment.
-#required-dependencies:
-#  - foreverdb-slug
+required-dependencies:
+  - forever-db
 
 ignore:
   - collected
