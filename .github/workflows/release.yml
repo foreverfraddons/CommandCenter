@@ -1,4 +1,4 @@
-# Once a day: if anything in the addon or its database changed since the last release,
+# Once a day: if anything in the addon changed since the last release (the data ships separately as ForeverDB),
 # bump the version, tag it and upload to CurseForge (and a GitHub release).
 name: Daily release
 
@@ -32,7 +32,7 @@ jobs:
           LAST=$(git describe --tags --abbrev=0 2>/dev/null || true)
           echo "last=$LAST" >> "$GITHUB_OUTPUT"
           if [ -z "$LAST" ] || [ "${{ inputs.force }}" = "true" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-          if git diff --quiet "$LAST" HEAD -- CommandCenter CommandCenter_ForeverDB; then
+          if git diff --quiet "$LAST" HEAD -- CommandCenter; then
             echo "Nothing changed since $LAST."; echo "go=false" >> "$GITHUB_OUTPUT"
           else
             echo "go=true" >> "$GITHUB_OUTPUT"

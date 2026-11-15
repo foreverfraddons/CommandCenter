@@ -780,7 +780,7 @@ local function showSource(id, link)
   spanel.child:SetHeight(math.max(10, y))
   spanel.empty:SetShown(#data == 0)
   spanel.empty:SetText(hasDB and "|cff888888Nothing known yet about where this comes from - it fills in as you loot, shop and quest.\nThe Wowhead link below always works.|r"
-    or "|cff888888The Forever database isn't installed (CommandCenter_ForeverDB) and nothing is recorded yet.\nThe Wowhead link below always works.|r")
+    or "|cff888888The Forever database isn't installed (ForeverDB addon) and nothing is recorded yet.\nThe Wowhead link below always works.|r")
   spanel:Show(); spanel:Raise()
 end
 S.ItemMenuShowSource = showSource

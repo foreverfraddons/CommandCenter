@@ -1,10 +1,12 @@
 -- ItemDB: Command Center's own WoW Forever database, used by "Where it comes from".
 -- Two layers, merged on the fly:
---   1. the shipped slice (addon CommandCenter_ForeverDB, loaded the first time it's needed),
---      built by the forever-db repository from the open vanilla database + everyone's recordings
+--   1. the shared ForeverDB addon (its own CurseForge project, a required dependency; LoadOnDemand,
+--      loaded the first time it's needed), built by the forever-db repository from the open
+--      vanilla database + everyone's recordings. Older installs may still have the
+--      CommandCenter_ForeverDB folder (global CC_ForeverDB) - used if ForeverDB isn't there.
 --   2. what you recorded yourself (Collector.lua) - so new finds show up right away
--- Shipped slice format (all ids are numbers, chances are per 10000):
---   CC_ForeverDB = { meta, npc = {[id] = {name, sub, minLv, maxLv, rank}}, obj = {[id] = {name}},
+-- Data format (all ids are numbers, chances are per 10000):
+--   ForeverDB = { meta, npc = {[id] = {name, sub, minLv, maxLv, rank}}, obj = {[id] = {name}},
 --     quest = {[id] = {title, level, minLevel}}, qg = {[qid] = {"c123", "o45"}}, item = {[id] = {name, q}},
 --     drop / odrop / idrop = {[item] = {sourceId, chance, ...}}, vend = {[item] = {npc, ...}},
 --     rew = {[item] = {qid, ...}}, start = {[item] = qid}, world = {[item] = minLv},
@@ -15,16 +17,28 @@ local _, S = ...
 local IDB = {}
 S.IDB = IDB
 
-local DATA_ADDON = "CommandCenter_ForeverDB"
+-- data addons in order of preference: {addon folder, global it fills}
+local SOURCES = { { "ForeverDB", "ForeverDB" }, { "CommandCenter_ForeverDB", "CC_ForeverDB" } }
 local tried = false
-local function shipped()
-  if type(CC_ForeverDB) == "table" then return CC_ForeverDB end
-  if not tried then
-    tried = true
-    local load = (C_AddOns and C_AddOns.LoadAddOn) or LoadAddOn
-    if load then pcall(load, DATA_ADDON) end
+local function found()
+  for _, s in ipairs(SOURCES) do
+    local d = _G[s[2]]
+    if type(d) == "table" and type(d.meta) == "table" then return d end
   end
-  return type(CC_ForeverDB) == "table" and CC_ForeverDB or nil
+end
+local function shipped()
+  local d = found()
+  if d or tried then return d end
+  tried = true
+  local load = (C_AddOns and C_AddOns.LoadAddOn) or LoadAddOn
+  if load then
+    for _, s in ipairs(SOURCES) do
+      pcall(load, s[1])
+      d = found()
+      if d then return d end
+    end
+  end
+  return nil
 end
 function IDB.Shipped() return shipped() end
 local function rec() return S.CollectDB and S.CollectDB() or nil end
