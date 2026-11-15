@@ -1,0 +1,12 @@
+WoW Forever database (forever-db)
+
+Parts of this data are derived from the cMaNGOS classic-db world database
+(https://github.com/cmangos/classic-db), licensed under the GNU General Public
+License v3.0. Those parts, and this generated data as a whole, are distributed
+under the same licence: see LICENSE-GPL.txt next to this file.
+
+The rest comes from in-game recordings made by players of World of Warcraft: Forever
+with Command Center's recorder.
+
+World of Warcraft and all related names are trademarks of Blizzard Entertainment.
+This project is not affiliated with Blizzard Entertainment.
