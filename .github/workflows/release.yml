@@ -1,0 +1,63 @@
+# Once a day: if anything in the addon or its database changed since the last release,
+# bump the version, tag it and upload to CurseForge (and a GitHub release).
+name: Daily release
+
+on:
+  schedule:
+    - cron: "23 8 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Release even if nothing changed"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repo-write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Anything new?
+        id: check
+        run: |
+          LAST=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          echo "last=$LAST" >> "$GITHUB_OUTPUT"
+          if [ -z "$LAST" ] || [ "${{ inputs.force }}" = "true" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if git diff --quiet "$LAST" HEAD -- CommandCenter CommandCenter_ForeverDB; then
+            echo "Nothing changed since $LAST."; echo "go=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump version and tag
+        if: steps.check.outputs.go == 'true'
+        id: ver
+        run: |
+          CUR=$(grep -m1 '^## Version:' CommandCenter/CommandCenter.toc | sed 's/## Version: *//')
+          IFS=. read -r MA MI PA <<< "$CUR"
+          NEW="$MA.$MI.$(( ${PA:-0} + 1 ))"
+          sed -i "s/^## Version:.*/## Version: $NEW/" CommandCenter/CommandCenter.toc
+          git config user.name "forever-db bot"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -am "Release v$NEW"
+          git tag "v$NEW"
+          git push origin HEAD "v$NEW"
+          echo "tag=v$NEW" >> "$GITHUB_OUTPUT"
+
+      - name: Package and upload to CurseForge
+        if: steps.check.outputs.go == 'true'
+        uses: BigWigsMods/packager@v2
+        with:
+          args: -p ${{ vars.CF_PROJECT_ID }}
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,10 @@
+## Interface: 16001, 120007
+## Title: Command Center - Forever database
+## Notes: WoW Forever item sources, vendors, quests and map spots for Command Center. Loaded only when needed. Built automatically by the forever-db repository.
+## Author: Fatedfr
+## Version: 0
+## LoadOnDemand: 1
+## Dependencies: CommandCenter
+## X-License: GPL-2.0 (data derived from cMaNGOS classic-db) - see LICENSE-DATA.txt
+
+ForeverDB.lua

@@ -1,0 +1,11 @@
+package-as: CommandCenter
+
+move-folders:
+  CommandCenter/CommandCenter: CommandCenter
+  CommandCenter/CommandCenter_ForeverDB: CommandCenter_ForeverDB
+
+ignore:
+  - collected
+  - sync
+  - README.md
+  - .github

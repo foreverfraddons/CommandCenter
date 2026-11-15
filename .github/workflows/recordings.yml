@@ -1,0 +1,16 @@
+# New recordings pushed from your PC -> ask forever-db to rebuild the database now.
+name: New recordings
+
+on:
+  push:
+    paths:
+      - "collected/**"
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tell forever-db
+        env:
+          GH_TOKEN: ${{ secrets.PIPELINE_TOKEN }}
+        run: gh api "repos/${{ vars.DB_REPO }}/dispatches" -f event_type=new-recordings

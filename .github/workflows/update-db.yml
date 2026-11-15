@@ -1,0 +1,40 @@
+# Pulls the latest Command Center slice of the Forever database into CommandCenter_ForeverDB/.
+# Commits only when the data changed. (The daily release job decides about CurseForge.)
+name: Update database
+
+on:
+  repository_dispatch:
+    types: [db-updated]
+  schedule:
+    - cron: "47 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repo-write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download slice
+        env:
+          GH_TOKEN: ${{ secrets.PIPELINE_TOKEN }}
+        run: |
+          gh release download latest --repo "${{ vars.DB_REPO }}" --pattern commandcenter.zip --dir /tmp/slice --clobber
+          unzip -oq /tmp/slice/commandcenter.zip -d /tmp/slice
+          rm -rf CommandCenter_ForeverDB
+          cp -r /tmp/slice/CommandCenter_ForeverDB CommandCenter_ForeverDB
+
+      - name: Commit if changed
+        run: |
+          git config user.name "forever-db bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A CommandCenter_ForeverDB
+          if git diff --cached --quiet; then echo "No database change."; exit 0; fi
+          git commit -m "Forever database update"
+          git push
