@@ -13,7 +13,16 @@ function Log($m) { $line = "$(Get-Date -Format s)  $m"; Write-Host $line; Add-Co
 
 if (-not (Test-Path (Join-Path $RepoPath ".git"))) { throw "Repository not found at $RepoPath - run install-sync.ps1 first." }
 Set-Location $RepoPath
-git pull --rebase --quiet 2>&1 | Out-Null
+# this folder is only a sync copy: always start from what's on GitHub (your recordings are written
+# again from the SavedVariables below, so nothing is lost)
+git fetch --quiet origin 2>&1 | Out-Null
+if ($LASTEXITCODE -ne 0) { Log "Could not reach GitHub (fetch failed) - check your internet / GitHub sign-in."; exit 1 }
+git reset --hard --quiet origin/main 2>&1 | Out-Null
+# git refuses to commit without a name and e-mail: give this sync copy its own
+if (-not (git config user.email)) {
+  git config user.name "Recordings sync"
+  git config user.email "recordings-sync@users.noreply.github.com"
+}
 
 $outDir = Join-Path $RepoPath "collected"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
@@ -45,6 +54,7 @@ git add collected | Out-Null
 git diff --cached --quiet
 if ($LASTEXITCODE -eq 0) { Log "No new recordings."; exit 0 }
 git commit -m "Recordings $(Get-Date -Format yyyy-MM-dd)" --quiet
-git push --quiet
+if ($LASTEXITCODE -ne 0) { Log "Commit failed (git said no) - nothing was sent."; exit 1 }
+git push --quiet origin HEAD:main
 if ($LASTEXITCODE -ne 0) { Log "Push failed - check your GitHub sign-in (Git Credential Manager)."; exit 1 }
 Log "Pushed $found recording file(s)."
