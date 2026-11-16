@@ -229,6 +229,21 @@ local function makeShortcut(rec)
   return f
 end
 
+-- other addons add themselves as a tool (home tile, Tools window, dock, Button Box):
+-- CommandCenter:RegisterTool{ label, desc, icon, available(), isOn(), set(on), window = "FrameName" }
+function S:RegisterTool(t)
+  if type(t) ~= "table" or not t.label or byLabel[t.label] then return false end
+  t.available = t.available or function() return true end
+  t.isOn = t.isOn or function() return false end
+  t.set = t.set or function() end
+  t.external = true
+  TOOLS[#TOOLS + 1] = t
+  byLabel[t.label] = t
+  if win then win:Hide(); win = nil end          -- the Tools window is rebuilt with the new row next time
+  if S.QuickBarLayout then pcall(S.QuickBarLayout, S) end
+  return true
+end
+
 -- every tool this character can use, in toolbox order (for the Button Box)
 function S:ToolLabels()
   local out = {}

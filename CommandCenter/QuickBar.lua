@@ -947,7 +947,11 @@ function S:DockWindowFor(it)
   if not it then return nil end
   if it.key == "tools" then return "CC_Tools" end
   if it.key == "bell" then return "CC_NotifPanel" end
-  if it.tool then return TOOL_WINDOWS[it.tool] end
+  if it.tool then
+    if TOOL_WINDOWS[it.tool] then return TOOL_WINDOWS[it.tool] end
+    local t = S.ToolInfo and S:ToolInfo(it.tool)     -- tools other addons registered (S:RegisterTool)
+    return t and t.window
+  end
 end
 
 -- the dock / border bar icon for a key ("home", "bell", "tool:BiB"...)
