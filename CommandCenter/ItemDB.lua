@@ -8,7 +8,7 @@
 -- Data format (all ids are numbers, chances are per 10000):
 --   ForeverDB = { meta, npc = {[id] = {name, sub, minLv, maxLv, rank}}, obj = {[id] = {name}},
 --     quest = {[id] = {title, level, minLevel}}, qg = {[qid] = {"c123", "o45"}}, item = {[id] = {name, q}},
---     drop / odrop / idrop = {[item] = {sourceId, chance, ...}}, vend = {[item] = {npc, ...}},
+--     drop / odrop / idrop = {[item] = {sourceId, chance, ...}} (chance 0 = rate unknown), vend = {[item] = {npc, ...}},
 --     rew = {[item] = {qid, ...}}, start = {[item] = qid}, world = {[item] = minLv},
 --     spw = {["c123"] = {{continent, x, y, x, y, ...}, ...}}   (world coordinates)
 --     spm = {["c123"] = {[uiMap] = {x, y, ...}}}                (0-1000 map coordinates)
@@ -113,7 +113,8 @@ function IDB.Sources(item)
   local function fromShipped(field, key, list)
     local t = T(d, field) and d[field][item]
     if not t then return end
-    for k = 1, #t, 2 do addChance(list, key, t[k], t[k + 1]) end
+    -- a chance of 0 means "drops here, rate unknown" (a source that lists drops without rates)
+    for k = 1, #t, 2 do addChance(list, key, t[k], (t[k + 1] or 0) > 0 and t[k + 1] or nil) end
   end
   fromShipped("drop", "drops", out.drops)
   fromShipped("odrop", "objects", out.objects)
