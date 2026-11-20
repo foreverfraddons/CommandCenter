@@ -806,6 +806,8 @@ S.ItemMenuShowSource = showSource
 -- put a real (clickable) item link into the chat box: the open one, or open it first
 function S.ItemMenuChatLink(link)
   if not link then return end
+  -- Messenger open on a chat: put it in the message box
+  if S.MsgInsertLink and S.MsgInsertLink(link, not (ChatEdit_GetActiveWindow and ChatEdit_GetActiveWindow())) then return end
   local box = (ChatEdit_GetActiveWindow and ChatEdit_GetActiveWindow())
   if box then
     if ChatEdit_InsertLink then ChatEdit_InsertLink(link) else box:Insert(link) end

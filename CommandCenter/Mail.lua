@@ -795,7 +795,9 @@ local function build()
   win.sweep:SetPoint("BOTTOMLEFT", 6, 4)
   UI:Tip(win.sweep, "Clear chat", "Wipe the chat history with this person (asks first).")
   win.input = UI:Edit(win.footer, RW - 130, 24, "Aa  - type a message, Enter to send", function() send() end)
-  win.input:SetPoint("BOTTOMLEFT", 36, 4); win.input:SetMaxLetters(600)
+  -- a whisper can be 255 bytes at most (the game drops longer ones); links count in full
+  win.input:SetPoint("BOTTOMLEFT", 36, 4); win.input:SetMaxLetters(255)
+  if win.input.SetMaxBytes then win.input:SetMaxBytes(256) end
   win.input:SetScript("OnEnterPressed", function() send() end)
   local sb = UI:PrimaryButton(win.footer, "Send", 76, 24, send)
   sb:SetPoint("BOTTOMRIGHT", -6, 4)
@@ -1202,6 +1204,31 @@ function S.MsgInsert(text)
   if not win or not win.input then return end
   win.input:SetText(text or ""); win.input:SetFocus()
 end
+
+-- Shift-click links (items, spells, quests, achievements...) into the message box.
+-- The game sends them to its own chat box (ChatEdit_InsertLink / ChatFrameUtil.InsertLink),
+-- which never sees our box, so we hook both and take the link when the Messenger is open
+-- on a chat and you're typing in it - or when no game chat box is open to take it.
+local function gameChatBox()
+  local get = (ChatFrameUtil and ChatFrameUtil.GetActiveWindow) or ChatEdit_GetActiveWindow
+  local ok, b = pcall(get or function() end)
+  if ok and b and b.IsShown and b:IsShown() then return b end
+end
+local lastLink, lastLinkAt
+function S.MsgInsertLink(link, force)
+  if type(link) ~= "string" or link == "" then return false end
+  if not win or not win:IsShown() or not win.input or not active then return false end
+  local now = GetTime and GetTime() or 0
+  if lastLink == link and lastLinkAt == now then return true end   -- both hooks fired
+  if not force and not win.input:HasFocus() and gameChatBox() then return false end
+  lastLink, lastLinkAt = link, now
+  win.input:SetFocus()
+  win.input:Insert(link)
+  return true
+end
+local function hookLink(link) S.MsgInsertLink(link) end
+if ChatEdit_InsertLink then hooksecurefunc("ChatEdit_InsertLink", hookLink) end
+if ChatFrameUtil and ChatFrameUtil.InsertLink then hooksecurefunc(ChatFrameUtil, "InsertLink", hookLink) end
 S:Listen("PLAYER_INFO", function() refreshSoon() end)
 
 function S:AskClearConversation(name)
