@@ -93,9 +93,6 @@ end
 local function pickup(bag, slot)
   if CC and CC.PickupContainerItem then CC.PickupContainerItem(bag, slot) elseif PickupContainerItem then PickupContainerItem(bag, slot) end
 end
-local function useItem(bag, slot)
-  if CC and CC.UseContainerItem then CC.UseContainerItem(bag, slot) elseif UseContainerItem then UseContainerItem(bag, slot) end
-end
 local function isNew(bag, slot)
   local ok, v = pcall(function() return C_NewItems and C_NewItems.IsNewItem and C_NewItems.IsNewItem(bag, slot) end)
   return ok and clean(v) and true or false
@@ -524,12 +521,16 @@ local function makeButton(bag, slot)
   if not ok or not b then ok, b = pcall(CreateFrame, "Button", name, parent, "ContainerFrameItemButtonTemplate") end
   if not ok or not b then
     -- no bag-slot template: a plain button that picks up / uses the item
-    b = CreateFrame("Button", name, parent)
+    -- (using an item is protected, so right-click goes through the game's secure
+    -- "use item" action for this bag slot instead of Command Center calling it)
+    b = CreateFrame("Button", name, parent, "SecureActionButtonTemplate")
     b.plain = true
     b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     b:RegisterForDrag("LeftButton")
-    b:SetScript("OnClick", function(self, btn)
-      if btn == "RightButton" then pcall(useItem, self.bag, self.slot) else pickup(self.bag, self.slot) end
+    b:SetAttribute("type2", "item")
+    b:SetAttribute("item2", bag .. " " .. slot)
+    b:HookScript("PreClick", function(self, btn)
+      if btn ~= "RightButton" then pickup(self.bag, self.slot) end
     end)
     b:SetScript("OnDragStart", function(self) pickup(self.bag, self.slot) end)
     b:SetScript("OnReceiveDrag", function(self) pickup(self.bag, self.slot) end)
@@ -867,15 +868,15 @@ function S:BiBSellJunk(quiet)
     end
   end
   if #queue == 0 then if not quiet then S:Print("No junk to sell.") end return end
-  local i = 0
-  local function nextOne()
-    i = i + 1
-    local r = queue[i]
-    if not r or not atVendor then return end
-    pcall(useItem, r.bag, r.slot)
-    C_Timer.After(0.2, nextOne)
+  -- selling by using each item (UseContainerItem) is protected now and gets "blocked";
+  -- the game's own "sell all junk" call is allowed
+  local sell = C_MerchantFrame and C_MerchantFrame.SellAllJunkItems
+  if not sell then
+    if not quiet then S:Print("Use the vendor's own \"Sell junk\" button - the game doesn't let addons sell items one by one.") end
+    return
   end
-  nextOne()
+  local ok = pcall(sell)
+  if not ok then if not quiet then S:Print("The game didn't let Command Center sell the junk - use the vendor's \"Sell junk\" button.") end return end
   local m = value
   S:Print(string.format("Selling %d junk item%s for %s.", #queue, #queue == 1 and "" or "s",
     GetCoinTextureString and GetCoinTextureString(m) or (math.floor(m / 10000) .. "g")))

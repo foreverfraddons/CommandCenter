@@ -27,7 +27,7 @@ local function cfg()
   if c.on == nil then c.on = true end
   c.mod = c.mod or "alt"
   c.button = c.button or "right"
-  if c.chatMod == nil then c.chatMod = false end       -- chat links: plain right-click is enough
+  if not c.chatModV2 then c.chatMod = true; c.chatModV2 = true end   -- chat links need the key (Alt) too
   if c.autoDelete == nil then c.autoDelete = true end
   if c.tellDelete == nil then c.tellDelete = true end
   c.unwanted = type(c.unwanted) == "table" and c.unwanted or {}
@@ -101,66 +101,81 @@ local function dressable(link)
 end
 
 ---------------------------------------------------------------------------
--- Open all: one now (your click), then the next each time the loot window closes
+-- Open all: a click button that opens one stack per click
 ---------------------------------------------------------------------------
--- Opening one at a time, slowly enough for the game: wait for the loot window to close,
--- for the bag slot to unlock, then a short pause. "Internal bag error" = try again a
--- bit later instead of giving up.
-local openQueue            -- { id, done, tries, token } while opening
-local OPEN_GAP = 1.0       -- seconds between opens
-local function finishOpen(msg)
-  if openQueue and msg then S:Print(msg) end
-  openQueue = nil
-end
-local openNext
-local function scheduleNext(delay)
-  if not openQueue then return end
-  openQueue.token = (openQueue.token or 0) + 1
-  local tok = openQueue.token
-  C_Timer.After(delay, function() if openQueue and openQueue.token == tok then openNext() end end)
-end
-openNext = function()
-  local q = openQueue
-  if not q then return end
-  if combat() then finishOpen("Opening stopped - you're in a fight.") return end
-  -- still looting? wait
-  if (LootFrame and LootFrame:IsShown()) or (GetNumLootItems and (GetNumLootItems() or 0) > 0) then scheduleNext(0.5) return end
-  if CursorHasItem and CursorHasItem() then scheduleNext(0.5) return end
-  -- the next unlocked stack of it
-  local pick, locked
-  for _, sl in ipairs(slotsOf(q.id)) do
+-- Using a bag item is protected: an addon calling UseContainerItem itself gets
+-- "blocked" (BugGrabber blames Command Center). So "Open all" shows a small secure
+-- button (the game's own secure "use item" action, set to that bag slot): each click
+-- opens the next one, and the button moves on to the next stack after the loot closes.
+local openBtn, openID
+local function nextLootSlot(id)
+  for _, sl in ipairs(slotsOf(id)) do
     if sl.loot then
       local i = slotInfo(sl.bag, sl.slot)
-      if i and i.isLocked then locked = true else pick = sl; break end
+      if i and not i.isLocked then return sl end
     end
   end
-  if not pick then
-    if locked then scheduleNext(0.5) return end
-    finishOpen(q.done > 0 and ("Opened " .. q.done .. ".") or nil)
+end
+local function openLeft(id)
+  local n = 0
+  for _, sl in ipairs(slotsOf(id)) do if sl.loot then local i = slotInfo(sl.bag, sl.slot); n = n + ((i and i.stackCount) or 1) end end
+  return n
+end
+local function refreshOpen()
+  if not openBtn or not openID then return end
+  if combat() then openBtn:Hide() return end            -- secure buttons can't change in a fight
+  local sl = nextLootSlot(openID)
+  if not sl then
+    if openBtn.opened and openBtn.opened > 0 then S:Print("Opened " .. openBtn.opened .. ".") end
+    openBtn:Hide(); openID = nil
     return
   end
-  q.done = q.done + 1
-  q.waiting = true
-  pcall(CC.UseContainerItem, pick.bag, pick.slot)
-  -- no loot window came up (or auto loot was very quick): carry on anyway
-  scheduleNext(3)
+  openBtn:SetAttribute("type", "item")
+  openBtn:SetAttribute("item", sl.bag .. " " .. sl.slot)
+  local name, _, _, _, icon = itemInfo(openID)
+  openBtn.icon:SetTexture(icon or 134400)
+  openBtn.text:SetText("|cff55ff55Open:|r " .. (name or ("item " .. openID)) .. "  |cff888888(" .. openLeft(openID) .. " left - click)|r")
+  openBtn:Show()
+end
+local function getOpenBtn()
+  if openBtn then return openBtn end
+  local b = CreateFrame("Button", "CC_OpenAllButton", UIParent, "SecureActionButtonTemplate" .. (BackdropTemplateMixin and ", BackdropTemplate" or ""))
+  b:SetSize(260, 34); b:SetFrameStrata("HIGH"); b:SetClampedToScreen(true)
+  b:RegisterForClicks("LeftButtonUp", "LeftButtonDown")
+  UI:Skin(b, function(self, th) UI.Flat(self, th.bg, 0.95, { 0.3, 0.9, 0.4 }, 1, 1) end)
+  b.icon = b:CreateTexture(nil, "ARTWORK"); b.icon:SetSize(26, 26); b.icon:SetPoint("LEFT", 4, 0); b.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+  b.text = UI:Text(b, "", "normal"); b.text:SetPoint("LEFT", b.icon, "RIGHT", 8, 0); b.text:SetPoint("RIGHT", -24, 0); b.text:SetWordWrap(false)
+  -- a plain close button on top (not part of the secure button's click)
+  local x = CreateFrame("Button", nil, b); x:SetSize(18, 18); x:SetPoint("RIGHT", -3, 0)
+  x.t = UI:Text(x, "|cffaaaaaax|r", "normal"); x.t:SetPoint("CENTER")
+  x:SetScript("OnClick", function() if not combat() then b:Hide() end; openID = nil end)
+  b:SetPoint("TOP", 0, -220)
+  b:SetScript("OnEnter", function(self)
+    GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+    GameTooltip:AddLine("Open all", 0.3, 1, 0.4)
+    GameTooltip:AddLine("Click to open one. The game only lets addons open items from your own click, so it's one per click.", 0.8, 0.8, 0.8, true)
+    GameTooltip:Show()
+  end)
+  b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+  openBtn = b
+  return b
 end
 local function openAll(id)
-  openQueue = { id = id, done = 0, tries = 0 }
-  openNext()
+  if combat() then S:Print("Can't open items in a fight - try again after.") return end
+  openID = id
+  local b = getOpenBtn()
+  b.opened = 0
+  -- put it under the mouse, so the first click is right there
+  local scale = b:GetEffectiveScale() or 1
+  local cx, cy = GetCursorPosition()
+  b:ClearAllPoints(); b:SetPoint("CENTER", UIParent, "BOTTOMLEFT", (cx or 0) / scale, (cy or 0) / scale)
+  refreshOpen()
 end
-S:On("LOOT_CLOSED", function() if openQueue then openQueue.waiting = false; scheduleNext(OPEN_GAP) end end)
-S:On("UI_ERROR_MESSAGE", function(_, _, msg)
-  if not openQueue or type(msg) ~= "string" then return end
-  if (ERR_INTERNAL_BAG_ERROR and msg == ERR_INTERNAL_BAG_ERROR) or msg:lower():find("internal bag error") then
-    openQueue.tries = openQueue.tries + 1
-    openQueue.done = math.max(0, openQueue.done - 1)
-    if openQueue.tries > 6 then finishOpen("Opening stopped - the game kept saying \"Internal bag error\". Try again in a moment.") return end
-    scheduleNext(1.5 + openQueue.tries * 0.5)          -- back off a little more each time
-  elseif (ERR_INV_FULL and msg == ERR_INV_FULL) or msg:lower():find("inventory is full") then
-    finishOpen("Opening stopped - your bags are full.")
-  end
-end)
+S:On("LOOT_OPENED", function() if openID and openBtn then openBtn.opened = (openBtn.opened or 0) + 1 end end)
+S:On("LOOT_CLOSED", function() if openID then C_Timer.After(0.4, refreshOpen) end end)
+S:On("BAG_UPDATE_DELAYED", function() if openID then C_Timer.After(0.2, refreshOpen) end end)
+S:On("PLAYER_REGEN_DISABLED", function() if openBtn then openBtn:Hide() end end)
+S:On("PLAYER_REGEN_ENABLED", function() if openID then C_Timer.After(0.5, refreshOpen) end end)
 
 ---------------------------------------------------------------------------
 -- Delete / unwanted
@@ -826,7 +841,9 @@ local function showMenu(link, bag, slot)
   end })
   add({ text = "Wowhead link", func = function() if UI.CopyBox then UI:CopyBox("Wowhead link - copy it (Ctrl+C) and open it in your browser", wowheadURL(id)) end end })
   add({ text = "Where it comes from...", func = function() C_Timer.After(0, function() showSource(id, link) end) end })
-  if cfg().unwanted[id] then
+  if not inBags then
+    -- (chat links: no unwanted / delete - those are for your bags)
+  elseif cfg().unwanted[id] then
     add({ text = "Unmark unwanted", func = function() S.ItemMenuSetUnwanted(id, false); S:Print((link or "It") .. " is no longer auto-deleted.") end })
   else
     add({ text = "Mark as unwanted (auto delete)", func = function() C_Timer.After(0, function() markUnwanted(id, link) end) end })
@@ -883,8 +900,11 @@ hooksecurefunc("SetItemRef", function(link, text, button)
   if not S.db or not S:ItemMenuIsOn() or not buttonOK(button) then return end
   if type(link) ~= "string" or not link:find("^item:") then return end
   local c = cfg()
-  if IsModifiedClick and IsModifiedClick() then return end          -- handled above
-  if c.chatMod then return end
+  if c.chatMod then
+    -- chat links need the key: with it held this opens the menu (the modified-click
+    -- path may not fire for every key, so it's caught here too; one click shows it once)
+    if c.mod == "none" or not modsMatch(c.mod) then return end
+  elseif IsModifiedClick and IsModifiedClick() then return end      -- handled above
   if ItemRefTooltip and ItemRefTooltip:IsShown() then ItemRefTooltip:Hide() end
   local full = text and text:find("|Hitem:") and text or link
   if type(full) == "string" and not full:find("|H") then
@@ -895,7 +915,7 @@ end)
 -- "no modifier": plain right-click in bags (the item is used as normal too)
 if C_Container and C_Container.UseContainerItem then
   hooksecurefunc(C_Container, "UseContainerItem", function(bag, slot)
-    if not S.db or not S:ItemMenuIsOn() or cfg().mod ~= "none" or openQueue then return end
+    if not S.db or not S:ItemMenuIsOn() or cfg().mod ~= "none" or openID then return end
     if (GetMouseButtonClicked and GetMouseButtonClicked()) ~= "RightButton" or cfg().button == "left" then return end
     local i = slotInfo(bag, slot)
     if i and i.hyperlink then tryShow(i.hyperlink, bag, slot) end
@@ -940,7 +960,7 @@ local function build()
   y = y - 30
   local ml = UI:Text(win, "Hold this key", "small"); ml:SetPoint("TOPLEFT", 18, y - 5)
   win.mod = UI:Dropdown(win, 250, MODS, cfg().mod, function(v) cfg().mod = v end); win.mod:SetPoint("TOPLEFT", 170, y); y = y - 30
-  win.chatMod = UI:Check(win, "Chat links need the key too", false, function(v) cfg().chatMod = v end,
+  win.chatMod = UI:Check(win, "Chat links need the key too", true, function(v) cfg().chatMod = v end,
     "Off: a plain click (the mouse button above) on an item link in chat opens the menu.")
   win.chatMod:SetPoint("TOPLEFT", 16, y); y = y - 30
   y = y - 4
