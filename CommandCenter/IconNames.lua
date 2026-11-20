@@ -2,6 +2,7 @@
 -- Learned by the icon picker on WoW Forever 1.60.1, so new installs can search icons
 -- right away instead of indexing every spell first.
 local _, S = ...
+if S.ModuleRev then S:ModuleRev("MessengerIconNames", 1) end
 S.ICON_NAMES_BUILD = "1.60.1-?"
 S.ICON_NAMES = {
 [136157] = "Blessing of Thule|Fatigued|Ward of Laze Passive|Ward of Laze effect|Curse of Frailty|Ward of Zanzil Passive",

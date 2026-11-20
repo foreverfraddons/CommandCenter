@@ -5,6 +5,7 @@
 --   * the player profile window (View profile), Add friend
 --   * /r in game chat opens the Messenger on the person you'd be replying to
 local _, S = ...
+if S.ModuleRev then S:ModuleRev("MessengerPlayers", 1) end
 local UI = S.UI
 
 local function G() return S.db.global end

@@ -1,6 +1,7 @@
 -- Messenger: your in-game whispers as chats - bubbles, day separators, times,
 -- sounds and pop-ups. Whispers are kept only on this computer.
 local _, S = ...
+if S.ModuleRev then S:ModuleRev("Messenger", 1) end
 local UI = S.UI
 
 local setState          -- (marks a whisper read / deletes it - set up with the whisper log below)

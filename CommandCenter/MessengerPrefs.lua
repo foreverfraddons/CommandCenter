@@ -2,6 +2,7 @@
 -- notification sounds, per-person overrides, and the pop-up toast.
 -- Saved per account in CommandCenterDB.global.msgr.
 local _, S = ...
+if S.ModuleRev then S:ModuleRev("MessengerPrefs", 1) end
 local UI = S.UI
 
 S.MSG_PRESETS = {
