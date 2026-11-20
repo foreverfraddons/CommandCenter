@@ -129,6 +129,7 @@ local function pickColor(c, onChange)
     ColorPickerFrame:SetupColorPickerAndShow({ r = r, g = g, b = b, hasOpacity = false,
       swatchFunc = function() apply() end, cancelFunc = function(prev) apply(prev) end })
   else
+    -- old clients only (no SetupColorPickerAndShow): the picker is set up through its fields
     ColorPickerFrame.hasOpacity = false
     ColorPickerFrame.previousValues = { r = r, g = g, b = b }
     ColorPickerFrame.func = function() apply() end
@@ -136,7 +137,13 @@ local function pickColor(c, onChange)
     if ColorPickerFrame.SetColorRGB then ColorPickerFrame:SetColorRGB(r, g, b) end
     if ShowUIPanel then ShowUIPanel(ColorPickerFrame) else ColorPickerFrame:Show() end
   end
-  ColorPickerFrame:SetFrameStrata("FULLSCREEN_DIALOG"); ColorPickerFrame:Raise()
+  -- Don't change the game's picker unless it would open behind our windows (DIALOG):
+  -- writing to Blizzard frames from addon code can taint them.
+  local st = ColorPickerFrame.GetFrameStrata and ColorPickerFrame:GetFrameStrata()
+  if st ~= "FULLSCREEN_DIALOG" and st ~= "TOOLTIP" and not InCombatLockdown() then
+    ColorPickerFrame:SetFrameStrata("FULLSCREEN_DIALOG")
+  end
+  if ColorPickerFrame.Raise then ColorPickerFrame:Raise() end
 end
 
 UI.PickColor = pickColor

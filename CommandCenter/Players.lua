@@ -1248,11 +1248,12 @@ function S.CharsOf(name)
   if not name then return {} end
   local main = S.MainOf(name)
   local out, seen = { main }, { [key(main)] = true }
+  -- the spellings seen in their whispers first (real realm), then alts we only know by name
+  local c = S.Conversation and S:Conversation(main)
+  if c and c.chars then for ch in pairs(c.chars) do if not seen[key(ch)] then seen[key(ch)] = true; out[#out + 1] = ch end end end
   for _, a in ipairs(S.AltsOf(main)) do
     if not seen[a] then seen[a] = true; out[#out + 1] = capFull(a) end
   end
-  local c = S.Conversation and S:Conversation(main)
-  if c and c.chars then for ch in pairs(c.chars) do if not seen[key(ch)] then seen[key(ch)] = true; out[#out + 1] = ch end end end
   return out
 end
 -- the character of theirs that's online right now (nil if none we know of)

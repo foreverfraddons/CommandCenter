@@ -79,8 +79,20 @@ function S.MsgBuildConversations(includeHidden)
   -- alts go into their main's conversation
   if S.MainOf then
     local merged = {}
+    -- a main may be saved as "Name" or with another realm spelling than its own
+    -- whisper thread: use the thread's spelling so it doesn't split in two
+    local byShort = {}
+    for name in pairs(by) do
+      local k = (name:match("^[^-]+") or name):lower()
+      if byShort[k] == nil then byShort[k] = name else byShort[k] = false end
+    end
+    local function spell(main)
+      if type(main) ~= "string" or by[main] then return main end
+      local k = (main:match("^[^-]+") or main):lower()
+      return byShort[k] or main
+    end
     for name, c in pairs(by) do
-      local main = c.demo and name or S.MainOf(name)
+      local main = c.demo and name or spell(S.MainOf(name))
       local m = merged[main]
       if not m then m = { with = main, msgs = {}, unread = 0, demo = c.demo, chars = {} }; merged[main] = m end
       for _, e in ipairs(c.msgs) do m.msgs[#m.msgs + 1] = e end
@@ -129,7 +141,20 @@ end
 
 function S:Conversation(name)
   if S.MainOf then name = S.MainOf(name) end
-  for _, c in ipairs(S:Conversations(true)) do if c.with == name then return c end end
+  local list = S:Conversations(true)
+  for _, c in ipairs(list) do if c.with == name then return c end end
+  -- same character, other spelling (with / without realm)
+  if type(name) == "string" then
+    local k = (name:match("^[^-]+") or name):lower()
+    local hit
+    for _, c in ipairs(list) do
+      if type(c.with) == "string" and (c.with:match("^[^-]+") or c.with):lower() == k then
+        if hit then return nil end   -- two people with that name: don't guess
+        hit = c
+      end
+    end
+    return hit
+  end
 end
 -- who a message in this conversation goes to: the character that whispered last
 function S.MsgReplyTarget(name)
