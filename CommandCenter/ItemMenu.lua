@@ -5,6 +5,7 @@
 -- Bag clicks are caught through the game's own modified-click handler, so the item
 -- isn't used when you open the menu (unless you pick "no modifier").
 local _, S = ...
+if S.ModuleRev then S:ModuleRev("ItemMenu", 2) end
 local UI = S.UI
 
 local function G() return S.db.global end
@@ -424,6 +425,10 @@ local function sourceData(id)
   local Qi = function(k) return db and q1(db, "QueryItemSingle", id, k) end
   local idOf = function(e) return e.id end
   section("Dropped by", "Interface\\Icons\\INV_Misc_Bone_HumanSkull_01", merged(own.drops, Qi("npcDrops"), idOf), function(e) return npcRow(db, e.id, "npc", e) end)
+  section("Skinned from", "Interface\\Icons\\INV_Misc_Pelt_Wolf_01", own.skins, function(e)
+    local r = npcRow(db, e.id, "skin", e)
+    return r
+  end)
   if own.world then
     out[#out + 1] = { title = "World drop", icon = "Interface\\Icons\\INV_Misc_Map_01", total = 1, rows = { { name = "Can drop from many creatures", sub = (own.world > 0 and ("Around level " .. own.world .. " and up") or "Anywhere in the world"), kind = "info", copy = "World drop" } } }
   end
@@ -473,7 +478,7 @@ end
 ---------------------------------------------------------------------------
 local spanel, spRows, spHeads            -- the source list panel (built further down)
 local WH = "https://www.wowhead.com/forever/"
-local WH_KIND = { npc = "npc=", vendor = "npc=", object = "object=", quest = "quest=", item = "item=" }
+local WH_KIND = { npc = "npc=", vendor = "npc=", skin = "npc=", object = "object=", quest = "quest=", item = "item=" }
 -- Questie's zone numbers -> the map the game uses for pins
 local function uiMapFor(areaId)
   if not areaId then return nil end
@@ -599,7 +604,7 @@ function S.ItemMenuShowDetail(row)
   else dpanel:SetPoint("CENTER") end
   local db = questie()
   local function Q(fn, k) return db and q1(db, fn, row.id, k) end
-  local KINDS = { npc = "Creature - drops the item", vendor = "Vendor - sells the item", object = "Object - the item is inside", quest = "Quest - gives the item", item = "Item - open it to find the item" }
+  local KINDS = { npc = "Creature - drops the item", skin = "Creature - skin it for the item", vendor = "Vendor - sells the item", object = "Object - the item is inside", quest = "Quest - gives the item", item = "Item - open it to find the item" }
   dpanel.title:SetText(row.name or "?")
   dpanel.kind:SetText("|cffaaaaaa" .. (KINDS[row.kind] or "") .. "|r")
   dpanel.src:SetShown(row.kind == "item")
@@ -613,7 +618,7 @@ function S.ItemMenuShowDetail(row)
     return t
   end
   local RANKS = { [1] = "|cffffd100Elite|r", [2] = "|cffff9933Rare elite|r", [3] = "|cffff3333Boss|r", [4] = "|cffcccccc Rare|r" }
-  if row.kind == "npc" or row.kind == "vendor" then
+  if row.kind == "npc" or row.kind == "vendor" or row.kind == "skin" then
     local own = IDB.NPC(row.id) or {}
     local lo, hi = own.minLv, own.maxLv
     if not lo then lo, hi = Q("QueryNPCSingle", "minLevel"), Q("QueryNPCSingle", "maxLevel") end
@@ -630,6 +635,24 @@ function S.ItemMenuShowDetail(row)
           (row.seen and ("  |cff888888(you looted it " .. row.seen .. " times from " .. row.of .. " corpses)|r") or ""))
       else
         add("Drop rate", "|cff888888Not known yet - it fills in as you (and others) loot it.|r")
+      end
+    end
+    if row.kind == "skin" then
+      add("Skinning", row.chance and ("|cff55ff55" .. pct(row.chance) .. "|r of skinned corpses give it") or nil)
+    end
+    if row.kind ~= "vendor" then
+      -- money and skinning from Drop Tables (real WoW Forever counts)
+      local avg, lo2, hi2, kills = IDB.Gold and IDB.Gold(row.id)
+      if avg and avg > 0 and GetCoinTextureString then
+        local range = (lo2 and hi2) and ("  |cff888888(" .. GetCoinTextureString(lo2) .. " - " .. GetCoinTextureString(hi2) .. ")|r") or ""
+        add("Money", GetCoinTextureString(avg) .. " per kill" .. range .. ((kills and kills > 0) and ("  |cff888888" .. kills .. " kills counted|r") or ""))
+      end
+      if row.kind == "npc" and IDB.SkinsOf then
+        local sk, names = IDB.SkinsOf(row.id), {}
+        for k = 1, math.min(4, #sk) do
+          names[#names + 1] = (itemInfo(sk[k].item) or IDB.ItemName(sk[k].item) or ("Item " .. sk[k].item)) .. " |cff55ff55" .. pct(sk[k].chance) .. "|r"
+        end
+        if #names > 0 then add("Skinning", table.concat(names, ", ")) end
       end
     end
     if row.kind == "vendor" and row.item then

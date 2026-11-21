@@ -12,8 +12,11 @@
 --     rew = {[item] = {qid, ...}}, start = {[item] = qid}, world = {[item] = minLv},
 --     spw = {["c123"] = {{continent, x, y, x, y, ...}, ...}}   (world coordinates)
 --     spm = {["c123"] = {[uiMap] = {x, y, ...}}}                (0-1000 map coordinates)
---     vp = {[npc] = {[item] = {price, stack, limited, costs}}} }
+--     vp = {[npc] = {[item] = {price, stack, limited, costs}}},
+--     skin = {[item] = {npc, chance, ...}}   what skinning a mob gives (Drop Tables, real WoW Forever counts),
+--     gold = {[npc] = {average copper per kill, smallest pile, largest pile, kills counted}} (Drop Tables) }
 local _, S = ...
+if S.ModuleRev then S:ModuleRev("ItemDB", 2) end
 local IDB = {}
 S.IDB = IDB
 
@@ -98,8 +101,8 @@ end
 --           vendors = {id...}, rewards = {qid...}, start = qid, world = minLv }
 function IDB.Sources(item)
   local d, r = shipped(), rec()
-  local out = { drops = {}, objects = {}, containers = {}, vendors = {}, rewards = {} }
-  local idx = { drops = {}, objects = {}, containers = {} }
+  local out = { drops = {}, objects = {}, containers = {}, vendors = {}, rewards = {}, skins = {} }
+  local idx = { drops = {}, objects = {}, containers = {}, skins = {} }
   local function addChance(list, key, id, chance, seenN, ofN)
     local e = idx[key][id]
     if e then
@@ -119,6 +122,7 @@ function IDB.Sources(item)
   fromShipped("drop", "drops", out.drops)
   fromShipped("odrop", "objects", out.objects)
   fromShipped("idrop", "containers", out.containers)
+  fromShipped("skin", "skins", out.skins)
   -- your own recordings
   if r then
     for key, e in pairs(r.loot) do
@@ -146,6 +150,23 @@ function IDB.Sources(item)
   out.world = T(d, "world") and d.world[item] or nil
   local function byChance(a, b) return (a.chance or 0) > (b.chance or 0) end
   table.sort(out.drops, byChance); table.sort(out.objects, byChance); table.sort(out.containers, byChance)
+  table.sort(out.skins, byChance)
+  return out
+end
+-- money a creature drops (Drop Tables' WoW Forever counts): average copper per kill, smallest, largest, kills
+function IDB.Gold(npc)
+  local d = shipped()
+  local g = T(d, "gold") and d.gold[npc]
+  if type(g) == "table" and g[1] then return g[1], g[2], g[3], g[4] end
+end
+-- what skinning a creature gives: { {item, chance}, ... } best first
+function IDB.SkinsOf(npc)
+  local d = shipped()
+  local out = {}
+  for item, t in pairs(T(d, "skin") or {}) do
+    for k = 1, #t, 2 do if t[k] == npc then out[#out + 1] = { item = item, chance = t[k + 1] } end end
+  end
+  table.sort(out, function(a, b) return (a.chance or 0) > (b.chance or 0) end)
   return out
 end
 -- what a vendor charges for an item (from your recordings): price, stack, limited, costs
