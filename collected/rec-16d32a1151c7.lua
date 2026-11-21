@@ -331,6 +331,13 @@
 0,
 5,
 },
+[10806] = {
+"Ursius",
+56,
+56,
+1,
+2,
+},
 [272391] = {
 "Moonstrider",
 57,
@@ -520,6 +527,13 @@
 0,
 6,
 },
+[11118] = {
+"Innkeeper Vizzie",
+30,
+30,
+0,
+5,
+},
 [4544] = {
 "Krueg Skullsplitter",
 37,
@@ -547,6 +561,13 @@
 45,
 0,
 6,
+},
+[11629] = {
+"Jessica Redpath",
+50,
+50,
+0,
+4,
 },
 [11190] = {
 "Everlook Bruiser",
@@ -583,6 +604,13 @@
 0,
 2,
 },
+[10431] = {
+"Gregor Greystone",
+55,
+55,
+0,
+4,
+},
 [1152] = {
 "Snapjaw Crocolisk",
 36,
@@ -590,12 +618,33 @@
 0,
 2,
 },
-[4624] = {
-"Booty Bay Bruiser",
-57,
-57,
+[11188] = {
+"Evie Whirlbrew",
+58,
+58,
 0,
 5,
+},
+[6126] = {
+"Haldarr Trickster",
+45,
+47,
+0,
+2,
+},
+[6522] = {
+"Andron Gant",
+15,
+15,
+0,
+6,
+},
+[6514] = {
+"Un'Goro Gorilla",
+50,
+51,
+0,
+2,
 },
 [255894] = {
 "Innkeeper Zizplink",
@@ -604,12 +653,33 @@
 0,
 5,
 },
-[3249] = {
-"Greater Thunderhawk",
-24,
-24,
+[4624] = {
+"Booty Bay Bruiser",
+57,
+57,
 0,
-2,
+5,
+},
+[5651] = {
+"Patrick Garrett",
+15,
+15,
+0,
+6,
+},
+[10303] = {
+"Storm Shadowhoof",
+60,
+60,
+0,
+6,
+},
+[4648] = {
+"Gelkis Stamper",
+33,
+34,
+0,
+5,
 },
 [9272] = {
 "Spark Nilminer",
@@ -625,17 +695,17 @@
 0,
 5,
 },
-[4648] = {
-"Gelkis Stamper",
-33,
-34,
+[1164] = {
+"Stonesplinter Bonesnapper",
+16,
+16,
 0,
-5,
+2,
 },
-[9271] = {
-"Hol'anyee Marshal",
-45,
-45,
+[247449] = {
+"Sin'dorei Tome of Summoning",
+1,
+1,
 0,
 5,
 },
@@ -646,12 +716,12 @@
 0,
 2,
 },
-[3267] = {
-"Razormane Water Seeker",
-11,
-11,
-0,
-2,
+[260102] = {
+"Bandarion Keep Paladin",
+55,
+55,
+1,
+5,
 },
 [7733] = {
 "Innkeeper Fizzgrimble",
@@ -667,19 +737,19 @@
 0,
 2,
 },
-[4128] = {
-"Hecklefang Stalker",
-23,
-23,
+[6506] = {
+"Ravasaur Runner",
+49,
+50,
 0,
 2,
 },
-[9623] = {
-"A-Me 01",
-48,
-48,
+[2350] = {
+"Forest Moss Creeper",
+20,
+20,
 0,
-5,
+2,
 },
 [4680] = {
 "Doomwarder Captain",
@@ -709,10 +779,10 @@
 0,
 2,
 },
-[2350] = {
-"Forest Moss Creeper",
-20,
-20,
+[4696] = {
+"Scorpashi Snapper",
+31,
+31,
 0,
 2,
 },
@@ -723,12 +793,12 @@
 0,
 2,
 },
-[254490] = {
-"Desolace Bone Worm",
-38,
-38,
+[3029] = {
+"Sewa Mistrunner",
+40,
+40,
 0,
-2,
+6,
 },
 [4708] = {
 "Shreev",
@@ -737,12 +807,12 @@
 0,
 5,
 },
-[8393] = {
-"Thersa Windsong",
-45,
-45,
+[254490] = {
+"Desolace Bone Worm",
+38,
+38,
 0,
-6,
+2,
 },
 [3383] = {
 "Southsea Cutthroat",
@@ -786,26 +856,26 @@
 0,
 5,
 },
-[1164] = {
-"Stonesplinter Bonesnapper",
-16,
-16,
-0,
-2,
-},
-[3083] = {
-"Honor Guard",
-60,
-60,
+[2110] = {
+"Black Rat",
 1,
+1,
+0,
+4,
+},
+[3367] = {
+"Felika",
+30,
+30,
+0,
 6,
 },
-[260102] = {
-"Bandarion Keep Paladin",
-55,
-55,
-1,
-5,
+[237738] = {
+"Blackmaw Ursa",
+51,
+52,
+0,
+2,
 },
 [255770] = {
 "Redridge Mystic",
@@ -828,19 +898,19 @@
 0,
 2,
 },
-[7465] = {
-"Magma Totem III",
-48,
-48,
+[3285] = {
+"Venture Co. Peon",
+13,
+13,
 0,
-5,
+2,
 },
-[10054] = {
-"Bulrug",
-30,
-30,
+[2216] = {
+"Apothecary Lydon",
+35,
+35,
 0,
-5,
+6,
 },
 [2388] = {
 "Innkeeper Shay",
@@ -877,19 +947,19 @@
 0,
 2,
 },
-[263440] = {
-"Hamur",
-42,
-42,
+[12045] = {
+"Hae'Wilani",
+30,
+30,
 0,
-4,
+6,
 },
-[3381] = {
-"Southsea Brigand",
-12,
-12,
-0,
-2,
+[12740] = {
+"Faustron",
+55,
+55,
+1,
+6,
 },
 [3425] = {
 "Savannah Prowler",
@@ -898,19 +968,12 @@
 0,
 2,
 },
-[237738] = {
-"Blackmaw Ursa",
-51,
-52,
-0,
-2,
-},
-[255772] = {
-"Redridge Trapper",
-36,
-37,
-0,
-2,
+[255759] = {
+"Shen'dralas Protector",
+60,
+60,
+1,
+4,
 },
 [2408] = {
 "Snapjaw",
@@ -919,19 +982,26 @@
 0,
 4,
 },
-[256795] = {
-"Twilight Fanatic",
-42,
-43,
+[14731] = {
+"Lard",
+48,
+48,
+0,
+5,
+},
+[255772] = {
+"Redridge Trapper",
+36,
+37,
 0,
 2,
 },
-[3285] = {
-"Venture Co. Peon",
-13,
-13,
-0,
-2,
+[6726] = {
+"Thalon",
+55,
+55,
+1,
+6,
 },
 [11686] = {
 "Ghostly Raider",
@@ -968,19 +1038,12 @@
 1,
 4,
 },
-[270582] = {
-"Mon'ye",
+[268557] = {
+"Olana Brighthoof",
 55,
 55,
 0,
 6,
-},
-[259988] = {
-"Gorgegut",
-42,
-42,
-0,
-4,
 },
 [255901] = {
 "Sand Crawler",
@@ -996,6 +1059,13 @@
 0,
 6,
 },
+[255898] = {
+"Murloc Oracle",
+38,
+39,
+0,
+2,
+},
 [5883] = {
 "Enyo",
 50,
@@ -1010,10 +1080,10 @@
 0,
 4,
 },
-[11798] = {
-"Bunthen Plainswind",
-60,
-60,
+[256904] = {
+"Farholde Scout",
+38,
+39,
 0,
 4,
 },
@@ -1052,11 +1122,11 @@
 0,
 2,
 },
-[255759] = {
-"Shen'dralas Protector",
-60,
-60,
-1,
+[8761] = {
+"Mosshoof Courser",
+53,
+53,
+0,
 4,
 },
 [3473] = {
@@ -1066,12 +1136,12 @@
 0,
 2,
 },
-[14731] = {
-"Lard",
-48,
-48,
-0,
-5,
+[5647] = {
+"Sandfury Firecaller",
+43,
+44,
+1,
+2,
 },
 [258588] = {
 "Jumbo Crawfish",
@@ -1094,19 +1164,19 @@
 0,
 2,
 },
-[6726] = {
-"Thalon",
-55,
-55,
-1,
-6,
-},
-[256655] = {
-"Gorg",
-38,
-38,
+[14739] = {
+"Mystic Yayo'jin",
+48,
+48,
 0,
-6,
+5,
+},
+[5287] = {
+"Longtooth Howler",
+43,
+44,
+0,
+2,
 },
 [2464] = {
 "Commander Aggro'gosh",
@@ -1122,26 +1192,26 @@
 0,
 5,
 },
-[5307] = {
-"Vale Screecher",
-41,
+[3099] = {
+"Dire Mottled Boar",
+6,
+7,
+0,
+4,
+},
+[256797] = {
+"Twilight Corrupter",
+42,
 43,
 0,
 2,
 },
-[255898] = {
-"Murloc Oracle",
-38,
-39,
+[7777] = {
+"Rok Orhan",
+40,
+40,
 0,
-2,
-},
-[256904] = {
-"Farholde Scout",
-38,
-39,
-0,
-4,
+6,
 },
 [256799] = {
 "Twilight Champion",
@@ -1164,11 +1234,11 @@
 0,
 6,
 },
-[5647] = {
-"Sandfury Firecaller",
-43,
-44,
-1,
+[262169] = {
+"Twilight Ritualist",
+39,
+41,
+0,
 2,
 },
 [2482] = {
@@ -1178,10 +1248,10 @@
 0,
 5,
 },
-[14739] = {
-"Mystic Yayo'jin",
-48,
-48,
+[2314] = {
+"Sahvan Bloodshadow",
+5,
+5,
 0,
 5,
 },
@@ -1206,12 +1276,12 @@
 1,
 2,
 },
-[3099] = {
-"Dire Mottled Boar",
+[11900] = {
+"Brakkar",
+55,
+55,
+1,
 6,
-7,
-0,
-4,
 },
 [257056] = {
 "Buzzbeak",
@@ -1220,12 +1290,12 @@
 1,
 2,
 },
-[12030] = {
-"Malux",
-30,
-30,
+[8961] = {
+"Felpaw Ravager",
+52,
+52,
 0,
-6,
+2,
 },
 [2498] = {
 "Crank Fizzlebub",
@@ -1234,26 +1304,26 @@
 0,
 5,
 },
-[8961] = {
-"Felpaw Ravager",
-52,
-52,
+[12030] = {
+"Malux",
+30,
+30,
 0,
-2,
+6,
 },
-[260995] = {
-"Ogre Miner",
-42,
-43,
+[11071] = {
+"Mot Dawnstrider",
+21,
+21,
+0,
+6,
+},
+[2530] = {
+"Yenniku",
+41,
+41,
 0,
 5,
-},
-[256797] = {
-"Twilight Corrupter",
-42,
-43,
-0,
-2,
 },
 [256801] = {
 "Murloc Warrior",
@@ -1276,61 +1346,12 @@
 0,
 4,
 },
-[3549] = {
-"Shelene Rhobart",
-25,
-25,
+[5922] = {
+"Strength of Earth Totem III",
+45,
+52,
 0,
 5,
-},
-[256383] = {
-"Meadowsbrook Farmhand",
-35,
-36,
-0,
-1,
-},
-[11071] = {
-"Mot Dawnstrider",
-21,
-21,
-0,
-6,
-},
-[1144] = {
-"Mosh'Ogg Witch Doctor",
-37,
-37,
-0,
-2,
-},
-[12150] = {
-"Riding Kodo (Purple)",
-1,
-1,
-0,
-5,
-},
-[2536] = {
-"Jon-Jon the Crow",
-43,
-43,
-0,
-2,
-},
-[3547] = {
-"Hamlin Atkins",
-10,
-10,
-0,
-5,
-},
-[257058] = {
-"Gobam",
-42,
-42,
-0,
-4,
 },
 [274734] = {
 "Yiyo Nightwalker",
@@ -1339,19 +1360,68 @@
 0,
 4,
 },
-[2530] = {
-"Yenniku",
-41,
-41,
-0,
-5,
-},
-[252711] = {
-"Decrepit Pylon Protector",
+[256418] = {
+"Krom'rosh",
 42,
+42,
+0,
+6,
+},
+[260383] = {
+"Sergeant Ulka",
+55,
+55,
+1,
+6,
+},
+[2536] = {
+"Jon-Jon the Crow",
+43,
 43,
 0,
 2,
+},
+[246152] = {
+"Shari Stilwell",
+16,
+16,
+0,
+5,
+},
+[3547] = {
+"Hamlin Atkins",
+10,
+10,
+0,
+5,
+},
+[3549] = {
+"Shelene Rhobart",
+25,
+25,
+0,
+5,
+},
+[11119] = {
+"Azzleby",
+30,
+30,
+0,
+5,
+},
+[12150] = {
+"Riding Kodo (Purple)",
+1,
+1,
+0,
+5,
+},
+[10136] = {
+"Chemist Fuely",
+30,
+30,
+0,
+6,
 },
 [2534] = {
 "Zanzil the Outcast",
@@ -1367,17 +1437,17 @@
 0,
 6,
 },
-[10136] = {
-"Chemist Fuely",
-30,
-30,
+[252711] = {
+"Decrepit Pylon Protector",
+42,
+43,
 0,
-6,
+2,
 },
-[7777] = {
-"Rok Orhan",
-40,
-40,
+[3982] = {
+"Monika Sengutz",
+7,
+7,
 0,
 6,
 },
@@ -1388,17 +1458,17 @@
 1,
 5,
 },
-[2570] = {
-"Boulderfist Shaman",
-39,
-39,
-1,
-2,
-},
-[261497] = {
-"Twilight Firecaller",
+[259962] = {
+"Fimbo Greasemitz",
 40,
-41,
+40,
+0,
+5,
+},
+[257916] = {
+"Eastsea Bombardier",
+43,
+44,
 0,
 2,
 },
@@ -1416,12 +1486,12 @@
 0,
 5,
 },
-[246152] = {
-"Shari Stilwell",
-16,
-16,
+[255769] = {
+"Redridge Brute",
+37,
+38,
 0,
-5,
+2,
 },
 [6127] = {
 "Haldarr Felsworn",
@@ -1444,19 +1514,19 @@
 1,
 2,
 },
-[257916] = {
-"Eastsea Bombardier",
-43,
-44,
-0,
-2,
-},
-[277729] = {
-"Arcane Elemental",
-42,
-42,
+[250539] = {
+"Paladin Trainee",
+10,
+10,
 0,
 5,
+},
+[2570] = {
+"Boulderfist Shaman",
+39,
+39,
+1,
+2,
 },
 [250283] = {
 "Vile Fin Attacker",
@@ -1486,12 +1556,12 @@
 4,
 2,
 },
-[6199] = {
-"Blood Elf Reclaimer",
-52,
-53,
+[257062] = {
+"Jezap Jinglesprocket",
+41,
+41,
 0,
-2,
+5,
 },
 [15395] = {
 "Nafien",
@@ -1500,12 +1570,12 @@
 0,
 5,
 },
-[6929] = {
-"Innkeeper Gryshka",
-30,
-30,
+[2680] = {
+"Vilebranch Wolf Pup",
+46,
+47,
 0,
-6,
+2,
 },
 [9273] = {
 "Petra Grossen",
@@ -1521,10 +1591,10 @@
 0,
 4,
 },
-[6195] = {
-"Spitelash Siren",
-51,
-52,
+[4249] = {
+"Pesterhide Snarler",
+29,
+29,
 0,
 2,
 },
@@ -1535,26 +1605,26 @@
 1,
 1,
 },
+[5292] = {
+"Feral Scar Yeti",
+43,
+43,
+0,
+2,
+},
+[6195] = {
+"Spitelash Siren",
+51,
+52,
+0,
+2,
+},
 [2590] = {
 "Syndicate Conjuror",
 35,
 36,
 1,
 1,
-},
-[2588] = {
-"Syndicate Prowler",
-36,
-37,
-1,
-1,
-},
-[257062] = {
-"Jezap Jinglesprocket",
-41,
-41,
-0,
-5,
 },
 [3615] = {
 "Devrak",
@@ -1570,12 +1640,12 @@
 0,
 5,
 },
-[11823] = {
-"Vark Battlescar",
-10,
-10,
+[259961] = {
+"Wharfmaster Whizzbuzz",
+45,
+45,
 0,
-6,
+5,
 },
 [3621] = {
 "Kurll",
@@ -1598,16 +1668,16 @@
 0,
 4,
 },
-[2648] = {
-"Vilebranch Aman'zasi Guard",
-51,
-51,
-1,
+[1981] = {
+"Dark Iron Ambusher",
+10,
+10,
+0,
 2,
 },
-[7366] = {
-"Stoneskin Totem IV",
-39,
+[8586] = {
+"Haggrum Bloodfist",
+45,
 45,
 0,
 5,
@@ -1619,13 +1689,6 @@
 0,
 5,
 },
-[13717] = {
-"Centaur Pariah",
-42,
-42,
-0,
-5,
-},
 [8610] = {
 "Kroum",
 55,
@@ -1633,8 +1696,15 @@
 1,
 6,
 },
-[257915] = {
-"Eastsea Raider",
+[6379] = {
+"Thunderhead Patriarch",
+52,
+52,
+0,
+2,
+},
+[2686] = {
+"Witherbark Broodguard",
 44,
 45,
 0,
@@ -1647,33 +1717,33 @@
 0,
 6,
 },
-[274913] = {
-"Max",
-1,
-1,
-0,
-5,
-},
-[6379] = {
-"Thunderhead Patriarch",
-52,
-52,
-0,
-2,
-},
-[7414] = {
-"Mana Spring Totem II",
-39,
-47,
-0,
-5,
-},
-[674] = {
-"Venture Co. Strip Miner",
+[677] = {
+"Venture Co. Tinkerer",
 40,
 41,
 0,
 2,
+},
+[255996] = {
+"Rog'mar Grunt",
+55,
+55,
+0,
+6,
+},
+[256891] = {
+"Executioner Morg",
+46,
+46,
+1,
+2,
+},
+[14737] = {
+"Smith Slagtree",
+47,
+47,
+0,
+5,
 },
 [263749] = {
 "Gronok the Butcher",
@@ -1682,12 +1752,12 @@
 0,
 4,
 },
-[8722] = {
-"Auctioneer Gullem",
-50,
-50,
+[2692] = {
+"Highvale Scout",
+45,
+45,
 0,
-6,
+2,
 },
 [2630] = {
 "Earthbind Totem",
@@ -1703,8 +1773,8 @@
 0,
 2,
 },
-[2716] = {
-"Dustbelcher Wyrmhunter",
+[5428] = {
+"Roc",
 41,
 41,
 0,
@@ -1745,17 +1815,17 @@
 1,
 2,
 },
-[2925] = {
-"Silvermane Howler",
-45,
-46,
+[9598] = {
+"Arei",
+56,
+56,
 0,
-2,
+4,
 },
-[5292] = {
-"Feral Scar Yeti",
-43,
-43,
+[262473] = {
+"Cinderscale Whelp",
+39,
+40,
 0,
 2,
 },
@@ -1766,9 +1836,9 @@
 0,
 2,
 },
-[2923] = {
-"Mangy Silvermane",
-41,
+[675] = {
+"Venture Co. Foreman",
+42,
 42,
 0,
 2,
@@ -1801,9 +1871,9 @@
 0,
 5,
 },
-[8586] = {
-"Haggrum Bloodfist",
-45,
+[7366] = {
+"Stoneskin Totem IV",
+39,
 45,
 0,
 5,
@@ -1815,8 +1885,8 @@
 0,
 2,
 },
-[14740] = {
-"Katoom the Angler",
+[13717] = {
+"Centaur Pariah",
 42,
 42,
 0,
@@ -1843,10 +1913,10 @@
 1,
 6,
 },
-[9622] = {
-"U'cha",
-55,
-55,
+[270664] = {
+"Venomweb Spitter",
+37,
+38,
 0,
 2,
 },
@@ -1885,19 +1955,12 @@
 0,
 2,
 },
-[2686] = {
-"Witherbark Broodguard",
-44,
-45,
+[7414] = {
+"Mana Spring Totem II",
+39,
+47,
 0,
-2,
-},
-[270664] = {
-"Venomweb Spitter",
-37,
-38,
-0,
-2,
+5,
 },
 [5412] = {
 "Gurda Wildmane",
@@ -1906,33 +1969,40 @@
 0,
 5,
 },
-[2692] = {
-"Highvale Scout",
-45,
-45,
-0,
+[678] = {
+"Mosh'Ogg Mauler",
+43,
+44,
+1,
 2,
 },
-[260471] = {
-"Thrash",
-39,
-39,
-0,
-5,
-},
-[675] = {
-"Venture Co. Foreman",
-42,
-42,
-0,
-2,
-},
-[262169] = {
-"Twilight Ritualist",
-39,
+[674] = {
+"Venture Co. Strip Miner",
+40,
 41,
 0,
 2,
+},
+[2716] = {
+"Dustbelcher Wyrmhunter",
+41,
+41,
+0,
+2,
+},
+[8722] = {
+"Auctioneer Gullem",
+50,
+50,
+0,
+6,
+},
+[259118] = {
+"Muln Earthfury",
+-1,
+-1,
+0,
+4,
 },
 [676] = {
 "Venture Co. Surveyor",
@@ -1941,19 +2011,19 @@
 0,
 2,
 },
-[5420] = {
-"Glasshide Gazer",
-46,
-46,
+[4429] = {
+"Goblin Pit Crewman",
+30,
+30,
 0,
-2,
+5,
 },
-[677] = {
-"Venture Co. Tinkerer",
-40,
-41,
+[11823] = {
+"Vark Battlescar",
+10,
+10,
 0,
-2,
+6,
 },
 [8762] = {
 "Timberweb Recluse",
@@ -1969,12 +2039,12 @@
 0,
 2,
 },
-[680] = {
-"Mosh'Ogg Lord",
-45,
-45,
-1,
-2,
+[6491] = {
+"Spirit Healer",
+60,
+60,
+0,
+5,
 },
 [679] = {
 "Mosh'Ogg Shaman",
@@ -1983,47 +2053,26 @@
 1,
 2,
 },
-[13917] = {
-"Izzy Coppergrab",
-55,
-55,
+[4453] = {
+"Wizzle Brassbolts",
+31,
+31,
 0,
 5,
 },
-[5428] = {
-"Roc",
-41,
-41,
-0,
-2,
-},
-[255769] = {
-"Redridge Brute",
-37,
-38,
-0,
-2,
-},
-[6491] = {
-"Spirit Healer",
-60,
-60,
-0,
-5,
-},
-[6499] = {
-"Ironhide Devilsaur",
-54,
-54,
+[680] = {
+"Mosh'Ogg Lord",
+45,
+45,
 1,
 2,
 },
-[10880] = {
-"Warcaller Gorlach",
-3,
-3,
+[6511] = {
+"Bloodpetal Thresher",
+49,
+50,
 0,
-6,
+4,
 },
 [15076] = {
 "Zandalarian Emissary",
@@ -2032,12 +2081,19 @@
 1,
 4,
 },
-[270667] = {
-"Farholde Priest",
-38,
-39,
-0,
+[7824] = {
+"Bulkrek Ragefist",
+55,
+55,
 1,
+6,
+},
+[10880] = {
+"Warcaller Gorlach",
+3,
+3,
+0,
+6,
 },
 [269647] = {
 "Mus'hale",
@@ -2046,8 +2102,22 @@
 0,
 6,
 },
-[4485] = {
-"Belgrom Rockmaul",
+[270667] = {
+"Farholde Priest",
+38,
+39,
+0,
+1,
+},
+[256433] = {
+"Woodworker",
+32,
+33,
+0,
+1,
+},
+[1385] = {
+"Brawn",
 35,
 35,
 0,
@@ -2067,19 +2137,19 @@
 0,
 5,
 },
-[6555] = {
-"Gorishi Tunneler",
-52,
-53,
-0,
-2,
-},
-[4453] = {
-"Wizzle Brassbolts",
-31,
-31,
+[6785] = {
+"Ratslin Maime",
+7,
+7,
 0,
 5,
+},
+[6499] = {
+"Ironhide Devilsaur",
+54,
+54,
+1,
+2,
 },
 [6503] = {
 "Spiked Stegodon",
@@ -2102,19 +2172,19 @@
 1,
 2,
 },
-[11548] = {
-"Loh'atu",
-45,
-45,
+[3904] = {
+"Searing Totem IV",
+44,
+52,
 0,
 5,
 },
-[259118] = {
-"Muln Earthfury",
--1,
--1,
+[6519] = {
+"Tar Lord",
+53,
+54,
 0,
-4,
+2,
 },
 [268624] = {
 "Razormane Raider",
@@ -2130,12 +2200,12 @@
 0,
 2,
 },
-[256433] = {
-"Woodworker",
-32,
-33,
+[221651] = {
+"Ceruleos",
+50,
+50,
 0,
-1,
+2,
 },
 [1380] = {
 "Saean",
@@ -2158,26 +2228,26 @@
 0,
 5,
 },
-[256434] = {
-"Turner's Mill Lumberjack",
-37,
+[259190] = {
+"Ephram Barbaro",
+55,
+55,
+0,
+5,
+},
+[4727] = {
+"Elder Thunder Lizard",
+38,
 38,
 0,
-1,
+2,
 },
-[2314] = {
-"Sahvan Bloodshadow",
-5,
-5,
+[6555] = {
+"Gorishi Tunneler",
+52,
+53,
 0,
-5,
-},
-[1385] = {
-"Brawn",
-35,
-35,
-0,
-6,
+2,
 },
 [6559] = {
 "Glutinous Ooze",
@@ -2200,12 +2270,12 @@
 0,
 6,
 },
-[11516] = {
-"Timbermaw Warder",
-53,
-54,
-0,
-2,
+[2780] = {
+"Caretaker Nevlin",
+41,
+41,
+1,
+1,
 },
 [15188] = {
 "Cenarion Emissary Blackhoof",
@@ -2214,12 +2284,12 @@
 0,
 4,
 },
-[2780] = {
-"Caretaker Nevlin",
-41,
-41,
-1,
-1,
+[696] = {
+"Skullsplitter Axe Thrower",
+39,
+40,
+0,
+2,
 },
 [2782] = {
 "Caretaker Alaric",
@@ -2228,52 +2298,24 @@
 1,
 1,
 },
-[6785] = {
-"Ratslin Maime",
-7,
-7,
+[7881] = {
+"Stoley",
+30,
+30,
 0,
 5,
 },
-[7804] = {
-"Trenton Lighthammer",
-55,
-55,
+[257655] = {
+"Deathguard Billmuth",
+10,
+10,
 0,
 5,
 },
-[3902] = {
-"Searing Totem II",
-39,
-39,
-0,
-5,
-},
-[255993] = {
-"Grakna",
-55,
-55,
-1,
-6,
-},
-[262006] = {
-"Twilight Ritual Circle",
-1,
-1,
-0,
-2,
-},
-[1404] = {
-"Kragg",
-40,
-40,
-0,
-6,
-},
-[8399] = {
-"Nyrill",
-39,
-39,
+[10305] = {
+"Umi Rumplesnicker",
+57,
+57,
 0,
 5,
 },
@@ -2281,6 +2323,34 @@
 "Black Skeletal Horse",
 1,
 1,
+0,
+5,
+},
+[2926] = {
+"Silvermane Stalker",
+47,
+48,
+0,
+2,
+},
+[4699] = {
+"Scorpashi Venomlash",
+38,
+39,
+0,
+2,
+},
+[239942] = {
+"Lady Sesspira",
+52,
+52,
+0,
+2,
+},
+[4649] = {
+"Gelkis Windchaser",
+33,
+34,
 0,
 5,
 },
@@ -2298,12 +2368,12 @@
 0,
 5,
 },
-[9274] = {
-"Dadanga",
-45,
-45,
+[3903] = {
+"Searing Totem III",
+39,
+39,
 0,
-5,
+2,
 },
 [9162] = {
 "Young Diemetradon",
@@ -2319,19 +2389,19 @@
 1,
 2,
 },
-[10305] = {
-"Umi Rumplesnicker",
-57,
-57,
+[14637] = {
+"Zorbin Fandazzle",
+40,
+40,
 0,
 5,
 },
-[7768] = {
-"Witherbark Bloodling",
-25,
-25,
+[14741] = {
+"Huntsman Markhor",
+45,
+45,
 0,
-2,
+5,
 },
 [5624] = {
 "Undercity Guardian",
@@ -2340,26 +2410,26 @@
 0,
 6,
 },
-[1420] = {
-"Toad",
-1,
-1,
+[6867] = {
+"Tracking Hound",
+30,
+30,
 0,
-4,
+5,
 },
-[11688] = {
-"Cursed Centaur",
-43,
-43,
-4,
-2,
-},
-[2926] = {
-"Silvermane Stalker",
-47,
-48,
+[10665] = {
+"Junior Apothecary Holland",
+20,
+20,
 0,
-2,
+5,
+},
+[14441] = {
+"Hunter Ragetotem",
+60,
+60,
+1,
+5,
 },
 [1412] = {
 "Squirrel",
@@ -2368,26 +2438,26 @@
 0,
 4,
 },
-[258491] = {
-"Kronk",
-42,
-42,
-1,
-2,
-},
-[3919] = {
-"Withered Ancient",
-26,
-26,
-0,
-2,
-},
-[3945] = {
-"Caravaneer Ruzzgot",
-37,
-37,
+[265577] = {
+"Zippie Fizzbolt",
+58,
+58,
 0,
 5,
+},
+[9986] = {
+"Shyrka Wolfrunner",
+30,
+30,
+0,
+6,
+},
+[4655] = {
+"Maraudine Wrangler",
+37,
+38,
+0,
+2,
 },
 [14373] = {
 "Sage Korolusk",
@@ -2403,12 +2473,12 @@
 1,
 2,
 },
-[239942] = {
-"Lady Sesspira",
-52,
-52,
+[9274] = {
+"Dadanga",
+45,
+45,
 0,
-2,
+5,
 },
 [710] = {
 "Mosh'Ogg Spellcrafter",
@@ -2417,17 +2487,17 @@
 1,
 2,
 },
-[4649] = {
-"Gelkis Windchaser",
-33,
-34,
+[1420] = {
+"Toad",
+1,
+1,
 0,
-5,
+4,
 },
-[6867] = {
-"Tracking Hound",
-30,
-30,
+[2839] = {
+"Haren Kanmae",
+41,
+41,
 0,
 5,
 },
@@ -2452,12 +2522,12 @@
 0,
 5,
 },
-[260211] = {
-"Scoutmaster Vargas",
-42,
-42,
-1,
-1,
+[1931] = {
+"Captured Scarlet Zealot",
+9,
+9,
+0,
+5,
 },
 [10361] = {
 "Gruul Darkblade",
@@ -2466,12 +2536,12 @@
 0,
 6,
 },
-[2928] = {
-"Primitive Owlbeast",
-44,
-45,
+[737] = {
+"Kebok",
+35,
+35,
 0,
-2,
+5,
 },
 [4681] = {
 "Mage Hunter",
@@ -2480,10 +2550,10 @@
 0,
 2,
 },
-[244808] = {
-"Aramis Hammerhand",
-5,
-5,
+[253177] = {
+"Nerlokh",
+45,
+45,
 0,
 5,
 },
@@ -2494,19 +2564,19 @@
 1,
 6,
 },
-[7724] = {
-"Senior Surveyor Fizzledowser",
-44,
-44,
-0,
-5,
+[14377] = {
+"Scout Tharr",
+60,
+60,
+1,
+6,
 },
-[4651] = {
-"Gelkis Earthcaller",
-34,
-35,
+[12799] = {
+"Sergeant Ba'sha",
+55,
+55,
 0,
-5,
+6,
 },
 [4701] = {
 "Dying Kodo",
@@ -2522,12 +2592,12 @@
 0,
 5,
 },
-[4647] = {
-"Gelkis Scout",
-33,
-33,
+[8763] = {
+"Mistwing Rogue",
+49,
+49,
 0,
-5,
+2,
 },
 [8395] = {
 "Sanath Lim-yo",
@@ -2536,17 +2606,17 @@
 0,
 5,
 },
-[2944] = {
-"Boss Tho'grun",
-41,
-41,
-0,
+[8215] = {
+"Grimungous",
+50,
+50,
+2,
 2,
 },
-[9270] = {
-"Williden Marshal",
-48,
-48,
+[5924] = {
+"Disease Cleansing Totem",
+50,
+50,
 0,
 5,
 },
@@ -2564,19 +2634,19 @@
 0,
 2,
 },
-[3903] = {
-"Searing Totem III",
-39,
-39,
+[721] = {
+"Rabbit",
+1,
+1,
 0,
-2,
+4,
 },
-[4635] = {
-"Kolkar Windchaser",
-32,
-32,
+[266862] = {
+"Juvenile Paletusk",
+33,
+33,
 0,
-2,
+4,
 },
 [3907] = {
 "Healing Stream Totem III",
@@ -2585,26 +2655,26 @@
 0,
 5,
 },
-[5892] = {
-"Searn Firewarder",
-15,
-15,
+[4611] = {
+"Doctor Herbert Halsey",
+50,
+50,
 0,
 6,
 },
-[12032] = {
-"Lui'Mala",
-30,
-30,
+[1495] = {
+"Deathguard Linnea",
+22,
+22,
 0,
-6,
+5,
 },
-[5646] = {
-"Sandfury Axe Thrower",
-43,
-43,
-1,
-2,
+[10921] = {
+"Taronn Redfeather",
+50,
+50,
+0,
+5,
 },
 [11552] = {
 "Timbermaw Mystic",
@@ -2613,24 +2683,24 @@
 0,
 2,
 },
-[11832] = {
-"Keeper Remulos",
-62,
-62,
-1,
-4,
-},
-[14637] = {
-"Zorbin Fandazzle",
-40,
-40,
+[1496] = {
+"Deathguard Dillinger",
+22,
+22,
 0,
 5,
 },
-[2978] = {
-"Venture Co. Worker",
-8,
-8,
+[262504] = {
+"Earthen Ring Shaman",
+55,
+55,
+0,
+4,
+},
+[5618] = {
+"Wastewander Bandit",
+42,
+42,
 0,
 2,
 },
@@ -2641,17 +2711,17 @@
 0,
 5,
 },
-[246143] = {
-"Frightened Paladin",
-3,
-3,
+[5614] = {
+"Sarok",
+25,
+25,
 0,
-2,
+6,
 },
-[1495] = {
-"Deathguard Linnea",
-22,
-22,
+[2996] = {
+"Torn",
+45,
+45,
 0,
 5,
 },
@@ -2711,12 +2781,12 @@
 0,
 5,
 },
-[14741] = {
-"Huntsman Markhor",
-45,
-45,
-0,
-5,
+[13718] = {
+"The Nameless Prophet",
+41,
+41,
+1,
+2,
 },
 [2924] = {
 "Silvermane Wolf",
@@ -2725,87 +2795,31 @@
 0,
 2,
 },
-[10665] = {
-"Junior Apothecary Holland",
-20,
-20,
-0,
-5,
-},
-[265577] = {
-"Zippie Fizzbolt",
-58,
-58,
-0,
-5,
-},
-[10921] = {
-"Taronn Redfeather",
-50,
-50,
-0,
-5,
-},
-[11681] = {
-"Horde Deforester",
-27,
-27,
-0,
-5,
-},
-[1918] = {
-"Karrel Grayves",
-2,
-2,
-0,
+[11688] = {
+"Cursed Centaur",
+43,
+43,
 4,
-},
-[8659] = {
-"Jes'rimon",
-50,
-50,
-0,
-6,
-},
-[1917] = {
-"Daniel Ulfman",
 2,
-2,
-0,
-4,
 },
-[272228] = {
-"Harvest Sentry",
-37,
-37,
+[2928] = {
+"Primitive Owlbeast",
+44,
+45,
 0,
 2,
 },
-[11752] = {
-"Blaise Montgomery",
-47,
-47,
-0,
-6,
-},
-[737] = {
-"Kebok",
-35,
-35,
+[3000] = {
+"Gibbert",
+45,
+45,
 0,
 5,
 },
-[9986] = {
-"Shyrka Wolfrunner",
+[3012] = {
+"Nata Dawnstrider",
 30,
 30,
-0,
-6,
-},
-[12799] = {
-"Sergeant Ba'sha",
-55,
-55,
 0,
 6,
 },
@@ -2816,26 +2830,40 @@
 0,
 4,
 },
-[6020] = {
-"Slimeshell Makrura",
-19,
-19,
+[8659] = {
+"Jes'rimon",
+50,
+50,
+0,
+6,
+},
+[11180] = {
+"Bloodvenom Post Brave",
+55,
+55,
+0,
+6,
+},
+[272228] = {
+"Harvest Sentry",
+37,
+37,
 0,
 2,
 },
-[1513] = {
-"Mangy Duskbat",
-3,
-4,
-0,
-4,
-},
-[251001] = {
-"Deathguard Kristof",
-55,
-55,
+[244808] = {
+"Aramis Hammerhand",
+5,
+5,
 0,
 5,
+},
+[2944] = {
+"Boss Tho'grun",
+41,
+41,
+0,
+2,
 },
 [11105] = {
 "Aboda",
@@ -2844,6 +2872,48 @@
 0,
 6,
 },
+[5892] = {
+"Searn Firewarder",
+15,
+15,
+0,
+6,
+},
+[3818] = {
+"Elder Shadowhorn Stag",
+26,
+27,
+0,
+4,
+},
+[264074] = {
+"Mazu'kon",
+35,
+35,
+0,
+4,
+},
+[1525] = {
+"Rotting Dead",
+5,
+6,
+0,
+2,
+},
+[1907] = {
+"Naga Explorer",
+43,
+44,
+0,
+2,
+},
+[4075] = {
+"Rat",
+1,
+1,
+0,
+4,
+},
 [2960] = {
 "Prairie Wolf Alpha",
 9,
@@ -2851,26 +2921,26 @@
 0,
 2,
 },
-[8763] = {
-"Mistwing Rogue",
-49,
-49,
+[276067] = {
+"Angus Hammerhand",
+12,
+12,
+0,
+5,
+},
+[2964] = {
+"Windfury Sorceress",
+9,
+9,
 0,
 2,
 },
-[5924] = {
-"Disease Cleansing Totem",
-50,
-50,
+[9163] = {
+"Diemetradon",
+51,
+52,
 0,
-5,
-},
-[265944] = {
-"William Pickman",
-9,
-9,
-0,
-5,
+2,
 },
 [254656] = {
 "Magister Kirandis",
@@ -2879,19 +2949,19 @@
 0,
 4,
 },
-[12136] = {
-"Snurk Bucksquick",
-45,
-45,
-0,
-6,
-},
-[6116] = {
-"Highborne Apparition",
-45,
-46,
-0,
+[1531] = {
+"Lost Soul",
+7,
+7,
+4,
 2,
+},
+[2781] = {
+"Caretaker Weston",
+41,
+41,
+1,
+1,
 },
 [1488] = {
 "Zanzil Zombie",
@@ -2907,12 +2977,12 @@
 0,
 2,
 },
-[266862] = {
-"Juvenile Paletusk",
-33,
-33,
+[1490] = {
+"Zanzil Witch Doctor",
+44,
+44,
 0,
-4,
+2,
 },
 [1491] = {
 "Zanzil Naga",
@@ -2921,19 +2991,19 @@
 0,
 2,
 },
-[4551] = {
-"Michael Garrett",
-55,
-55,
-1,
-6,
-},
-[9163] = {
-"Diemetradon",
-51,
-52,
+[259054] = {
+"Wildplains Patriarch",
+38,
+39,
 0,
 2,
+},
+[4310] = {
+"Cor Grimtotem",
+62,
+62,
+0,
+6,
 },
 [4945] = {
 "Goblin Drag Car",
@@ -2949,12 +3019,12 @@
 0,
 5,
 },
-[1496] = {
-"Deathguard Dillinger",
-22,
-22,
+[4953] = {
+"Moccasin",
+1,
+1,
 0,
-5,
+4,
 },
 [8883] = {
 "Riding Horse",
@@ -2963,17 +3033,17 @@
 0,
 5,
 },
-[11945] = {
-"Claire Willower",
-5,
-5,
+[6196] = {
+"Spitelash Myrmidon",
+50,
+51,
 0,
-5,
+2,
 },
-[2996] = {
-"Torn",
-45,
-45,
+[260540] = {
+"Jasper Geartoggle",
+39,
+39,
 0,
 5,
 },
@@ -2984,12 +3054,12 @@
 0,
 5,
 },
-[3000] = {
-"Gibbert",
-45,
-45,
+[1501] = {
+"Mindless Zombie",
+1,
+1,
 0,
-5,
+4,
 },
 [1502] = {
 "Wretched Zombie",
@@ -2998,40 +3068,40 @@
 0,
 4,
 },
-[772] = {
-"Stranglethorn Tigress",
-37,
-38,
-0,
-2,
-},
-[259056] = {
-"Komuk",
-45,
-45,
+[263380] = {
+"Ghostmaw",
+42,
+42,
 1,
-4,
+2,
 },
-[1543] = {
-"Vile Fin Puddlejumper",
-7,
-8,
+[259269] = {
+"High Plains Buzzard",
+38,
+39,
 0,
 2,
 },
-[3100] = {
-"Elder Mottled Boar",
-8,
-9,
-0,
-4,
-},
-[3012] = {
-"Nata Dawnstrider",
-30,
-30,
+[3216] = {
+"Neeru Fireblade",
+37,
+37,
 0,
 6,
+},
+[10916] = {
+"Winterfall Runner",
+57,
+57,
+0,
+2,
+},
+[6020] = {
+"Slimeshell Makrura",
+19,
+19,
+0,
+2,
 },
 [1508] = {
 "Young Scavenger",
@@ -3047,18 +3117,18 @@
 0,
 6,
 },
-[6196] = {
-"Spitelash Myrmidon",
-50,
-51,
+[1570] = {
+"Executor Arren",
+5,
+5,
 0,
-2,
+5,
 },
-[10980] = {
-"Umi's Mechanical Yeti",
-55,
-56,
-0,
+[256881] = {
+"Overlord Kilgar",
+46,
+46,
+1,
 2,
 },
 [1512] = {
@@ -3068,31 +3138,24 @@
 0,
 4,
 },
-[4047] = {
-"Zor Lonetree",
-62,
-62,
+[1513] = {
+"Mangy Duskbat",
+3,
+4,
 0,
-6,
+4,
 },
-[9683] = {
-"Lar'korwi Mate",
-49,
-49,
+[4495] = {
+"Gnome Pit Boss",
+35,
+35,
 0,
-2,
+5,
 },
 [1515] = {
 "Executor Zygand",
 14,
 14,
-0,
-5,
-},
-[1570] = {
-"Executor Arren",
-5,
-5,
 0,
 5,
 },
@@ -3102,6 +3165,13 @@
 14,
 0,
 5,
+},
+[3246] = {
+"Fleeting Plainstrider",
+12,
+13,
+0,
+4,
 },
 [1518] = {
 "Apothecary Johaan",
@@ -3117,12 +3187,12 @@
 0,
 5,
 },
-[1520] = {
-"Rattlecage Soldier",
-6,
-7,
+[12136] = {
+"Snurk Bucksquick",
+45,
+45,
 0,
-2,
+6,
 },
 [1521] = {
 "Gretchen Dedmar",
@@ -3152,10 +3222,10 @@
 0,
 5,
 },
-[1525] = {
-"Rotting Dead",
-5,
-6,
+[7115] = {
+"Jaedenar Adept",
+51,
+51,
 0,
 2,
 },
@@ -3173,10 +3243,10 @@
 0,
 6,
 },
-[10916] = {
-"Winterfall Runner",
-57,
-57,
+[235909] = {
+"Furze",
+50,
+50,
 0,
 2,
 },
@@ -3194,11 +3264,11 @@
 0,
 5,
 },
-[1531] = {
-"Lost Soul",
-7,
-7,
-4,
+[6116] = {
+"Highborne Apparition",
+45,
+46,
+0,
 2,
 },
 [258626] = {
@@ -3229,12 +3299,12 @@
 0,
 2,
 },
-[260973] = {
-"Klunk",
-42,
-42,
+[255697] = {
+"Shen'dralar Scholar",
+60,
+60,
 0,
-2,
+4,
 },
 [255174] = {
 "Blind Screecher",
@@ -3243,12 +3313,12 @@
 0,
 2,
 },
-[2761] = {
-"Cresting Exile",
-39,
-39,
+[10682] = {
+"Raider Kerr",
+35,
+35,
 0,
-2,
+6,
 },
 [6148] = {
 "Cliff Walker",
@@ -3257,12 +3327,12 @@
 1,
 2,
 },
-[254674] = {
-"Woodwyrd",
-60,
-60,
-1,
-4,
+[6517] = {
+"Tar Beast",
+50,
+51,
+0,
+2,
 },
 [193] = {
 "Blue Dragonspawn",
@@ -3271,19 +3341,19 @@
 1,
 2,
 },
-[3246] = {
-"Fleeting Plainstrider",
-12,
-13,
+[4467] = {
+"Vilebranch Soothsayer",
+46,
+47,
 0,
-4,
+2,
 },
-[3084] = {
-"Bluffwatcher",
-55,
-55,
+[1543] = {
+"Vile Fin Puddlejumper",
+7,
+8,
 0,
-6,
+2,
 },
 [1544] = {
 "Vile Fin Minor Oracle",
@@ -3299,10 +3369,10 @@
 0,
 6,
 },
-[235909] = {
-"Furze",
-50,
-50,
+[9683] = {
+"Lar'korwi Mate",
+49,
+49,
 0,
 2,
 },
@@ -3334,19 +3404,19 @@
 0,
 4,
 },
-[4150] = {
-"Saltstone Gazer",
-34,
-35,
+[3100] = {
+"Elder Mottled Boar",
+8,
+9,
+0,
+4,
+},
+[6505] = {
+"Ravasaur",
+48,
+49,
 0,
 2,
-},
-[8612] = {
-"Screecher Spirit",
-50,
-50,
-0,
-5,
 },
 [1553] = {
 "Greater Duskbat",
@@ -3362,25 +3432,25 @@
 0,
 2,
 },
-[10682] = {
-"Raider Kerr",
-35,
-35,
-0,
-6,
-},
-[6517] = {
-"Tar Beast",
-50,
-51,
+[6380] = {
+"Thunderhead Consort",
+54,
+54,
 0,
 2,
 },
-[6513] = {
-"Un'Goro Stomper",
-51,
-52,
-0,
+[5361] = {
+"Wave Strider",
+48,
+48,
+1,
+2,
+},
+[4374] = {
+"Strashaz Hydra",
+47,
+50,
+1,
 2,
 },
 [260931] = {
@@ -3404,12 +3474,12 @@
 0,
 5,
 },
-[259269] = {
-"High Plains Buzzard",
-38,
-39,
+[1561] = {
+"Bloodsail Raider",
+41,
+41,
 0,
-2,
+1,
 },
 [1562] = {
 "Bloodsail Mage",
@@ -3418,19 +3488,19 @@
 0,
 1,
 },
-[7407] = {
-"Chief Engineer Bilgewhizzle",
-50,
-50,
+[5597] = {
+"Grunt Komak",
+38,
+38,
+0,
+6,
+},
+[272330] = {
+"Panda Cub",
+10,
+36,
 0,
 5,
-},
-[6505] = {
-"Ravasaur",
-48,
-49,
-0,
-2,
 },
 [8404] = {
 "Xan'tish",
@@ -3481,10 +3551,10 @@
 0,
 2,
 },
-[6380] = {
-"Thunderhead Consort",
-54,
-54,
+[3226] = {
+"Corrupted Scorpid",
+11,
+11,
 0,
 2,
 },
@@ -3502,12 +3572,12 @@
 0,
 6,
 },
-[4382] = {
-"Withervine Creeper",
-36,
-36,
+[4430] = {
+"Gnome Pit Crewman",
+30,
+30,
 0,
-2,
+5,
 },
 [11561] = {
 "Undead Ravager",
@@ -3516,19 +3586,19 @@
 0,
 2,
 },
-[7455] = {
-"Winterspring Owl",
-55,
-55,
+[3244] = {
+"Greater Plainstrider",
+11,
+11,
 0,
 4,
 },
-[5425] = {
-"Starving Blisterpaw",
-41,
-42,
+[10922] = {
+"Greta Mosshoof",
+59,
+59,
 0,
-2,
+5,
 },
 [251343] = {
 "Shen'dralar Citizen",
@@ -3551,47 +3621,47 @@
 0,
 5,
 },
-[272330] = {
-"Panda Cub",
-10,
-36,
-0,
-5,
-},
-[3240] = {
-"Stormsnout",
-19,
-19,
+[12922] = {
+"Imp Minion",
+46,
+47,
 0,
 2,
 },
-[3244] = {
-"Greater Plainstrider",
-11,
-11,
+[11945] = {
+"Claire Willower",
+5,
+5,
 0,
+5,
+},
+[254674] = {
+"Woodwyrd",
+60,
+60,
+1,
 4,
 },
-[10922] = {
-"Greta Mosshoof",
-59,
-59,
+[259052] = {
+"Rog'mar Poacher",
+38,
+39,
 0,
-5,
+6,
 },
-[260428] = {
-"Shadowvale Lurcher",
-10,
-12,
+[257901] = {
+"Eastsea Buccaneer",
+41,
+42,
 0,
 2,
 },
-[11899] = {
-"Shardi",
-55,
-55,
-1,
-6,
+[6512] = {
+"Bloodpetal Trapper",
+52,
+53,
+0,
+4,
 },
 [7367] = {
 "Stoneskin Totem V",
@@ -3607,19 +3677,19 @@
 0,
 5,
 },
-[10978] = {
-"Legacki",
-57,
-57,
+[6516] = {
+"Un'Goro Thunderer",
+52,
+53,
+0,
+2,
+},
+[11681] = {
+"Horde Deforester",
+27,
+27,
 0,
 5,
-},
-[4310] = {
-"Cor Grimtotem",
-62,
-62,
-0,
-6,
 },
 [10666] = {
 "Gordo",
@@ -3649,12 +3719,12 @@
 0,
 6,
 },
-[818] = {
-"Mai'Zoth",
-47,
-47,
-1,
-2,
+[4502] = {
+"Tharg",
+44,
+44,
+0,
+6,
 },
 [8660] = {
 "The Evalcharr",
@@ -3663,12 +3733,12 @@
 4,
 2,
 },
-[5361] = {
-"Wave Strider",
-48,
-48,
-1,
-2,
+[7407] = {
+"Chief Engineer Bilgewhizzle",
+50,
+50,
+0,
+5,
 },
 [6388] = {
 "Zanzil Skeleton",
@@ -3684,12 +3754,12 @@
 0,
 5,
 },
-[272328] = {
-"Mini Diablo",
-1,
-41,
+[8766] = {
+"Forest Ooze",
+52,
+53,
 0,
-5,
+2,
 },
 [7423] = {
 "Flametongue Totem III",
@@ -3698,10 +3768,10 @@
 0,
 5,
 },
-[5426] = {
-"Blisterpaw Hyena",
-44,
-45,
+[260430] = {
+"Shadowvale Mystic",
+10,
+12,
 0,
 2,
 },
@@ -3719,33 +3789,33 @@
 0,
 6,
 },
-[5597] = {
-"Grunt Komak",
-38,
-38,
+[2703] = {
+"Zengu",
+40,
+40,
 0,
 6,
 },
-[4374] = {
-"Strashaz Hydra",
-47,
-50,
-1,
+[7443] = {
+"Shardtooth Mauler",
+55,
+56,
+0,
 2,
 },
-[6560] = {
-"Stone Guardian",
-60,
-61,
-1,
-4,
-},
-[3216] = {
-"Neeru Fireblade",
-37,
-37,
+[1652] = {
+"Deathguard Burgess",
+24,
+24,
 0,
-6,
+5,
+},
+[7451] = {
+"Raging Owlbeast",
+55,
+55,
+0,
+2,
 },
 [8764] = {
 "Mistwing Ravager",
@@ -3761,24 +3831,24 @@
 0,
 2,
 },
-[3300] = {
-"Adder",
-1,
-1,
+[4558] = {
+"Lauren Newcomb",
+30,
+30,
 0,
-4,
+6,
 },
-[11835] = {
-"Theodore Griffs",
-50,
-50,
+[1656] = {
+"Thurman Agamand",
+10,
+10,
 0,
-5,
+2,
 },
-[3226] = {
-"Corrupted Scorpid",
-11,
-11,
+[5425] = {
+"Starving Blisterpaw",
+41,
+42,
 0,
 2,
 },
@@ -3789,12 +3859,12 @@
 0,
 2,
 },
-[4554] = {
-"Tawny Grisette",
-30,
-30,
+[1657] = {
+"Devlin Agamand",
+9,
+9,
 0,
-6,
+2,
 },
 [7483] = {
 "Windfury Totem II",
@@ -3810,26 +3880,26 @@
 0,
 4,
 },
-[259179] = {
-"Redridge Thug",
-38,
-39,
+[4359] = {
+"Mirefin Murloc",
+35,
+35,
 0,
 2,
 },
-[2215] = {
-"High Executor Darthalia",
-60,
-60,
-1,
-6,
-},
-[4430] = {
-"Gnome Pit Crewman",
-30,
-30,
+[3238] = {
+"Stormhide",
+22,
+23,
 0,
-5,
+2,
+},
+[3240] = {
+"Stormsnout",
+19,
+19,
+0,
+2,
 },
 [3242] = {
 "Zhevra Runner",
@@ -3880,26 +3950,26 @@
 0,
 5,
 },
-[255697] = {
-"Shen'dralar Scholar",
-60,
-60,
-0,
-4,
-},
-[6512] = {
-"Bloodpetal Trapper",
-52,
-53,
-0,
-4,
-},
-[6516] = {
-"Un'Goro Thunderer",
-52,
-53,
+[6508] = {
+"Venomhide Ravasaur",
+50,
+51,
 0,
 2,
+},
+[272012] = {
+"Cat Familiar",
+56,
+56,
+0,
+2,
+},
+[10978] = {
+"Legacki",
+57,
+57,
+0,
+5,
 },
 [6520] = {
 "Scorching Elemental",
@@ -3922,26 +3992,26 @@
 0,
 2,
 },
-[9987] = {
-"Shoja'my",
-30,
-30,
-0,
-6,
+[818] = {
+"Mai'Zoth",
+47,
+47,
+1,
+2,
 },
-[1656] = {
-"Thurman Agamand",
+[259434] = {
+"Tarnished Drudge",
 10,
-10,
+11,
 0,
 2,
 },
-[1657] = {
-"Devlin Agamand",
-9,
-9,
+[222478] = {
+"Sentinel Keldara Sunblade",
+45,
+45,
 0,
-2,
+5,
 },
 [7567] = {
 "Crimson Snake",
@@ -3971,12 +4041,12 @@
 0,
 2,
 },
-[260430] = {
-"Shadowvale Mystic",
-10,
-12,
-0,
-2,
+[6560] = {
+"Stone Guardian",
+60,
+61,
+1,
+4,
 },
 [3284] = {
 "Venture Co. Drudger",
@@ -3985,38 +4055,38 @@
 0,
 2,
 },
-[9164] = {
-"Elder Diemetradon",
-54,
-55,
-0,
-2,
-},
-[274833] = {
-"An'drak",
-55,
-55,
+[3318] = {
+"Koma",
+45,
+45,
 0,
 6,
 },
-[2693] = {
-"Highvale Marksman",
-46,
-46,
+[4343] = {
+"Drywallow Snapper",
+37,
+37,
 0,
 2,
 },
-[7424] = {
-"Fire Resistance Totem II",
-52,
-52,
+[7408] = {
+"Spigot Operator Luglunket",
+40,
+40,
 0,
 5,
 },
-[268744] = {
-"Frog Familiar",
-42,
-42,
+[1661] = {
+"Novice Elreth",
+3,
+3,
+0,
+5,
+},
+[7400] = {
+"Searing Totem V",
+50,
+52,
 0,
 5,
 },
@@ -4041,17 +4111,17 @@
 0,
 6,
 },
-[1652] = {
-"Deathguard Burgess",
-24,
-24,
+[4554] = {
+"Tawny Grisette",
+30,
+30,
 0,
-5,
+6,
 },
-[4558] = {
-"Lauren Newcomb",
-30,
-30,
+[3304] = {
+"Master Vornal",
+11,
+11,
 0,
 6,
 },
@@ -4097,19 +4167,19 @@
 0,
 5,
 },
-[3318] = {
-"Koma",
-45,
-45,
+[9164] = {
+"Elder Diemetradon",
+54,
+55,
+0,
+2,
+},
+[274833] = {
+"An'drak",
+55,
+55,
 0,
 6,
-},
-[12241] = {
-"Magra",
-43,
-43,
-1,
-2,
 },
 [255829] = {
 "Clugfist",
@@ -4118,19 +4188,19 @@
 1,
 5,
 },
-[1661] = {
-"Novice Elreth",
-3,
-3,
+[12257] = {
+"Mechanical Yeti",
+58,
+58,
 0,
-5,
+2,
 },
-[7412] = {
-"Frost Resistance Totem II",
-52,
-52,
-0,
-5,
+[12241] = {
+"Magra",
+43,
+43,
+1,
+2,
 },
 [274834] = {
 "Evermore",
@@ -4209,10 +4279,10 @@
 0,
 5,
 },
-[260968] = {
-"Twilight Mauler",
-41,
-42,
+[7392] = {
+"Prairie Chicken",
+53,
+53,
 0,
 2,
 },
@@ -4230,19 +4300,19 @@
 0,
 2,
 },
-[3322] = {
-"Kaja",
-30,
-30,
+[416] = {
+"Pagmat",
+4,
+4,
 0,
-6,
+5,
 },
-[6377] = {
-"Thunderhead Stagwing",
-49,
-49,
+[2671] = {
+"Mechanical Squirrel",
+21,
+29,
 0,
-2,
+5,
 },
 [1675] = {
 "Rot Hide Mongrel",
@@ -4265,19 +4335,19 @@
 0,
 6,
 },
-[261711] = {
-"Empowered Brute",
-38,
-39,
-0,
+[2707] = {
+"Shadra",
+55,
+55,
+1,
 2,
 },
-[13737] = {
-"Marandis' Sister",
-36,
-36,
+[3320] = {
+"Soran",
+45,
+45,
 0,
-4,
+6,
 },
 [4690] = {
 "Rabid Bonepaw",
@@ -4293,12 +4363,12 @@
 0,
 5,
 },
-[2707] = {
-"Shadra",
-55,
-55,
+[13697] = {
+"Cavindra",
+45,
+45,
 1,
-2,
+5,
 },
 [7771] = {
 "Marvon Rivetseeker",
@@ -4314,17 +4384,10 @@
 0,
 5,
 },
-[3320] = {
-"Soran",
-45,
-45,
-0,
-6,
-},
-[4646] = {
-"Gelkis Outrunner",
-32,
-33,
+[1569] = {
+"Shadow Priest Sarvis",
+5,
+5,
 0,
 5,
 },
@@ -4335,12 +4398,19 @@
 0,
 6,
 },
-[7807] = {
-"Homing Robot OOX-22/FE",
-42,
-42,
+[3384] = {
+"Southsea Privateer",
+14,
+14,
 0,
-5,
+2,
+},
+[263369] = {
+"G45-B4G",
+38,
+38,
+0,
+2,
 },
 [4726] = {
 "Raging Thunder Lizard",
@@ -4370,12 +4440,12 @@
 0,
 5,
 },
-[14720] = {
-"High Overlord Saurfang",
-62,
-62,
-1,
-6,
+[4646] = {
+"Gelkis Outrunner",
+32,
+33,
+0,
+5,
 },
 [4387] = {
 "Withervine Mire Beast",
@@ -4384,19 +4454,19 @@
 0,
 2,
 },
-[3384] = {
-"Southsea Privateer",
-14,
-14,
+[7807] = {
+"Homing Robot OOX-22/FE",
+42,
+42,
 0,
-2,
+5,
 },
-[2655] = {
-"Green Sludge",
-46,
-47,
+[11546] = {
+"Jack Sterling",
+50,
+50,
 0,
-2,
+5,
 },
 [5308] = {
 "Rogue Vale Screecher",
@@ -4405,12 +4475,12 @@
 0,
 2,
 },
-[268707] = {
-"Prairie Wolf Pup",
-21,
-56,
-0,
-5,
+[2645] = {
+"Vilebranch Shadow Hunter",
+49,
+49,
+1,
+2,
 },
 [269729] = {
 "Risen Warhorse",
@@ -4440,10 +4510,10 @@
 0,
 6,
 },
-[269730] = {
-"Risen Charger",
-1,
-2,
+[268707] = {
+"Prairie Wolf Pup",
+21,
+56,
 0,
 5,
 },
@@ -4454,18 +4524,18 @@
 0,
 5,
 },
-[2393] = {
-"Christoph Jeffcoat",
-32,
-32,
-0,
-6,
+[2643] = {
+"Vilebranch Berserker",
+48,
+48,
+1,
+2,
 },
-[271080] = {
-"Blightsculler",
-10,
-10,
-4,
+[2641] = {
+"Vilebranch Headhunter",
+47,
+47,
+1,
 2,
 },
 [3424] = {
@@ -4496,33 +4566,33 @@
 0,
 6,
 },
-[5286] = {
-"Longtooth Runner",
-40,
-41,
+[4251] = {
+"Goblin Racer",
+32,
+32,
 0,
-2,
+5,
 },
-[259431] = {
-"Rudolph Gelhardt",
-12,
-12,
+[269730] = {
+"Risen Charger",
+1,
+2,
 0,
-2,
+5,
 },
-[9525] = {
-"Freewind Brave",
-45,
-45,
+[9501] = {
+"Innkeeper Adegwa",
+30,
+30,
 0,
 6,
 },
-[263367] = {
-"Sleebo Fizzlespout",
-40,
-40,
-0,
-5,
+[271080] = {
+"Blightsculler",
+10,
+10,
+4,
+2,
 },
 [1713] = {
 "Elder Shadowmaw Panther",
@@ -4531,17 +4601,10 @@
 0,
 2,
 },
-[255850] = {
-"Bolder'ok Brute",
-42,
-44,
-0,
-4,
-},
-[4351] = {
-"Bloodfen Raptor",
-36,
-36,
+[8581] = {
+"Blood Elf Defender",
+52,
+53,
 0,
 2,
 },
@@ -4552,13 +4615,6 @@
 0,
 6,
 },
-[3448] = {
-"Tonga Runetotem",
-22,
-22,
-0,
-6,
-},
 [261208] = {
 "Twilight Brute",
 36,
@@ -4566,10 +4622,24 @@
 0,
 2,
 },
-[1736] = {
-"Deathguard Randolph",
-55,
-55,
+[3448] = {
+"Tonga Runetotem",
+22,
+22,
+0,
+6,
+},
+[5885] = {
+"Deino",
+40,
+40,
+0,
+6,
+},
+[10468] = {
+"Felnok Steelspring",
+54,
+54,
 0,
 5,
 },
@@ -4580,32 +4650,18 @@
 0,
 5,
 },
-[5885] = {
-"Deino",
-40,
-40,
+[3456] = {
+"Razormane Pathfinder",
+21,
+21,
 0,
-6,
+2,
 },
 [3458] = {
 "Razormane Seer",
 24,
 24,
 0,
-2,
-},
-[260569] = {
-"Shady Smuggler",
-39,
-39,
-0,
-5,
-},
-[11786] = {
-"Ambereye Reaver",
-41,
-42,
-1,
 2,
 },
 [11778] = {
@@ -4615,12 +4671,33 @@
 1,
 2,
 },
+[11786] = {
+"Ambereye Reaver",
+41,
+42,
+1,
+2,
+},
+[1822] = {
+"Venom Mist Lurker",
+51,
+51,
+0,
+2,
+},
 [3466] = {
 "Zhevra Courser",
 20,
 21,
 0,
 4,
+},
+[1739] = {
+"Deathguard Phillip",
+55,
+55,
+0,
+5,
 },
 [5913] = {
 "Tremor Totem",
@@ -4629,19 +4706,12 @@
 0,
 5,
 },
-[263343] = {
-"Low Plains Buzzard",
-37,
-38,
-0,
-2,
-},
-[259046] = {
-"Freshwater Crocolisk",
-38,
-39,
-0,
-2,
+[2615] = {
+"Stromgarde Roughrider",
+40,
+40,
+1,
+1,
 },
 [1738] = {
 "Deathguard Terrence",
@@ -4650,10 +4720,10 @@
 0,
 5,
 },
-[1739] = {
-"Deathguard Phillip",
-55,
-55,
+[260570] = {
+"Stitch Pinwizzle",
+41,
+41,
 0,
 5,
 },
@@ -4664,12 +4734,12 @@
 0,
 2,
 },
-[255849] = {
-"Bolder'ok Magus",
-40,
-41,
+[236028] = {
+"Honey Wasp",
+47,
+49,
 0,
-4,
+2,
 },
 [1742] = {
 "Deathguard Bartholomew",
@@ -4706,26 +4776,26 @@
 0,
 5,
 },
+[2465] = {
+"Far Seer Mok'thardin",
+45,
+45,
+0,
+6,
+},
+[11443] = {
+"Gordok Ogre-Mage",
+52,
+52,
+1,
+2,
+},
 [1740] = {
 "Deathguard Saltain",
 7,
 7,
 0,
 5,
-},
-[222857] = {
-"Odd Totem",
-1,
-1,
-0,
-5,
-},
-[8390] = {
-"Chemist Cuely",
-30,
-30,
-0,
-6,
 },
 [4946] = {
 "Gnome Drag Car",
@@ -4755,12 +4825,12 @@
 0,
 2,
 },
-[3632] = {
-"Deviate Creeper",
-16,
-16,
-1,
-2,
+[5953] = {
+"Razor Hill Grunt",
+28,
+32,
+0,
+6,
 },
 [263348] = {
 "Roving Tallstrider",
@@ -4776,12 +4846,12 @@
 0,
 5,
 },
-[8885] = {
-"Riding Raptor",
-2,
-2,
+[2639] = {
+"Vilebranch Axe Thrower",
+46,
+46,
 0,
-5,
+2,
 },
 [260525] = {
 "Tallow Sparksocket",
@@ -4797,12 +4867,12 @@
 0,
 6,
 },
-[6017] = {
-"Lava Spout Totem",
-46,
-46,
+[262838] = {
+"Magram Marauder",
+42,
+42,
 0,
-2,
+1,
 },
 [2497] = {
 "Nimboya",
@@ -4811,12 +4881,12 @@
 0,
 6,
 },
-[262838] = {
-"Magram Marauder",
-42,
-42,
+[6017] = {
+"Lava Spout Totem",
+46,
+46,
 0,
-1,
+2,
 },
 [2501] = {
 "\"Sea Wolf\" MacKinley",
@@ -4846,17 +4916,17 @@
 1,
 5,
 },
+[6193] = {
+"Spitelash Screamer",
+47,
+48,
+0,
+2,
+},
 [253526] = {
 "Bristleback Skullcrusher",
 42,
 43,
-0,
-2,
-},
-[441] = {
-"Black Dragon Whelp",
-18,
-18,
 0,
 2,
 },
@@ -4867,19 +4937,19 @@
 0,
 6,
 },
+[441] = {
+"Black Dragon Whelp",
+18,
+18,
+0,
+2,
+},
 [883] = {
 "Deer",
 5,
 5,
 0,
 4,
-},
-[4147] = {
-"Saltstone Basilisk",
-30,
-30,
-0,
-2,
 },
 [10060] = {
 "Grimestack",
@@ -4888,19 +4958,19 @@
 0,
 5,
 },
-[2519] = {
-"Kin'weelay",
-39,
-39,
-0,
+[14392] = {
+"Overlord Runthak",
+60,
+60,
+1,
 6,
 },
-[5278] = {
-"Sprite Darter",
-43,
-45,
+[255207] = {
+"Prowler",
+42,
+42,
 0,
-4,
+2,
 },
 [3548] = {
 "Selina Weston",
@@ -4916,19 +4986,19 @@
 0,
 2,
 },
+[5278] = {
+"Sprite Darter",
+43,
+45,
+0,
+4,
+},
 [270780] = {
 "Qujo",
 48,
 48,
 0,
 5,
-},
-[2579] = {
-"Mesa Buzzard",
-34,
-35,
-0,
-2,
 },
 [11139] = {
 "Yugrek",
@@ -4972,19 +5042,19 @@
 0,
 2,
 },
-[12338] = {
-"Shadowprey Guardian",
-55,
-55,
-0,
-6,
-},
 [8143] = {
 "Loorana",
 49,
 49,
 0,
 6,
+},
+[6117] = {
+"Highborne Lichling",
+46,
+47,
+0,
+2,
 },
 [9157] = {
 "Bloodpetal Pest",
@@ -5070,12 +5140,12 @@
 1,
 2,
 },
-[6117] = {
-"Highborne Lichling",
-46,
-47,
+[8115] = {
+"Witch Doctor Uzer'i",
+50,
+50,
 0,
-2,
+6,
 },
 [14376] = {
 "Scout Manslayer",
@@ -5084,24 +5154,24 @@
 1,
 6,
 },
-[255207] = {
-"Prowler",
-42,
-42,
+[12338] = {
+"Shadowprey Guardian",
+55,
+55,
+0,
+6,
+},
+[2579] = {
+"Mesa Buzzard",
+34,
+35,
 0,
 2,
 },
-[14392] = {
-"Overlord Runthak",
-60,
-60,
-1,
-6,
-},
-[8115] = {
-"Witch Doctor Uzer'i",
-50,
-50,
+[2519] = {
+"Kin'weelay",
+39,
+39,
 0,
 6,
 },
@@ -5119,10 +5189,10 @@
 1,
 1,
 },
-[6193] = {
-"Spitelash Screamer",
-47,
-48,
+[4147] = {
+"Saltstone Basilisk",
+30,
+30,
 0,
 2,
 },
@@ -5182,24 +5252,24 @@
 0,
 5,
 },
-[2639] = {
-"Vilebranch Axe Thrower",
-46,
-46,
+[8885] = {
+"Riding Raptor",
+2,
+2,
 0,
+5,
+},
+[7995] = {
+"Vile Priestess Hexx",
+51,
+51,
+1,
 2,
 },
-[5953] = {
-"Razor Hill Grunt",
-28,
-32,
-0,
-6,
-},
-[11443] = {
-"Gordok Ogre-Mage",
-52,
-52,
+[3632] = {
+"Deviate Creeper",
+16,
+16,
 1,
 2,
 },
@@ -5210,68 +5280,54 @@
 1,
 2,
 },
-[236028] = {
-"Honey Wasp",
-47,
-49,
-0,
-2,
-},
-[2615] = {
-"Stromgarde Roughrider",
-40,
-40,
-1,
-1,
-},
-[7995] = {
-"Vile Priestess Hexx",
-51,
-51,
-1,
-2,
-},
-[1822] = {
-"Venom Mist Lurker",
-51,
-51,
-0,
-2,
-},
-[10468] = {
-"Felnok Steelspring",
-54,
-54,
-0,
-5,
-},
-[2465] = {
-"Far Seer Mok'thardin",
-45,
-45,
+[8390] = {
+"Chemist Cuely",
+30,
+30,
 0,
 6,
 },
-[260570] = {
-"Stitch Pinwizzle",
-41,
-41,
+[222857] = {
+"Odd Totem",
+1,
+1,
 0,
 5,
 },
-[3456] = {
-"Razormane Pathfinder",
-21,
-21,
+[1736] = {
+"Deathguard Randolph",
+55,
+55,
+0,
+5,
+},
+[255849] = {
+"Bolder'ok Magus",
+40,
+41,
+0,
+4,
+},
+[259046] = {
+"Freshwater Crocolisk",
+38,
+39,
 0,
 2,
 },
-[9477] = {
-"Cloned Ooze",
-50,
-51,
+[263343] = {
+"Low Plains Buzzard",
+37,
+38,
 0,
 2,
+},
+[260569] = {
+"Shady Smuggler",
+39,
+39,
+0,
+5,
 },
 [1499] = {
 "Magistrate Sevren",
@@ -5280,53 +5336,18 @@
 0,
 5,
 },
-[8581] = {
-"Blood Elf Defender",
-52,
-53,
+[9477] = {
+"Cloned Ooze",
+50,
+51,
 0,
 2,
 },
-[9501] = {
-"Innkeeper Adegwa",
-30,
-30,
+[4351] = {
+"Bloodfen Raptor",
+36,
+36,
 0,
-6,
-},
-[257001] = {
-"Old Rot-Chum",
-42,
-42,
-1,
-2,
-},
-[4251] = {
-"Goblin Racer",
-32,
-32,
-0,
-5,
-},
-[2641] = {
-"Vilebranch Headhunter",
-47,
-47,
-1,
-2,
-},
-[2643] = {
-"Vilebranch Berserker",
-48,
-48,
-1,
-2,
-},
-[2645] = {
-"Vilebranch Shadow Hunter",
-49,
-49,
-1,
 2,
 },
 [260566] = {
@@ -5335,6 +5356,55 @@
 41,
 0,
 5,
+},
+[255850] = {
+"Bolder'ok Brute",
+42,
+44,
+0,
+4,
+},
+[257001] = {
+"Old Rot-Chum",
+42,
+42,
+1,
+2,
+},
+[263367] = {
+"Sleebo Fizzlespout",
+40,
+40,
+0,
+5,
+},
+[9525] = {
+"Freewind Brave",
+45,
+45,
+0,
+6,
+},
+[259431] = {
+"Rudolph Gelhardt",
+12,
+12,
+0,
+2,
+},
+[5286] = {
+"Longtooth Runner",
+40,
+41,
+0,
+2,
+},
+[2393] = {
+"Christoph Jeffcoat",
+32,
+32,
+0,
+6,
 },
 [2649] = {
 "Witherbark Scalper",
@@ -5357,10 +5427,10 @@
 0,
 2,
 },
-[263369] = {
-"G45-B4G",
-38,
-38,
+[2655] = {
+"Green Sludge",
+46,
+47,
 0,
 2,
 },
@@ -5378,12 +5448,12 @@
 0,
 1,
 },
-[13697] = {
-"Cavindra",
-45,
-45,
+[14720] = {
+"High Overlord Saurfang",
+62,
+62,
 1,
-5,
+6,
 },
 [246389] = {
 "Hilda the Breaker",
@@ -5399,12 +5469,12 @@
 0,
 5,
 },
-[1569] = {
-"Shadow Priest Sarvis",
-5,
-5,
+[261711] = {
+"Empowered Brute",
+38,
+39,
 0,
-5,
+2,
 },
 [7380] = {
 "Siamese",
@@ -5413,12 +5483,12 @@
 0,
 5,
 },
-[2671] = {
-"Mechanical Squirrel",
-21,
-29,
+[13737] = {
+"Marandis' Sister",
+36,
+36,
 0,
-5,
+4,
 },
 [10676] = {
 "Raider Jhash",
@@ -5434,19 +5504,19 @@
 0,
 2,
 },
-[416] = {
-"Pagmat",
-4,
-4,
+[3322] = {
+"Kaja",
+30,
+30,
 0,
-5,
+6,
 },
-[7400] = {
-"Searing Totem V",
-50,
-52,
+[6377] = {
+"Thunderhead Stagwing",
+49,
+49,
 0,
-5,
+2,
 },
 [2681] = {
 "Vilebranch Raiding Wolf",
@@ -5455,19 +5525,19 @@
 1,
 2,
 },
-[7408] = {
-"Spigot Operator Luglunket",
-40,
-40,
-0,
-5,
-},
-[4343] = {
-"Drywallow Snapper",
-37,
-37,
+[260968] = {
+"Twilight Mauler",
+41,
+42,
 0,
 2,
+},
+[7412] = {
+"Frost Resistance Totem II",
+52,
+52,
+0,
+5,
 },
 [11755] = {
 "Harlo Wigglesworth",
@@ -5476,24 +5546,24 @@
 0,
 5,
 },
-[222478] = {
-"Sentinel Keldara Sunblade",
-45,
-45,
+[268744] = {
+"Frog Familiar",
+42,
+42,
 0,
 5,
 },
-[259434] = {
-"Tarnished Drudge",
-10,
-11,
+[7424] = {
+"Fire Resistance Totem II",
+52,
+52,
 0,
-2,
+5,
 },
-[4359] = {
-"Mirefin Murloc",
-35,
-35,
+[2693] = {
+"Highvale Marksman",
+46,
+46,
 0,
 2,
 },
@@ -5518,20 +5588,6 @@
 0,
 2,
 },
-[3304] = {
-"Master Vornal",
-11,
-11,
-0,
-6,
-},
-[2703] = {
-"Zengu",
-40,
-40,
-0,
-6,
-},
 [261710] = {
 "Twilight Brute",
 39,
@@ -5539,12 +5595,26 @@
 0,
 2,
 },
-[8766] = {
-"Forest Ooze",
-52,
-53,
+[259179] = {
+"Redridge Thug",
+38,
+39,
 0,
 2,
+},
+[3300] = {
+"Adder",
+1,
+1,
+0,
+4,
+},
+[11835] = {
+"Theodore Griffs",
+50,
+50,
+0,
+5,
 },
 [263120] = {
 "Gray Dawnbright",
@@ -5553,10 +5623,10 @@
 0,
 1,
 },
-[4502] = {
-"Tharg",
-44,
-44,
+[9987] = {
+"Shoja'my",
+30,
+30,
 0,
 6,
 },
@@ -5567,19 +5637,19 @@
 0,
 2,
 },
-[257901] = {
-"Eastsea Buccaneer",
-41,
-42,
+[5426] = {
+"Blisterpaw Hyena",
+44,
+45,
 0,
 2,
 },
-[259052] = {
-"Rog'mar Poacher",
-38,
-39,
+[272328] = {
+"Mini Diablo",
+1,
+41,
 0,
-6,
+5,
 },
 [4411] = {
 "Darkfang Lurker",
@@ -5588,19 +5658,19 @@
 0,
 2,
 },
-[6508] = {
-"Venomhide Ravasaur",
-50,
-51,
+[260428] = {
+"Shadowvale Lurcher",
+10,
+12,
 0,
 2,
 },
-[12922] = {
-"Imp Minion",
-46,
-47,
-0,
-2,
+[11899] = {
+"Shardi",
+55,
+55,
+1,
+6,
 },
 [272329] = {
 "Zergling",
@@ -5623,12 +5693,12 @@
 0,
 2,
 },
-[3238] = {
-"Stormhide",
-22,
-23,
-0,
-2,
+[2215] = {
+"High Executor Darthalia",
+60,
+60,
+1,
+6,
 },
 [5462] = {
 "Sea Spray",
@@ -5644,17 +5714,17 @@
 0,
 5,
 },
-[7451] = {
-"Raging Owlbeast",
+[7455] = {
+"Winterspring Owl",
 55,
 55,
 0,
-2,
+4,
 },
-[7443] = {
-"Shardtooth Mauler",
-55,
-56,
+[4382] = {
+"Withervine Creeper",
+36,
+36,
 0,
 2,
 },
@@ -5679,19 +5749,19 @@
 0,
 4,
 },
-[4467] = {
-"Vilebranch Soothsayer",
-46,
-47,
+[6513] = {
+"Un'Goro Stomper",
+51,
+52,
 0,
 2,
 },
-[259054] = {
-"Wildplains Patriarch",
-38,
-39,
+[10980] = {
+"Umi's Mechanical Yeti",
+55,
+57,
 0,
-2,
+5,
 },
 [6521] = {
 "Living Blaze",
@@ -5700,26 +5770,26 @@
 0,
 2,
 },
-[263307] = {
-"Glade Viper",
-37,
-38,
+[4314] = {
+"Gorkas",
+55,
+55,
+1,
+6,
+},
+[8958] = {
+"Angerclaw Mauler",
+49,
+50,
 0,
 2,
 },
-[1890] = {
-"Rattlecage Skeleton",
-2,
-3,
+[8612] = {
+"Screecher Spirit",
+50,
+50,
 0,
-4,
-},
-[264074] = {
-"Mazu'kon",
-35,
-35,
-0,
-4,
+5,
 },
 [9997] = {
 "Spraggle Frock",
@@ -5728,18 +5798,18 @@
 0,
 5,
 },
-[4495] = {
-"Gnome Pit Boss",
-35,
-35,
+[2761] = {
+"Cresting Exile",
+39,
+39,
 0,
-5,
+2,
 },
-[256881] = {
-"Overlord Kilgar",
-46,
-46,
-1,
+[260973] = {
+"Klunk",
+42,
+42,
+0,
 2,
 },
 [259055] = {
@@ -5770,19 +5840,19 @@
 0,
 5,
 },
-[1561] = {
-"Bloodsail Raider",
-41,
-41,
+[4150] = {
+"Saltstone Gazer",
+34,
+35,
 0,
-1,
+2,
 },
-[4314] = {
-"Gorkas",
-55,
-55,
-1,
-6,
+[772] = {
+"Stranglethorn Tigress",
+37,
+38,
+0,
+2,
 },
 [264663] = {
 "Dead Orc",
@@ -5791,19 +5861,19 @@
 1,
 6,
 },
-[8958] = {
-"Angerclaw Mauler",
-49,
-50,
+[263307] = {
+"Glade Viper",
+37,
+38,
 0,
 2,
 },
-[2781] = {
-"Caretaker Weston",
-41,
-41,
+[259056] = {
+"Komuk",
+45,
+45,
 1,
-1,
+4,
 },
 [2783] = {
 "Marez Cowl",
@@ -5812,26 +5882,12 @@
 1,
 2,
 },
-[4075] = {
-"Rat",
-1,
-1,
+[1890] = {
+"Rattlecage Skeleton",
+2,
+3,
 0,
 4,
-},
-[7115] = {
-"Jaedenar Adept",
-51,
-51,
-0,
-2,
-},
-[1907] = {
-"Naga Explorer",
-43,
-44,
-0,
-2,
 },
 [7099] = {
 "Ironbeak Hunter",
@@ -5840,6 +5896,20 @@
 0,
 4,
 },
+[4551] = {
+"Michael Garrett",
+55,
+55,
+1,
+6,
+},
+[1520] = {
+"Rattlecage Soldier",
+6,
+7,
+0,
+2,
+},
 [4559] = {
 "Timothy Weldon",
 30,
@@ -5847,26 +5917,26 @@
 0,
 6,
 },
-[3818] = {
-"Elder Shadowhorn Stag",
-26,
-27,
+[265944] = {
+"William Pickman",
+9,
+9,
 0,
-4,
+5,
 },
-[263380] = {
-"Ghostmaw",
-42,
-42,
-1,
-2,
-},
-[11180] = {
-"Bloodvenom Post Brave",
-55,
-55,
+[4047] = {
+"Zor Lonetree",
+62,
+62,
 0,
 6,
+},
+[251001] = {
+"Deathguard Kristof",
+55,
+55,
+0,
+5,
 },
 [5598] = {
 "Atal'ai Exile",
@@ -5875,8 +5945,8 @@
 0,
 5,
 },
-[12027] = {
-"Tukk",
+[12032] = {
+"Lui'Mala",
 30,
 30,
 0,
@@ -5896,52 +5966,24 @@
 0,
 2,
 },
-[5614] = {
-"Sarok",
-25,
-25,
-0,
-6,
-},
-[5618] = {
-"Wastewander Bandit",
-42,
-42,
-0,
+[1917] = {
+"Daniel Ulfman",
 2,
+2,
+0,
+4,
+},
+[1918] = {
+"Karrel Grayves",
+2,
+2,
+0,
+4,
 },
 [1919] = {
 "Samuel Fipps",
 5,
 5,
-0,
-4,
-},
-[1501] = {
-"Mindless Zombie",
-1,
-1,
-0,
-4,
-},
-[260540] = {
-"Jasper Geartoggle",
-39,
-39,
-0,
-5,
-},
-[4611] = {
-"Doctor Herbert Halsey",
-50,
-50,
-0,
-6,
-},
-[4953] = {
-"Moccasin",
-1,
-1,
 0,
 4,
 },
@@ -5952,68 +5994,96 @@
 0,
 1,
 },
-[8215] = {
-"Grimungous",
-50,
-50,
-2,
-2,
-},
-[1490] = {
-"Zanzil Witch Doctor",
-44,
-44,
+[3084] = {
+"Bluffwatcher",
+55,
+55,
 0,
-2,
-},
-[2964] = {
-"Windfury Sorceress",
-9,
-9,
-0,
-2,
-},
-[14377] = {
-"Scout Tharr",
-60,
-60,
-1,
 6,
 },
-[253177] = {
-"Nerlokh",
-45,
-45,
-0,
-5,
-},
-[276067] = {
-"Angus Hammerhand",
-12,
-12,
-0,
-5,
-},
-[1931] = {
-"Captured Scarlet Zealot",
-9,
-9,
-0,
-5,
-},
-[2839] = {
-"Haren Kanmae",
-41,
-41,
-0,
-5,
-},
-[4655] = {
-"Maraudine Wrangler",
-37,
-38,
+[246143] = {
+"Frightened Paladin",
+3,
+3,
 0,
 2,
+},
+[2978] = {
+"Venture Co. Worker",
+8,
+8,
+0,
+2,
+},
+[11832] = {
+"Keeper Remulos",
+62,
+62,
+1,
+4,
+},
+[5646] = {
+"Sandfury Axe Thrower",
+43,
+43,
+1,
+2,
+},
+[12027] = {
+"Tukk",
+30,
+30,
+0,
+6,
+},
+[258491] = {
+"Kronk",
+42,
+42,
+1,
+2,
+},
+[4635] = {
+"Kolkar Windchaser",
+32,
+32,
+0,
+2,
+},
+[9270] = {
+"Williden Marshal",
+48,
+48,
+0,
+5,
+},
+[11752] = {
+"Blaise Montgomery",
+47,
+47,
+0,
+6,
+},
+[4647] = {
+"Gelkis Scout",
+33,
+33,
+0,
+5,
+},
+[4651] = {
+"Gelkis Earthcaller",
+34,
+35,
+0,
+5,
+},
+[7724] = {
+"Senior Surveyor Fizzledowser",
+44,
+44,
+0,
+5,
 },
 [1934] = {
 "Tirisfal Farmer",
@@ -6029,12 +6099,12 @@
 0,
 2,
 },
-[14441] = {
-"Hunter Ragetotem",
-60,
-60,
+[260211] = {
+"Scoutmaster Vargas",
+42,
+42,
 1,
-5,
+1,
 },
 [14757] = {
 "Elder Torntusk",
@@ -6057,12 +6127,12 @@
 0,
 2,
 },
-[721] = {
-"Rabbit",
-1,
-1,
+[3919] = {
+"Withered Ancient",
+26,
+26,
 0,
-4,
+2,
 },
 [1941] = {
 "Rot Hide Graverobber",
@@ -6085,26 +6155,26 @@
 0,
 1,
 },
-[4699] = {
-"Scorpashi Venomlash",
-38,
-39,
+[7768] = {
+"Witherbark Bloodling",
+25,
+25,
 0,
 2,
 },
-[13718] = {
-"The Nameless Prophet",
-41,
-41,
-1,
-2,
-},
-[262504] = {
-"Earthen Ring Shaman",
-55,
-55,
+[3945] = {
+"Caravaneer Ruzzgot",
+37,
+37,
 0,
-4,
+5,
+},
+[1404] = {
+"Kragg",
+40,
+40,
+0,
+6,
 },
 [7780] = {
 "Rin'ji",
@@ -6113,10 +6183,10 @@
 0,
 5,
 },
-[257655] = {
-"Deathguard Billmuth",
-10,
-10,
+[8399] = {
+"Nyrill",
+39,
+39,
 0,
 5,
 },
@@ -6127,47 +6197,47 @@
 0,
 5,
 },
-[7881] = {
-"Stoley",
-30,
-30,
-0,
-5,
-},
-[4727] = {
-"Elder Thunder Lizard",
-38,
-38,
+[262006] = {
+"Twilight Ritual Circle",
+1,
+1,
 0,
 2,
 },
-[259190] = {
-"Ephram Barbaro",
+[255993] = {
+"Grakna",
 55,
 55,
-0,
-5,
+1,
+6,
 },
-[3904] = {
-"Searing Totem IV",
-44,
-52,
-0,
-5,
-},
-[3906] = {
-"Healing Stream Totem II",
-38,
-38,
-0,
-5,
-},
-[696] = {
-"Skullsplitter Axe Thrower",
+[3902] = {
+"Searing Totem II",
 39,
-40,
+39,
+0,
+5,
+},
+[7804] = {
+"Trenton Lighthammer",
+55,
+55,
+0,
+5,
+},
+[11516] = {
+"Timbermaw Warder",
+53,
+54,
 0,
 2,
+},
+[256434] = {
+"Turner's Mill Lumberjack",
+37,
+38,
+0,
+1,
 },
 [5770] = {
 "Nara Wildmane",
@@ -6183,12 +6253,12 @@
 0,
 5,
 },
-[7824] = {
-"Bulkrek Ragefist",
-55,
-55,
-1,
-6,
+[11548] = {
+"Loh'atu",
+45,
+45,
+0,
+5,
 },
 [257017] = {
 "Twilight Worg",
@@ -6204,19 +6274,19 @@
 0,
 5,
 },
-[6519] = {
-"Tar Lord",
-53,
-54,
+[3906] = {
+"Healing Stream Totem II",
+38,
+38,
 0,
-2,
+5,
 },
-[6511] = {
-"Bloodpetal Thresher",
-49,
-50,
+[4485] = {
+"Belgrom Rockmaul",
+35,
+35,
 0,
-4,
+6,
 },
 [4775] = {
 "Felicia Doan",
@@ -6232,19 +6302,19 @@
 0,
 5,
 },
-[221651] = {
-"Ceruleos",
-50,
-50,
-0,
-2,
-},
-[4429] = {
-"Goblin Pit Crewman",
-30,
-30,
+[13917] = {
+"Izzy Coppergrab",
+55,
+55,
 0,
 5,
+},
+[5420] = {
+"Glasshide Gazer",
+46,
+46,
+0,
+2,
 },
 [4791] = {
 "Nazeer Bloodpike",
@@ -6267,12 +6337,12 @@
 0,
 6,
 },
-[9598] = {
-"Arei",
-56,
-56,
+[260471] = {
+"Thrash",
+39,
+39,
 0,
-4,
+5,
 },
 [7876] = {
 "Tran'rek",
@@ -6288,26 +6358,26 @@
 0,
 4,
 },
-[14737] = {
-"Smith Slagtree",
-47,
-47,
+[9622] = {
+"U'cha",
+55,
+55,
 0,
-5,
-},
-[256891] = {
-"Executioner Morg",
-46,
-46,
-1,
 2,
 },
-[255996] = {
-"Rog'mar Grunt",
-55,
-55,
+[2923] = {
+"Mangy Silvermane",
+41,
+42,
 0,
-6,
+2,
+},
+[2925] = {
+"Silvermane Howler",
+45,
+46,
+0,
+2,
 },
 [2927] = {
 "Vicious Owlbeast",
@@ -6330,33 +6400,33 @@
 0,
 5,
 },
-[678] = {
-"Mosh'Ogg Mauler",
-43,
-44,
-1,
-2,
-},
-[2680] = {
-"Vilebranch Wolf Pup",
-46,
-47,
-0,
-2,
-},
-[1981] = {
-"Dark Iron Ambusher",
-10,
-10,
-0,
-2,
-},
-[259961] = {
-"Wharfmaster Whizzbuzz",
-45,
-45,
+[14740] = {
+"Katoom the Angler",
+42,
+42,
 0,
 5,
+},
+[260391] = {
+"Captain Haynes",
+43,
+43,
+0,
+4,
+},
+[274913] = {
+"Max",
+1,
+1,
+0,
+5,
+},
+[257915] = {
+"Eastsea Raider",
+44,
+45,
+0,
+2,
 },
 [270310] = {
 "Farholde Steed",
@@ -6372,25 +6442,25 @@
 0,
 5,
 },
-[260391] = {
-"Captain Haynes",
-43,
-43,
-0,
-4,
-},
-[262473] = {
-"Cinderscale Whelp",
-39,
-40,
+[6199] = {
+"Blood Elf Reclaimer",
+52,
+53,
 0,
 2,
 },
-[4249] = {
-"Pesterhide Snarler",
-29,
-29,
-0,
+[2588] = {
+"Syndicate Prowler",
+36,
+37,
+1,
+1,
+},
+[2648] = {
+"Vilebranch Aman'zasi Guard",
+51,
+51,
+1,
 2,
 },
 [11788] = {
@@ -6407,12 +6477,12 @@
 0,
 4,
 },
-[259962] = {
-"Fimbo Greasemitz",
-40,
-40,
+[6929] = {
+"Innkeeper Gryshka",
+30,
+30,
 0,
-5,
+6,
 },
 [2957] = {
 "Elder Plainstrider",
@@ -6421,12 +6491,12 @@
 0,
 4,
 },
-[3982] = {
-"Monika Sengutz",
-7,
-7,
+[277729] = {
+"Arcane Elemental",
+42,
+42,
 0,
-6,
+5,
 },
 [8759] = {
 "Mosshoof Runner",
@@ -6435,12 +6505,12 @@
 0,
 4,
 },
-[5922] = {
-"Strength of Earth Totem III",
-45,
-52,
+[261497] = {
+"Twilight Firecaller",
+40,
+41,
 0,
-5,
+2,
 },
 [2965] = {
 "Windfury Matriarch",
@@ -6456,12 +6526,12 @@
 0,
 2,
 },
-[250539] = {
-"Paladin Trainee",
-10,
-10,
+[257058] = {
+"Gobam",
+42,
+42,
 0,
-5,
+4,
 },
 [2971] = {
 "Taloned Swoop",
@@ -6491,46 +6561,18 @@
 1,
 2,
 },
-[11900] = {
-"Brakkar",
-55,
-55,
-1,
-6,
-},
-[260383] = {
-"Sergeant Ulka",
-55,
-55,
-1,
-6,
-},
-[256418] = {
-"Krom'rosh",
-42,
-42,
+[256383] = {
+"Meadowsbrook Farmhand",
+35,
+36,
 0,
-6,
-},
-[266735] = {
-"Excitable Slime",
 1,
-1,
-0,
-5,
 },
 [3521] = {
 "Ak'Zeloth",
 22,
 22,
 0,
-6,
-},
-[8020] = {
-"Shyn",
-55,
-55,
-1,
 6,
 },
 [2494] = {
@@ -6540,12 +6582,40 @@
 0,
 5,
 },
-[5287] = {
-"Longtooth Howler",
-43,
-44,
+[266735] = {
+"Excitable Slime",
+1,
+1,
+0,
+5,
+},
+[1144] = {
+"Mosh'Ogg Witch Doctor",
+37,
+37,
 0,
 2,
+},
+[8020] = {
+"Shyn",
+55,
+55,
+1,
+6,
+},
+[260995] = {
+"Ogre Miner",
+42,
+43,
+0,
+5,
+},
+[5951] = {
+"Hare",
+1,
+1,
+0,
+4,
 },
 [2995] = {
 "Tal",
@@ -6568,26 +6638,26 @@
 0,
 1,
 },
-[268557] = {
-"Olana Brighthoof",
-55,
-55,
-0,
-6,
-},
-[5951] = {
-"Hare",
-1,
-1,
+[11798] = {
+"Bunthen Plainswind",
+60,
+60,
 0,
 4,
 },
-[259585] = {
-"Master Mycologist Shurome",
-60,
-60,
+[5307] = {
+"Vale Screecher",
+41,
+43,
 0,
-5,
+2,
+},
+[256655] = {
+"Gorg",
+38,
+38,
+0,
+6,
 },
 [7033] = {
 "Firegut Ogre",
@@ -6596,10 +6666,24 @@
 0,
 2,
 },
-[8761] = {
-"Mosshoof Courser",
-53,
-53,
+[259585] = {
+"Master Mycologist Shurome",
+60,
+60,
+0,
+5,
+},
+[256795] = {
+"Twilight Fanatic",
+42,
+43,
+0,
+2,
+},
+[15105] = {
+"Warsong Emissary",
+30,
+30,
 0,
 4,
 },
@@ -6610,31 +6694,17 @@
 0,
 6,
 },
-[15105] = {
-"Warsong Emissary",
-30,
-30,
+[259988] = {
+"Gorgegut",
+42,
+42,
 0,
 4,
 },
-[12740] = {
-"Faustron",
+[270582] = {
+"Mon'ye",
 55,
 55,
-1,
-6,
-},
-[12045] = {
-"Hae'Wilani",
-30,
-30,
-0,
-6,
-},
-[2216] = {
-"Apothecary Lydon",
-35,
-35,
 0,
 6,
 },
@@ -6652,40 +6722,40 @@
 0,
 6,
 },
-[3367] = {
-"Felika",
-30,
-30,
+[3381] = {
+"Southsea Brigand",
+12,
+12,
 0,
-6,
+2,
 },
-[2110] = {
-"Black Rat",
-1,
-1,
+[263440] = {
+"Hamur",
+42,
+42,
 0,
 4,
 },
-[3029] = {
-"Sewa Mistrunner",
-40,
-40,
+[10054] = {
+"Bulrug",
+30,
+30,
+0,
+5,
+},
+[8393] = {
+"Thersa Windsong",
+45,
+45,
 0,
 6,
 },
-[6506] = {
-"Ravasaur Runner",
-49,
-50,
+[7465] = {
+"Magma Totem III",
+48,
+48,
 0,
-2,
-},
-[4696] = {
-"Scorpashi Snapper",
-31,
-31,
-0,
-2,
+5,
 },
 [11101] = {
 "Mana Tide Totem III",
@@ -6694,12 +6764,12 @@
 0,
 5,
 },
-[247449] = {
-"Sin'dorei Tome of Summoning",
+[3083] = {
+"Honor Guard",
+60,
+60,
 1,
-1,
-0,
-5,
+6,
 },
 [7097] = {
 "Ironbeak Owl",
@@ -6708,38 +6778,38 @@
 0,
 4,
 },
-[6514] = {
-"Un'Goro Gorilla",
-50,
-51,
+[9623] = {
+"A-Me 01",
+48,
+48,
+0,
+5,
+},
+[4128] = {
+"Hecklefang Stalker",
+23,
+23,
 0,
 2,
 },
-[6522] = {
-"Andron Gant",
-15,
-15,
+[3267] = {
+"Razormane Water Seeker",
+11,
+11,
 0,
-6,
+2,
 },
-[5651] = {
-"Patrick Garrett",
-15,
-15,
-0,
-6,
-},
-[10303] = {
-"Storm Shadowhoof",
-60,
-60,
-0,
-6,
-},
-[6126] = {
-"Haldarr Trickster",
+[9271] = {
+"Hol'anyee Marshal",
 45,
-47,
+45,
+0,
+5,
+},
+[3249] = {
+"Greater Thunderhawk",
+24,
+24,
 0,
 2,
 },
@@ -6751,16 +6821,13 @@
 135,
 1,
 },
-[2678] = {
-10,
-5,
-},
 [4536] = {
 25,
 5,
 },
-[3713] = {
-160,
+["t"] = 1795014040,
+[4470] = {
+38,
 1,
 },
 [21219] = {
@@ -6775,27 +6842,30 @@
 200000,
 1,
 },
-[2692] = {
-40,
+[10284] = {
+200,
 1,
 },
 [159] = {
 25,
 5,
 },
-[10284] = {
-200,
+[2692] = {
+40,
 1,
 },
 [11291] = {
 4500,
 1,
 },
-[4470] = {
-38,
+[3713] = {
+160,
 1,
 },
-["t"] = 1795014040,
+[2678] = {
+10,
+5,
+},
 },
 [276067] = {
 [2398] = {
@@ -6859,8 +6929,8 @@
 1,
 },
 ["t"] = 1794823578,
-[2491] = {
-484,
+[2492] = {
+284,
 1,
 },
 [2402] = {
@@ -6891,8 +6961,8 @@
 342,
 1,
 },
-[2492] = {
-284,
+[2491] = {
+484,
 1,
 },
 },
@@ -7010,12 +7080,12 @@
 2390,
 1,
 },
-[2516] = {
-10,
-200,
+[2026] = {
+6286,
+1,
 },
-[2509] = {
-414,
+[2490] = {
+540,
 1,
 },
 [2491] = {
@@ -7026,25 +7096,25 @@
 3815,
 1,
 },
-[2488] = {
-536,
-1,
-},
 [2028] = {
 5065,
+1,
+},
+[2488] = {
+536,
 1,
 },
 [2208] = {
 3650,
 1,
 },
-[2490] = {
-540,
+[2509] = {
+414,
 1,
 },
-[2026] = {
-6286,
-1,
+[2516] = {
+10,
+200,
 },
 },
 [2135] = {
@@ -7169,20 +7239,20 @@
 17,
 1,
 },
-[4289] = {
-45,
-1,
-},
-[2692] = {
-36,
+[5788] = {
+585,
 1,
 },
 [2678] = {
 9,
 5,
 },
-[3713] = {
-144,
+[6530] = {
+90,
+1,
+},
+[6532] = {
+225,
 1,
 },
 [4399] = {
@@ -7193,14 +7263,11 @@
 9,
 1,
 },
-[6217] = {
-112,
-1,
-},
 [6054] = {
 810,
 1,
 },
+["t"] = 1795013716,
 [3372] = {
 180,
 5,
@@ -7225,17 +7292,20 @@
 450,
 1,
 },
-["t"] = 1795013716,
-[6532] = {
-225,
+[6217] = {
+112,
 1,
 },
-[6530] = {
-90,
+[3713] = {
+144,
 1,
 },
-[5788] = {
-585,
+[2692] = {
+36,
+1,
+},
+[4289] = {
+45,
 1,
 },
 },
@@ -7341,8 +7411,8 @@
 1830,
 1,
 },
-[276203] = {
-118729,
+[5173] = {
+100,
 1,
 },
 [2521] = {
@@ -7357,9 +7427,9 @@
 24811,
 1,
 },
-[11285] = {
-1000,
-200,
+[2523] = {
+28285,
+1,
 },
 [3372] = {
 200,
@@ -7373,9 +7443,9 @@
 50,
 200,
 },
-[11284] = {
-1000,
-200,
+[3137] = {
+7593,
+1,
 },
 [2522] = {
 22548,
@@ -7385,40 +7455,40 @@
 19336,
 1,
 },
-[2527] = {
-29356,
+[2930] = {
+50,
 1,
 },
 [1645] = {
 2000,
 5,
 },
-[2930] = {
-50,
+[2527] = {
+29356,
 1,
 },
 [5060] = {
 1500,
 1,
 },
-[3137] = {
-7593,
-1,
+[11284] = {
+1000,
+200,
 },
 [2515] = {
 50,
 200,
 },
-[2523] = {
-28285,
-1,
+[11285] = {
+1000,
+200,
 },
 [8923] = {
 200,
 1,
 },
-[5173] = {
-100,
+[276203] = {
+118729,
 1,
 },
 },
@@ -7455,13 +7525,13 @@
 10,
 1,
 },
-[3371] = {
-20,
-5,
+[277114] = {
+25,
+1,
 },
 ["t"] = 1794819774,
-[6217] = {
-124,
+[6256] = {
+23,
 1,
 },
 [2320] = {
@@ -7472,19 +7542,11 @@
 100,
 1,
 },
-[6256] = {
-23,
+[2324] = {
+25,
 1,
 },
 [6260] = {
-50,
-1,
-},
-[4536] = {
-25,
-5,
-},
-[2604] = {
 50,
 1,
 },
@@ -7492,13 +7554,21 @@
 25,
 1,
 },
-[2324] = {
-25,
+[2604] = {
+50,
 1,
 },
-[277114] = {
+[4536] = {
 25,
+5,
+},
+[6217] = {
+124,
 1,
+},
+[3371] = {
+20,
+5,
 },
 },
 [12959] = {
@@ -7506,17 +7576,17 @@
 24811,
 1,
 },
-[4599] = {
-2000,
-5,
+[4471] = {
+135,
+1,
 },
 [4498] = {
 2500,
 1,
 },
-[4471] = {
-135,
-1,
+[1205] = {
+500,
+5,
 },
 [3030] = {
 300,
@@ -7526,8 +7596,8 @@
 25,
 5,
 },
-[3770] = {
-500,
+[1708] = {
+1000,
 5,
 },
 [11291] = {
@@ -7542,9 +7612,9 @@
 2000,
 5,
 },
-[1708] = {
-1000,
-5,
+[3135] = {
+1830,
+1,
 },
 [3137] = {
 7593,
@@ -7566,8 +7636,8 @@
 25,
 5,
 },
-[3107] = {
-1830,
+[15326] = {
+24811,
 1,
 },
 [8766] = {
@@ -7591,12 +7661,12 @@
 7593,
 1,
 },
-[11284] = {
-1000,
-200,
-},
 [2515] = {
 50,
+200,
+},
+[11284] = {
+1000,
 200,
 },
 [4497] = {
@@ -7607,16 +7677,16 @@
 38,
 1,
 },
-[15326] = {
-24811,
-1,
-},
-[3135] = {
+[3107] = {
 1830,
 1,
 },
-[1205] = {
+[3770] = {
 500,
+5,
+},
+[4599] = {
+2000,
 5,
 },
 },
@@ -7633,8 +7703,8 @@
 6184,
 1,
 },
-[2526] = {
-17403,
+[2524] = {
+17273,
 1,
 },
 [2468] = {
@@ -7645,16 +7715,16 @@
 9181,
 1,
 },
-[2522] = {
-20294,
+[2463] = {
+12326,
 1,
 },
-[2432] = {
-6921,
+[2465] = {
+11230,
 1,
 },
-[2525] = {
-23841,
+[3889] = {
+7130,
 1,
 },
 [3594] = {
@@ -7673,12 +7743,12 @@
 7183,
 1,
 },
-[2527] = {
-26421,
+[2434] = {
+4649,
 1,
 },
-[2448] = {
-14543,
+[2417] = {
+14106,
 1,
 },
 [2521] = {
@@ -7689,12 +7759,12 @@
 25457,
 1,
 },
-[2463] = {
-12326,
+[2525] = {
+23841,
 1,
 },
-[2465] = {
-11230,
+[2527] = {
+26421,
 1,
 },
 [2467] = {
@@ -7718,8 +7788,8 @@
 4930,
 1,
 },
-[2417] = {
-14106,
+[2448] = {
+14543,
 1,
 },
 [2419] = {
@@ -7730,20 +7800,20 @@
 7157,
 1,
 },
-[2434] = {
-4649,
+[2432] = {
+6921,
 1,
 },
-[3889] = {
-7130,
+[2522] = {
+20294,
 1,
 },
 [2520] = {
 22166,
 1,
 },
-[2524] = {
-17273,
+[2526] = {
+17403,
 1,
 },
 },
@@ -7782,40 +7852,20 @@
 },
 ["t"] = 1794751006,
 },
-[10361] = {
-[2529] = {
-58528,
+[263440] = {
+[2524] = {
+19192,
 1,
 },
-[2530] = {
-46998,
+["t"] = 1794948635,
+[2525] = {
+26489,
 1,
 },
-[2531] = {
-50553,
+[2527] = {
+29356,
 1,
 },
-[2532] = {
-47348,
-1,
-},
-[2533] = {
-54997,
-1,
-},
-[2534] = {
-40888,
-1,
-},
-[2535] = {
-55401,
-1,
-},
-[2528] = {
-46653,
-1,
-},
-["t"] = 1795115587,
 },
 [255894] = {
 [1205] = {
@@ -7846,10 +7896,7 @@
 500,
 5,
 },
-[4599] = {
-2000,
-5,
-},
+["t"] = 1794827145,
 [3771] = {
 1000,
 5,
@@ -7862,15 +7909,18 @@
 125,
 5,
 },
-[159] = {
-25,
-5,
-},
 [8766] = {
 4000,
 5,
 },
-["t"] = 1794827145,
+[159] = {
+25,
+5,
+},
+[4599] = {
+2000,
+5,
+},
 },
 [3000] = {
 [2522] = {
@@ -7952,43 +8002,43 @@
 10,
 200,
 },
-[3131] = {
-299,
+["t"] = 1794819687,
+[159] = {
+25,
+5,
+},
+[4496] = {
+500,
 1,
 },
 [2947] = {
 42,
 1,
 },
-[2946] = {
-299,
-1,
-},
-[2512] = {
-10,
-200,
-},
-[4496] = {
-500,
+[3111] = {
+42,
 1,
 },
 [4498] = {
 2500,
 1,
 },
-[159] = {
-25,
-5,
+[2512] = {
+10,
+200,
 },
-[3111] = {
-42,
+[2946] = {
+299,
 1,
 },
 [4470] = {
 38,
 1,
 },
-["t"] = 1794819687,
+[3131] = {
+299,
+1,
+},
 },
 [2136] = {
 [2491] = {
@@ -8025,129 +8075,51 @@
 1,
 },
 },
-[263440] = {
-[2524] = {
-19192,
-1,
+[257057] = {
+[3771] = {
+1000,
+5,
 },
-["t"] = 1794948635,
-[2525] = {
-26489,
-1,
+[8952] = {
+4000,
+5,
 },
-[2527] = {
-29356,
-1,
+[117] = {
+25,
+5,
+},
+[4599] = {
+2000,
+5,
+},
+["t"] = 1794948663,
+[3770] = {
+500,
+5,
+},
+[2287] = {
+125,
+5,
 },
 },
 [12045] = {
-["t"] = 1795086361,
-[2522] = {
-20294,
-1,
-},
 [2523] = {
 25457,
 1,
 },
-[2531] = {
-50553,
+[2522] = {
+20294,
 1,
 },
 [2530] = {
 46998,
 1,
 },
-},
-[3322] = {
-[3024] = {
-6389,
+[2531] = {
+50553,
 1,
 },
-[11284] = {
-900,
-200,
-},
-[3033] = {
-270,
-200,
-},
-[2516] = {
-9,
-200,
-},
-[2509] = {
-373,
-1,
-},
-[5441] = {
-90,
-1,
-},
-[2519] = {
-45,
-200,
-},
-["t"] = 1795041287,
-[3023] = {
-3394,
-1,
-},
-[2511] = {
-1192,
-1,
-},
-},
-[2113] = {
-[1835] = {
-31,
-1,
-},
-[3595] = {
-23,
-1,
-},
-[193] = {
-48,
-1,
-},
-[1836] = {
-31,
-1,
-},
-[194] = {
-49,
-1,
-},
-[714] = {
-32,
-1,
-},
-[195] = {
-36,
-1,
-},
-[85] = {
-62,
-1,
-},
-[210] = {
-45,
-1,
-},
-[3596] = {
-23,
-1,
-},
-[209] = {
-60,
-1,
-},
-[711] = {
-25,
-1,
-},
-["t"] = 1794816677,
+["t"] = 1795086361,
 },
 [260566] = {
 [3024] = {
@@ -8183,6 +8155,96 @@
 1,
 },
 ["t"] = 1794838520,
+},
+[2113] = {
+[1835] = {
+31,
+1,
+},
+[3595] = {
+23,
+1,
+},
+[193] = {
+48,
+1,
+},
+[1836] = {
+31,
+1,
+},
+[194] = {
+49,
+1,
+},
+[714] = {
+32,
+1,
+},
+[195] = {
+36,
+1,
+},
+["t"] = 1794816677,
+[210] = {
+45,
+1,
+},
+[209] = {
+60,
+1,
+},
+[3596] = {
+23,
+1,
+},
+[711] = {
+25,
+1,
+},
+[85] = {
+62,
+1,
+},
+},
+[3322] = {
+[3024] = {
+6389,
+1,
+},
+[11284] = {
+900,
+200,
+},
+[3033] = {
+270,
+200,
+},
+[2516] = {
+9,
+200,
+},
+[2509] = {
+373,
+1,
+},
+[5441] = {
+90,
+1,
+},
+[2519] = {
+45,
+200,
+},
+[2511] = {
+1192,
+1,
+},
+[3023] = {
+3394,
+1,
+},
+["t"] = 1795041287,
 },
 [7485] = {
 [4544] = {
@@ -8234,19 +8296,19 @@
 1800,
 5,
 },
-[2287] = {
-113,
+[8766] = {
+3600,
 5,
 },
 [159] = {
 23,
 5,
 },
-[8952] = {
+[8950] = {
 3600,
 5,
 },
-[8950] = {
+[8952] = {
 3600,
 5,
 },
@@ -8254,37 +8316,45 @@
 23,
 5,
 },
-[8766] = {
-3600,
-5,
-},
-},
-[257057] = {
-[3771] = {
-1000,
-5,
-},
-[8952] = {
-4000,
-5,
-},
-[117] = {
-25,
-5,
-},
 [2287] = {
-125,
+113,
 5,
 },
-["t"] = 1794948663,
-[4599] = {
-2000,
-5,
 },
-[3770] = {
-500,
-5,
+[10361] = {
+[2529] = {
+58528,
+1,
 },
+[2530] = {
+46998,
+1,
+},
+[2531] = {
+50553,
+1,
+},
+[2532] = {
+47348,
+1,
+},
+[2533] = {
+54997,
+1,
+},
+[2534] = {
+40888,
+1,
+},
+[2535] = {
+55401,
+1,
+},
+[2528] = {
+46653,
+1,
+},
+["t"] = 1795115587,
 },
 },
 ["loot"] = {
@@ -8568,27 +8638,15 @@
 },
 ["n"] = 1,
 },
-["c:2649"] = {
+["i:20767"] = {
 ["i"] = {
-[1520] = 1,
+[3864] = 1,
 },
 ["n"] = 1,
 },
-["c:1544"] = {
+["c:11793"] = {
 ["i"] = {
-[2859] = 1,
-},
-["n"] = 1,
-},
-["o:164659"] = {
-["i"] = {
-[11185] = 1,
-},
-["n"] = 1,
-},
-["c:1523"] = {
-["i"] = {
-[3162] = 1,
+[15373] = 1,
 },
 ["n"] = 1,
 },
@@ -8599,12 +8657,24 @@
 },
 ["n"] = 1,
 },
+["c:1523"] = {
+["i"] = {
+[3162] = 1,
+},
+["n"] = 1,
+},
+["o:164659"] = {
+["i"] = {
+[11185] = 1,
+},
+["n"] = 1,
+},
 ["i:4636"] = {
 ["i"] = {
-[15233] = 1,
 [3864] = 1,
-[7440] = 1,
 [6419] = 1,
+[7440] = 1,
+[15233] = 1,
 },
 ["n"] = 4,
 },
@@ -8622,9 +8692,9 @@
 },
 ["n"] = 2,
 },
-["c:1935"] = {
+["c:1520"] = {
 ["i"] = {
-[2212] = 1,
+[211786] = 1,
 },
 ["n"] = 1,
 },
@@ -8634,9 +8704,9 @@
 },
 ["n"] = 1,
 },
-["c:8759"] = {
+["c:1509"] = {
 ["i"] = {
-[5471] = 1,
+[3363] = 1,
 },
 ["n"] = 1,
 },
@@ -8649,8 +8719,8 @@
 ["c:8127"] = {
 ["i"] = {
 [9639] = 1,
-[254098] = 1,
 [9243] = 1,
+[254098] = 1,
 },
 ["n"] = 1,
 },
@@ -8689,26 +8759,26 @@
 ["i"] = {
 [7369] = 1,
 [10289] = 1,
-[12039] = 1,
 [12009] = 1,
+[12039] = 1,
 },
 ["n"] = 4,
-},
-["c:710"] = {
-["i"] = {
-[7909] = 1,
-},
-["n"] = 1,
-},
-["i:4637"] = {
-["i"] = {
-[7478] = 1,
-},
-["n"] = 1,
 },
 ["c:1656"] = {
 ["i"] = {
 [2830] = 1,
+},
+["n"] = 1,
+},
+["c:12203"] = {
+["i"] = {
+[4784] = 1,
+},
+["n"] = 1,
+},
+["c:1553"] = {
+["i"] = {
+[7073] = 1,
 },
 ["n"] = 1,
 },
@@ -8727,9 +8797,9 @@
 ["c:780"] = {
 ["i"] = {
 [1524] = 1,
-[1520] = 2,
-[8151] = 1,
 [4306] = 1,
+[8151] = 1,
+[1520] = 2,
 },
 ["n"] = 3,
 },
@@ -8739,15 +8809,15 @@
 },
 ["n"] = 1,
 },
-["c:12203"] = {
+["i:4637"] = {
 ["i"] = {
-[4784] = 1,
+[7478] = 1,
 },
 ["n"] = 1,
 },
-["c:1553"] = {
+["c:710"] = {
 ["i"] = {
-[7073] = 1,
+[7909] = 1,
 },
 ["n"] = 1,
 },
@@ -8764,15 +8834,15 @@
 },
 ["n"] = 1,
 },
-["c:1509"] = {
+["c:8759"] = {
 ["i"] = {
-[3363] = 1,
+[5471] = 1,
 },
 ["n"] = 1,
 },
-["c:1520"] = {
+["c:1935"] = {
 ["i"] = {
-[211786] = 1,
+[2212] = 1,
 },
 ["n"] = 1,
 },
@@ -8795,15 +8865,15 @@
 },
 ["n"] = 1,
 },
-["c:11793"] = {
+["c:1544"] = {
 ["i"] = {
-[15373] = 1,
+[2859] = 1,
 },
 ["n"] = 1,
 },
-["i:20767"] = {
+["c:2649"] = {
 ["i"] = {
-[3864] = 1,
+[1520] = 1,
 },
 ["n"] = 1,
 },
@@ -8901,13 +8971,13 @@
 ["e"] = {
 "c260231",
 },
-["n"] = "The Monster Surfaces",
-["g"] = {
-"c260231",
-},
 ["r"] = {
 274948,
 },
+["g"] = {
+"c260231",
+},
+["n"] = "The Monster Surfaces",
 },
 [95427] = {
 ["e"] = {
@@ -9278,8 +9348,8 @@
 ["n"] = "King of the Wild Plains",
 },
 [7861] = {
-["n"] = "WANTED: Vile Priestess Hexx and Her Minions",
 ["lv"] = 51,
+["n"] = "WANTED: Vile Priestess Hexx and Her Minions",
 },
 [94668] = {
 ["e"] = {
@@ -9323,10 +9393,10 @@
 "c258031",
 },
 ["lv"] = 43,
+["n"] = "WANTED: Scoutmaster Vargas",
 ["r"] = {
 276105,
 },
-["n"] = "WANTED: Scoutmaster Vargas",
 },
 [96010] = {
 ["lv"] = 41,
@@ -9547,12 +9617,12 @@
 ["e"] = {
 "c258570",
 },
-["g"] = {
-"c258570",
-},
 ["c"] = {
 275050,
 275051,
+},
+["g"] = {
+"c258570",
 },
 ["n"] = "Bring Me His Head",
 },
@@ -9797,8 +9867,8 @@
 ["n"] = "Biting the Hand",
 },
 [2781] = {
-["n"] = "WANTED: Caliph Scorpidsting",
 ["lv"] = 46,
+["n"] = "WANTED: Caliph Scorpidsting",
 },
 [95602] = {
 ["e"] = {
@@ -9844,13 +9914,13 @@
 ["e"] = {
 "c2465",
 },
-["n"] = "Mok'thardin's Enchantment",
-["g"] = {
-"c2465",
-},
 ["r"] = {
 4112,
 },
+["g"] = {
+"c2465",
+},
+["n"] = "Mok'thardin's Enchantment",
 },
 [94964] = {
 ["e"] = {
@@ -9988,8 +10058,8 @@
 ["n"] = "Touring the Grounds",
 },
 [4145] = {
-["lv"] = 52,
 ["n"] = "Larion and Muigin",
+["lv"] = 52,
 },
 [2846] = {
 ["c"] = {
@@ -10047,12 +10117,12 @@
 ["e"] = {
 "c1499",
 },
-["g"] = {
-"c1499",
-},
 ["c"] = {
 6063,
 3439,
+},
+["g"] = {
+"c1499",
 },
 ["n"] = "Graverobbers",
 },
@@ -10090,13 +10160,13 @@
 ["e"] = {
 "c256418",
 },
+["g"] = {
+"c256418",
+},
 ["c"] = {
 279852,
 279480,
 279853,
-},
-["g"] = {
-"c256418",
 },
 ["n"] = "Eye of Mugg",
 },
@@ -10150,15 +10220,15 @@
 ["e"] = {
 "c259961",
 },
-["n"] = "Twice Misplaced Trust",
+["r"] = {
+2595,
+},
 ["c"] = {
 278017,
 278018,
 278019,
 },
-["r"] = {
-2595,
-},
+["n"] = "Twice Misplaced Trust",
 },
 [93787] = {
 ["e"] = {
@@ -10187,8 +10257,8 @@
 ["n"] = "Buying Friendship: Gelkis",
 },
 [2875] = {
-["n"] = "WANTED: Andre Firebeard",
 ["lv"] = 45,
+["n"] = "WANTED: Andre Firebeard",
 },
 [8410] = {
 ["lv"] = 52,
@@ -10226,13 +10296,13 @@
 ["e"] = {
 "c1740",
 },
-["g"] = {
-"c1740",
-},
 ["c"] = {
 11848,
 11849,
 11850,
+},
+["g"] = {
+"c1740",
 },
 ["n"] = "Scavenging Deathknell",
 },
@@ -10265,12 +10335,12 @@
 ["e"] = {
 "c4706",
 },
-["g"] = {
-"c4708",
-},
 ["c"] = {
 6726,
 6727,
+},
+["g"] = {
+"c4708",
 },
 ["n"] = "Safety First",
 },
@@ -10363,12 +10433,12 @@
 ["e"] = {
 "c1569",
 },
-["g"] = {
-"c1569",
-},
 ["c"] = {
 3275,
 11847,
+},
+["g"] = {
+"c1569",
 },
 ["n"] = "The Mindless Ones",
 },
@@ -10431,8 +10501,8 @@
 ["n"] = "Return Trip",
 },
 [7862] = {
-["n"] = "Job Opening: Guard Captain of Revantusk Village",
 ["lv"] = 51,
+["n"] = "Job Opening: Guard Captain of Revantusk Village",
 },
 [95163] = {
 ["e"] = {
@@ -10498,13 +10568,13 @@
 ["e"] = {
 "c1518",
 },
-["n"] = "A New Plague",
-["g"] = {
-"c1518",
-},
 ["r"] = {
 3382,
 },
+["g"] = {
+"c1518",
+},
+["n"] = "A New Plague",
 },
 [96026] = {
 ["lv"] = 41,
@@ -10513,12 +10583,12 @@
 },
 ["n"] = "Step Two: More Rock",
 },
-[2873] = {
-["lv"] = 45,
+[4293] = {
+["lv"] = 52,
 ["g"] = {
-"c7881",
+"c10136",
 },
-["n"] = "Stoley's Shipment",
+["n"] = "A Sample of Slime...",
 },
 [4284] = {
 ["e"] = {
@@ -10530,29 +10600,21 @@
 },
 ["n"] = "Crystals of Power",
 },
-[3882] = {
-["c"] = {
-11908,
-11909,
-},
+[3561] = {
 ["e"] = {
-"c9272",
-},
-["lv"] = 51,
-["g"] = {
-"c9272",
-},
-["n"] = "Roll the Bones",
-},
-[3883] = {
-["e"] = {
-"c9271",
+"c8379",
 },
 ["lv"] = 52,
 ["g"] = {
-"c9271",
+"c8587",
 },
-["n"] = "Alien Ecology",
+["n"] = "Delivery to Archmage Xylem",
+},
+[2933] = {
+["e"] = {
+"c2216",
+},
+["n"] = "Venom Bottles",
 },
 [368] = {
 ["lv"] = 9,
@@ -10561,11 +10623,12 @@
 },
 ["n"] = "A New Plague",
 },
-[2933] = {
-["e"] = {
-"c2216",
+[3444] = {
+["lv"] = 51,
+["g"] = {
+"c7771",
 },
-["n"] = "Venom Bottles",
+["n"] = "The Stone Circle",
 },
 [2934] = {
 ["e"] = {
@@ -10622,28 +10685,22 @@
 ["n"] = "Krol'dok Moulding",
 },
 [3844] = {
-["lv"] = 52,
 ["n"] = "It's a Secret to Everybody",
+["lv"] = 52,
 },
-[7816] = {
-["e"] = {
-"c14740",
-},
-["lv"] = 48,
+[4292] = {
+["lv"] = 56,
 ["g"] = {
-"c14740",
+"c9619",
 },
-["n"] = "Gammerita, Mon!",
+["n"] = "The Bait for Lar'korwi",
 },
-[3527] = {
-["e"] = {
-"c8579",
+[7046] = {
+["lv"] = 49,
+["r"] = {
+17191,
 },
-["lv"] = 47,
-["g"] = {
-"c8579",
-},
-["n"] = "The Prophecy of Mosh'aru",
+["n"] = "The Scepter of Celebras",
 },
 [96776] = {
 ["e"] = {
@@ -10659,12 +10716,12 @@
 ["e"] = {
 "c5688",
 },
-["g"] = {
-"c6784",
-},
 ["c"] = {
 4604,
 159,
+},
+["g"] = {
+"c6784",
 },
 ["n"] = "A Rogue's Deal",
 },
@@ -10672,22 +10729,22 @@
 ["e"] = {
 "c1661",
 },
-["g"] = {
-"c1661",
-},
 ["c"] = {
 247840,
 247841,
 247846,
 },
+["g"] = {
+"c1661",
+},
 ["n"] = "Marla's Last Wish",
 },
-[826] = {
-["lv"] = 10,
+[95285] = {
+["lv"] = 53,
 ["g"] = {
-"c3188",
+"c260383",
 },
-["n"] = "Zalazane",
+["n"] = "Right Place, Wrong Time",
 },
 [370] = {
 ["g"] = {
@@ -10714,42 +10771,53 @@
 },
 ["n"] = "Smuggler's Special",
 },
-[95288] = {
+[600] = {
 ["e"] = {
-"c255897",
+"c2498",
 },
-["lv"] = 43,
+["c"] = {
+5253,
+4128,
+287071,
+},
+["n"] = "Venture Company Mining",
+},
+[7845] = {
+["lv"] = 51,
 ["g"] = {
-"c255897",
+"c14736",
 },
-["n"] = "Smuggler's Paradise",
-},
-[405] = {
-["lv"] = 8,
-["g"] = {
-"c1499",
-},
-["n"] = "The Prodigal Lich",
-},
-[3362] = {
-["lv"] = 50,
-["g"] = {
-"c7876",
-},
-["n"] = "Thistleshrub Valley",
-},
-[98203] = {
-["lv"] = 49,
-["g"] = {
-"c270780",
-},
-["n"] = "Witch Doctor Ti'ik",
+["n"] = "Kidnapped Elder Torntusk!",
 },
 [77] = {
 ["g"] = {
 "c7801",
 },
 ["n"] = "A Sticky Situation",
+},
+[3520] = {
+["e"] = {
+"c8579",
+},
+["lv"] = 44,
+["g"] = {
+"c8579",
+},
+["n"] = "Screecher Spirits",
+},
+[613] = {
+["e"] = {
+"c2501",
+},
+["c"] = {
+4129,
+270090,
+270091,
+},
+["g"] = {
+"c2501",
+},
+["n"] = "Cracking Maury's Foot",
 },
 [94974] = {
 ["lv"] = 41,
@@ -10758,61 +10826,74 @@
 },
 ["n"] = "Key Ingredients",
 },
-[91488] = {
-["e"] = {
-"c3621",
-},
-["lv"] = 48,
+[5155] = {
+["lv"] = 51,
 ["g"] = {
-"c3621",
+"c10922",
 },
-["n"] = "Home on the Range",
+["n"] = "Forces of Jaedenar",
 },
-[3518] = {
+[7028] = {
+["c"] = {
+17775,
+17776,
+17777,
+17779,
+},
 ["e"] = {
-"c4046",
+"c13656",
 },
-["lv"] = 52,
+["lv"] = 47,
 ["g"] = {
-"c8587",
+"c13656",
 },
-["n"] = "Delivery to Magatha Grimtotem",
+["n"] = "Twisted Evils",
 },
-[3517] = {
+[96063] = {
+["r"] = {
+274922,
+},
 ["e"] = {
-"c8587",
+"c263367",
 },
-["lv"] = 52,
+["lv"] = 38,
 ["g"] = {
-"c8587",
+"c263367",
 },
-["n"] = "Stealing Knowledge",
+["n"] = "Gaseous Gold",
 },
-[94672] = {
+[5535] = {
 ["e"] = {
-"c256710",
+"c11548",
 },
-["lv"] = 41,
+["lv"] = 47,
 ["g"] = {
-"c256710",
+"c11548",
 },
-["n"] = "Encroaching Twilight",
+["n"] = "Spiritual Unrest",
 },
-[96658] = {
-["e"] = {
-"c265944",
-},
+[97959] = {
 ["lv"] = 6,
 ["g"] = {
 "c265812",
 },
-["n"] = "Camping 101: Cooking",
+["n"] = "Camping 101: Mining",
 },
-[91497] = {
+[94533] = {
+["c"] = {
+274942,
+274943,
+274944,
+274946,
+},
+["e"] = {
+"c258031",
+},
+["lv"] = 40,
 ["g"] = {
-"c247449",
+"c258031",
 },
-["n"] = "Seals of the Sin'dorei",
+["n"] = "Snargl's Snout",
 },
 [407] = {
 ["e"] = {
@@ -10823,19 +10904,12 @@
 },
 ["n"] = "Fields of Grief",
 },
-[426] = {
-["c"] = {
-3447,
-3834,
-},
-["e"] = {
-"c1496",
-},
-["lv"] = 8,
+[1690] = {
+["lv"] = 43,
 ["g"] = {
-"c1496",
+"c7407",
 },
-["n"] = "The Mills Overrun",
+["n"] = "Wastewander Justice",
 },
 [91685] = {
 ["c"] = {
@@ -10871,47 +10945,37 @@
 },
 ["n"] = "Forsaken Duties",
 },
-[94972] = {
-["c"] = {
-279859,
-279860,
-},
+[95260] = {
 ["e"] = {
-"c256710",
+"c260231",
 },
-["lv"] = 44,
+["lv"] = 42,
+["n"] = "Terrors From the Deep",
+},
+[95296] = {
 ["g"] = {
-"c256710",
+"c255897",
 },
-["n"] = "Tome of Twilight",
+["n"] = "Shipping and Handling",
 },
-[91208] = {
+[95992] = {
 ["e"] = {
-"c244808",
+"c263190",
 },
-["lv"] = 4,
-["g"] = {
-"c244808",
+["lv"] = 42,
+["r"] = {
+274962,
 },
-["n"] = "Coming to Terms",
-},
-[2974] = {
-["e"] = {
-"c4544",
-},
-["g"] = {
-"c4544",
-},
-["n"] = "A Grim Discovery",
+["n"] = "WANTED: Ghostmaw",
 },
 [617] = {
 ["e"] = {
 "c2494",
 },
-["n"] = "Akiris by the Bundle",
 ["r"] = {
 4117,
 },
+["n"] = "Akiris by the Bundle",
 },
 [94975] = {
 ["r"] = {
@@ -10954,12 +11018,12 @@
 ["e"] = {
 "c4485",
 },
+["g"] = {
+"c4544",
+},
 ["c"] = {
 11858,
 11859,
-},
-["g"] = {
-"c4544",
 },
 ["n"] = "A Grim Discovery",
 },
@@ -10970,18 +11034,11 @@
 },
 ["n"] = "Gelkis Alliance",
 },
-[86784] = {
-["r"] = {
-279939,
-},
-["e"] = {
-"c265812",
-},
-["lv"] = 7,
+[408] = {
 ["g"] = {
-"c1742",
+"c1499",
 },
-["n"] = "Sticks and Bones",
+["n"] = "The Family Crypt",
 },
 [592] = {
 ["c"] = {
@@ -11024,18 +11081,14 @@
 },
 ["n"] = "I Know a Guy",
 },
-[7067] = {
-["r"] = {
-17774,
-},
+[95420] = {
 ["e"] = {
-"c13717",
+"c255829",
 },
-["lv"] = 48,
 ["g"] = {
-"c13717",
+"c256710",
 },
-["n"] = "The Pariah's Instructions",
+["n"] = "Land of Giants",
 },
 [4300] = {
 ["c"] = {
@@ -11052,15 +11105,20 @@
 },
 ["n"] = "Bone-Bladed Weapons",
 },
-[3380] = {
+[2768] = {
+["c"] = {
+9533,
+9534,
+270099,
+},
 ["e"] = {
-"c7771",
+"c7407",
 },
-["lv"] = 51,
+["lv"] = 47,
 ["g"] = {
-"c8115",
+"c7407",
 },
-["n"] = "The Sunken Temple",
+["n"] = "Divino-matic Rod",
 },
 [95934] = {
 ["lv"] = 42,
@@ -11069,15 +11127,15 @@
 },
 ["n"] = "Proof of Profit",
 },
-[96775] = {
+[99134] = {
 ["e"] = {
-"c264074",
+"c1515",
 },
-["lv"] = 46,
+["lv"] = 6,
 ["g"] = {
-"c264074",
+"c1515",
 },
-["n"] = "Zum'rah's Head",
+["n"] = "Discipline",
 },
 [375] = {
 ["c"] = {
@@ -11097,35 +11155,30 @@
 ["e"] = {
 "c2530",
 },
-["n"] = "Filling the Soul Gem",
 ["r"] = {
 3913,
 },
+["n"] = "Filling the Soul Gem",
 },
-[99134] = {
+[96775] = {
 ["e"] = {
-"c1515",
+"c264074",
 },
-["lv"] = 6,
+["lv"] = 46,
 ["g"] = {
-"c1515",
+"c264074",
 },
-["n"] = "Discipline",
+["n"] = "Zum'rah's Head",
 },
-[2768] = {
-["c"] = {
-9533,
-9534,
-270099,
-},
+[3380] = {
 ["e"] = {
-"c7407",
+"c7771",
 },
-["lv"] = 47,
+["lv"] = 51,
 ["g"] = {
-"c7407",
+"c8115",
 },
-["n"] = "Divino-matic Rod",
+["n"] = "The Sunken Temple",
 },
 [3503] = {
 ["e"] = {
@@ -11133,14 +11186,18 @@
 },
 ["n"] = "Meeting with the Master",
 },
-[95420] = {
+[7067] = {
+["r"] = {
+17774,
+},
 ["e"] = {
-"c255829",
+"c13717",
 },
+["lv"] = 48,
 ["g"] = {
-"c256710",
+"c13717",
 },
-["n"] = "Land of Giants",
+["n"] = "The Pariah's Instructions",
 },
 [3505] = {
 ["e"] = {
@@ -11152,47 +11209,64 @@
 },
 ["n"] = "Betrayed",
 },
-[408] = {
-["g"] = {
-"c1499",
+[86784] = {
+["r"] = {
+279939,
 },
-["n"] = "The Family Crypt",
+["e"] = {
+"c265812",
+},
+["lv"] = 7,
+["g"] = {
+"c1742",
+},
+["n"] = "Sticks and Bones",
 },
 [376] = {
 ["e"] = {
-"c1661",
-},
-["g"] = {
 "c1661",
 },
 ["c"] = {
 6060,
 2173,
 },
+["g"] = {
+"c1661",
+},
 ["n"] = "The Damned",
 },
-[95992] = {
+[2974] = {
 ["e"] = {
-"c263190",
+"c4544",
 },
-["lv"] = 42,
-["n"] = "WANTED: Ghostmaw",
-["r"] = {
-274962,
-},
-},
-[95296] = {
 ["g"] = {
-"c255897",
+"c4544",
 },
-["n"] = "Shipping and Handling",
+["n"] = "A Grim Discovery",
 },
-[95260] = {
+[91208] = {
 ["e"] = {
-"c260231",
+"c244808",
 },
-["lv"] = 42,
-["n"] = "Terrors From the Deep",
+["lv"] = 4,
+["g"] = {
+"c244808",
+},
+["n"] = "Coming to Terms",
+},
+[94972] = {
+["c"] = {
+279859,
+279860,
+},
+["e"] = {
+"c256710",
+},
+["lv"] = 44,
+["g"] = {
+"c256710",
+},
+["n"] = "Tome of Twilight",
 },
 [5481] = {
 ["e"] = {
@@ -11204,12 +11278,19 @@
 },
 ["n"] = "Gordo's Task",
 },
-[1690] = {
-["lv"] = 43,
-["g"] = {
-"c7407",
+[426] = {
+["c"] = {
+3447,
+3834,
 },
-["n"] = "Wastewander Justice",
+["e"] = {
+"c1496",
+},
+["lv"] = 8,
+["g"] = {
+"c1496",
+},
+["n"] = "The Mills Overrun",
 },
 [95424] = {
 ["e"] = {
@@ -11221,123 +11302,99 @@
 },
 ["n"] = "Might Makes Right",
 },
-[94533] = {
-["c"] = {
-274942,
-274943,
-274944,
-274946,
-},
-["e"] = {
-"c258031",
-},
-["lv"] = 40,
+[91497] = {
 ["g"] = {
-"c258031",
+"c247449",
 },
-["n"] = "Snargl's Snout",
+["n"] = "Seals of the Sin'dorei",
 },
-[97959] = {
+[96658] = {
+["e"] = {
+"c265944",
+},
 ["lv"] = 6,
 ["g"] = {
 "c265812",
 },
-["n"] = "Camping 101: Mining",
+["n"] = "Camping 101: Cooking",
 },
-[5535] = {
+[94672] = {
 ["e"] = {
-"c11548",
+"c256710",
 },
-["lv"] = 47,
+["lv"] = 41,
 ["g"] = {
-"c11548",
+"c256710",
 },
-["n"] = "Spiritual Unrest",
+["n"] = "Encroaching Twilight",
 },
-[96063] = {
-["r"] = {
-274922,
-},
+[3517] = {
 ["e"] = {
-"c263367",
+"c8587",
 },
-["lv"] = 38,
+["lv"] = 52,
 ["g"] = {
-"c263367",
+"c8587",
 },
-["n"] = "Gaseous Gold",
+["n"] = "Stealing Knowledge",
 },
-[7028] = {
-["c"] = {
-17775,
-17776,
-17777,
-17779,
-},
+[3518] = {
 ["e"] = {
-"c13656",
+"c4046",
 },
-["lv"] = 47,
+["lv"] = 52,
 ["g"] = {
-"c13656",
+"c8587",
 },
-["n"] = "Twisted Evils",
+["n"] = "Delivery to Magatha Grimtotem",
 },
-[5155] = {
-["lv"] = 51,
-["g"] = {
-"c10922",
-},
-["n"] = "Forces of Jaedenar",
-},
-[3520] = {
+[91488] = {
 ["e"] = {
-"c8579",
+"c3621",
 },
-["lv"] = 44,
+["lv"] = 48,
 ["g"] = {
-"c8579",
+"c3621",
 },
-["n"] = "Screecher Spirits",
+["n"] = "Home on the Range",
 },
-[613] = {
+[98203] = {
+["lv"] = 49,
+["g"] = {
+"c270780",
+},
+["n"] = "Witch Doctor Ti'ik",
+},
+[3362] = {
+["lv"] = 50,
+["g"] = {
+"c7876",
+},
+["n"] = "Thistleshrub Valley",
+},
+[405] = {
+["lv"] = 8,
+["g"] = {
+"c1499",
+},
+["n"] = "The Prodigal Lich",
+},
+[95288] = {
 ["e"] = {
-"c2501",
+"c255897",
 },
+["lv"] = 43,
 ["g"] = {
-"c2501",
+"c255897",
 },
-["c"] = {
-4129,
-270090,
-270091,
+["n"] = "Smuggler's Paradise",
 },
-["n"] = "Cracking Maury's Foot",
-},
-[7845] = {
-["lv"] = 51,
+[826] = {
+["lv"] = 10,
 ["g"] = {
-"c14736",
+"c3188",
 },
-["n"] = "Kidnapped Elder Torntusk!",
-},
-[600] = {
-["e"] = {
-"c2498",
-},
-["c"] = {
-5253,
-4128,
-287071,
-},
-["n"] = "Venture Company Mining",
-},
-[95285] = {
-["lv"] = 53,
-["g"] = {
-"c260383",
-},
-["n"] = "Right Place, Wrong Time",
+["n"] = "Zalazane",
 },
 [91209] = {
 ["e"] = {
@@ -11356,19 +11413,25 @@
 },
 ["n"] = "Legends of Maraudon",
 },
-[7046] = {
-["lv"] = 49,
-["n"] = "The Scepter of Celebras",
-["r"] = {
-17191,
+[3527] = {
+["e"] = {
+"c8579",
 },
-},
-[4292] = {
-["lv"] = 56,
+["lv"] = 47,
 ["g"] = {
-"c9619",
+"c8579",
 },
-["n"] = "The Bait for Lar'korwi",
+["n"] = "The Prophecy of Mosh'aru",
+},
+[7816] = {
+["e"] = {
+"c14740",
+},
+["lv"] = 48,
+["g"] = {
+"c14740",
+},
+["n"] = "Gammerita, Mon!",
 },
 [95425] = {
 ["e"] = {
@@ -11380,33 +11443,40 @@
 },
 ["n"] = "Unworthy Champion",
 },
-[3444] = {
+[3883] = {
+["e"] = {
+"c9271",
+},
+["lv"] = 52,
+["g"] = {
+"c9271",
+},
+["n"] = "Alien Ecology",
+},
+[3882] = {
+["c"] = {
+11908,
+11909,
+},
+["e"] = {
+"c9272",
+},
 ["lv"] = 51,
 ["g"] = {
-"c7771",
+"c9272",
 },
-["n"] = "The Stone Circle",
-},
-[3561] = {
-["e"] = {
-"c8379",
-},
-["lv"] = 52,
-["g"] = {
-"c8587",
-},
-["n"] = "Delivery to Archmage Xylem",
+["n"] = "Roll the Bones",
 },
 [4501] = {
-["lv"] = 55,
 ["n"] = "Beware of Pterrordax",
+["lv"] = 55,
 },
-[4293] = {
-["lv"] = 52,
+[2873] = {
+["lv"] = 45,
 ["g"] = {
-"c10136",
+"c7881",
 },
-["n"] = "A Sample of Slime...",
+["n"] = "Stoley's Shipment",
 },
 },
 ["recent"] = {
@@ -11490,22 +11560,22 @@
 392,
 },
 },
-["c:12740"] = {
-[1450] = {
-322,
-665,
+["c:6522"] = {
+[1458] = {
+548,
+760,
 },
 },
-["c:7801"] = {
-[1425] = {
-267,
-485,
-},
-},
-["c:255774"] = {
+["c:255769"] = {
 [2548] = {
-237,
-632,
+303,
+661,
+},
+},
+["c:2113"] = {
+[1420] = {
+324,
+656,
 },
 },
 ["c:2136"] = {
@@ -11520,16 +11590,16 @@
 532,
 },
 },
-["c:2928"] = {
-[1425] = {
-504,
-498,
+["c:8420"] = {
+[1447] = {
+534,
+218,
 },
 },
-["c:2113"] = {
-[1420] = {
-324,
-656,
+["c:13699"] = {
+[1443] = {
+270,
+777,
 },
 },
 ["c:9270"] = {
@@ -11538,10 +11608,10 @@
 72,
 },
 },
-["c:255769"] = {
-[2548] = {
-303,
-661,
+["c:2928"] = {
+[1425] = {
+504,
+498,
 },
 },
 ["c:1742"] = {
@@ -11562,28 +11632,28 @@
 487,
 },
 },
-["c:10136"] = {
-[1458] = {
-475,
-728,
-},
-},
-["c:11899"] = {
-[1445] = {
-356,
-318,
-},
-},
-["c:265812"] = {
-[1420] = {
-572,
-554,
-},
-},
 ["c:7311"] = {
 [1454] = {
 390,
 860,
+},
+},
+["c:4453"] = {
+[1441] = {
+781,
+771,
+},
+},
+["c:11756"] = {
+[1446] = {
+511,
+278,
+},
+},
+["c:10136"] = {
+[1458] = {
+475,
+728,
 },
 },
 ["c:667"] = {
@@ -11592,44 +11662,6 @@
 331,
 466,
 312,
-},
-},
-["c:3549"] = {
-[1420] = {
-654,
-601,
-},
-},
-["c:8659"] = {
-[1454] = {
-555,
-342,
-},
-},
-["c:2851"] = {
-[1417] = {
-731,
-327,
-},
-},
-["c:2137"] = {
-[1420] = {
-603,
-528,
-},
-},
-["c:674"] = {
-[1434] = {
-414,
-444,
-415,
-428,
-},
-},
-["c:246152"] = {
-[1420] = {
-603,
-526,
 },
 },
 ["c:8737"] = {
@@ -11644,16 +11676,54 @@
 505,
 },
 },
-["c:2997"] = {
-[1456] = {
-418,
-619,
+["c:2851"] = {
+[1417] = {
+731,
+327,
 },
 },
 ["c:264074"] = {
 [1412] = {
 325,
 207,
+},
+},
+["c:674"] = {
+[1434] = {
+414,
+444,
+415,
+428,
+},
+},
+["c:260540"] = {
+[2548] = {
+760,
+526,
+},
+},
+["c:3549"] = {
+[1420] = {
+654,
+601,
+},
+},
+["c:2498"] = {
+[1434] = {
+271,
+773,
+},
+},
+["c:2997"] = {
+[1456] = {
+418,
+619,
+},
+},
+["c:3621"] = {
+[1447] = {
+219,
+522,
 },
 },
 ["c:256657"] = {
@@ -11680,9 +11750,9 @@
 521,
 },
 },
-["c:260540"] = {
-[2548] = {
-760,
+["c:246152"] = {
+[1420] = {
+603,
 526,
 },
 },
@@ -11704,12 +11774,10 @@
 292,
 },
 },
-["c:1513"] = {
-[1420] = {
-352,
-647,
-351,
-669,
+["c:2393"] = {
+[1424] = {
+624,
+191,
 },
 },
 ["c:257058"] = {
@@ -11724,12 +11792,10 @@
 339,
 },
 },
-["c:780"] = {
-[1434] = {
-472,
-397,
-472,
-310,
+["c:255897"] = {
+[2548] = {
+771,
+528,
 },
 },
 ["c:275954"] = {
@@ -11738,22 +11804,22 @@
 463,
 },
 },
-["c:260566"] = {
+["c:14637"] = {
+[1444] = {
+448,
+434,
+},
+},
+["o:620422"] = {
 [2548] = {
-786,
-537,
+638,
+365,
 },
 },
-["c:3000"] = {
-[1449] = {
-441,
-73,
-},
-},
-["c:1387"] = {
-[1434] = {
-325,
-293,
+["c:1553"] = {
+[1420] = {
+504,
+476,
 },
 },
 ["c:2132"] = {
@@ -11774,16 +11840,18 @@
 547,
 },
 },
-["c:2393"] = {
-[1424] = {
-624,
-191,
+["c:1513"] = {
+[1420] = {
+352,
+647,
+351,
+669,
 },
 },
-["o:620422"] = {
-[2548] = {
-638,
-365,
+["c:3000"] = {
+[1449] = {
+441,
+73,
 },
 },
 ["c:7824"] = {
@@ -11804,22 +11872,22 @@
 791,
 },
 },
-["c:268557"] = {
-[1412] = {
-327,
-242,
-},
-},
-["c:7408"] = {
+["c:222856"] = {
 [1446] = {
-524,
-284,
+430,
+413,
 },
 },
-["c:2536"] = {
+["c:2530"] = {
 [1434] = {
-353,
-516,
+391,
+582,
+},
+},
+["c:256655"] = {
+[2548] = {
+587,
+447,
 },
 },
 ["c:11832"] = {
@@ -11828,28 +11896,28 @@
 420,
 },
 },
-["c:14741"] = {
-[1425] = {
-791,
-794,
+["c:259962"] = {
+[2548] = {
+790,
+542,
 },
 },
-["c:696"] = {
-[1434] = {
-425,
-351,
+["c:256418"] = {
+[2548] = {
+593,
+457,
 },
 },
-["c:10583"] = {
-[1449] = {
-452,
-59,
+["c:2118"] = {
+[1420] = {
+610,
+524,
 },
 },
-["c:5598"] = {
-[1425] = {
-339,
-752,
+["c:260231"] = {
+[2548] = {
+799,
+525,
 },
 },
 ["c:1661"] = {
@@ -11858,10 +11926,10 @@
 661,
 },
 },
-["o:164659"] = {
-[1449] = {
-697,
-348,
+["c:2497"] = {
+[1434] = {
+321,
+278,
 },
 },
 ["c:1518"] = {
@@ -11870,10 +11938,10 @@
 523,
 },
 },
-["c:2530"] = {
-[1434] = {
-391,
-582,
+["c:4791"] = {
+[1445] = {
+352,
+307,
 },
 },
 ["c:8115"] = {
@@ -11894,16 +11962,16 @@
 504,
 },
 },
-["c:259962"] = {
-[2548] = {
-790,
-542,
+["c:14741"] = {
+[1425] = {
+791,
+794,
 },
 },
-["c:263440"] = {
+["c:260995"] = {
 [2548] = {
-672,
-217,
+272,
+357,
 },
 },
 ["c:1568"] = {
@@ -11918,10 +11986,10 @@
 528,
 },
 },
-["c:260231"] = {
-[2548] = {
-799,
-525,
+["c:5598"] = {
+[1425] = {
+339,
+752,
 },
 },
 ["c:9117"] = {
@@ -11930,12 +11998,10 @@
 26,
 },
 },
-["o:164780"] = {
-[1449] = {
-690,
-289,
-729,
-467,
+["c:3403"] = {
+[1454] = {
+378,
+368,
 },
 },
 ["c:1523"] = {
@@ -11944,22 +12010,16 @@
 359,
 },
 },
-["c:2497"] = {
-[1434] = {
-321,
-278,
+["o:164659"] = {
+[1449] = {
+697,
+348,
 },
 },
-["c:256418"] = {
+["c:263440"] = {
 [2548] = {
-593,
-457,
-},
-},
-["c:257062"] = {
-[2548] = {
-656,
-213,
+672,
+217,
 },
 },
 ["c:263190"] = {
@@ -11968,10 +12028,16 @@
 453,
 },
 },
-["c:251001"] = {
+["c:257062"] = {
+[2548] = {
+656,
+213,
+},
+},
+["c:1656"] = {
 [1420] = {
-652,
-601,
+446,
+321,
 },
 },
 ["c:7804"] = {
@@ -11986,10 +12052,10 @@
 519,
 },
 },
-["c:11548"] = {
-[1447] = {
-113,
-781,
+["c:255993"] = {
+[2548] = {
+596,
+451,
 },
 },
 ["c:12045"] = {
@@ -12004,16 +12070,16 @@
 780,
 },
 },
-["c:260931"] = {
-[2548] = {
-499,
-471,
+["c:246394"] = {
+[1420] = {
+229,
+497,
 },
 },
-["c:259961"] = {
-[2548] = {
-794,
-527,
+["c:1496"] = {
+[1420] = {
+582,
+516,
 },
 },
 ["c:250282"] = {
@@ -12028,16 +12094,10 @@
 515,
 },
 },
-["c:246394"] = {
-[1420] = {
-229,
-497,
-},
-},
-["c:2122"] = {
-[1420] = {
-324,
-656,
+["c:2501"] = {
+[1434] = {
+278,
+771,
 },
 },
 ["c:8579"] = {
@@ -12046,10 +12106,16 @@
 224,
 },
 },
-["c:1743"] = {
+["c:2122"] = {
 [1420] = {
-586,
-515,
+324,
+656,
+},
+},
+["c:1385"] = {
+[1434] = {
+317,
+288,
 },
 },
 ["c:8390"] = {
@@ -12058,10 +12124,10 @@
 718,
 },
 },
-["c:2927"] = {
-[1425] = {
-358,
-468,
+["c:8399"] = {
+[1447] = {
+264,
+462,
 },
 },
 ["c:247449"] = {
@@ -12076,10 +12142,10 @@
 285,
 },
 },
-["c:1385"] = {
-[1434] = {
-317,
-288,
+["c:9997"] = {
+[1449] = {
+437,
+84,
 },
 },
 ["c:14736"] = {
@@ -12088,34 +12154,10 @@
 812,
 },
 },
-["c:8399"] = {
-[1447] = {
-264,
-462,
-},
-},
-["c:4485"] = {
+["c:3322"] = {
 [1454] = {
-751,
-342,
-},
-},
-["c:256710"] = {
-[2548] = {
-595,
-440,
-},
-},
-["c:6491"] = {
-[2548] = {
-760,
-546,
-},
-},
-["c:4708"] = {
-[1446] = {
-510,
-272,
+523,
+624,
 },
 },
 ["c:12240"] = {
@@ -12124,34 +12166,16 @@
 577,
 },
 },
-["c:7771"] = {
-[1446] = {
-527,
-459,
-},
-},
-["c:260391"] = {
+["c:256710"] = {
 [2548] = {
-912,
-397,
+595,
+440,
 },
 },
-["c:3309"] = {
+["c:4485"] = {
 [1454] = {
-496,
-695,
-},
-},
-["c:13417"] = {
-[1454] = {
-386,
-363,
-},
-},
-["c:260383"] = {
-[1445] = {
-703,
-189,
+751,
+342,
 },
 },
 ["c:3945"] = {
@@ -12160,16 +12184,58 @@
 741,
 },
 },
+["c:6491"] = {
+[2548] = {
+760,
+546,
+},
+},
+["c:7771"] = {
+[1446] = {
+527,
+459,
+},
+},
 ["c:8576"] = {
 [1447] = {
 223,
 515,
 },
 },
+["c:3309"] = {
+[1454] = {
+496,
+695,
+},
+},
 ["c:7876"] = {
 [1446] = {
 516,
 268,
+},
+},
+["c:259988"] = {
+[2548] = {
+696,
+259,
+},
+},
+["c:13656"] = {
+[1443] = {
+622,
+396,
+},
+},
+["c:260391"] = {
+[2548] = {
+912,
+397,
+},
+},
+["c:13417"] = {
+[1454] = {
+386,
+363,
 },
 },
 ["c:3310"] = {
@@ -12190,12 +12256,10 @@
 755,
 },
 },
-["c:1525"] = {
-[1420] = {
-517,
-510,
-501,
-541,
+["c:5770"] = {
+[1456] = {
+755,
+311,
 },
 },
 ["c:9271"] = {
@@ -12210,22 +12274,22 @@
 413,
 },
 },
-["c:8020"] = {
-[1444] = {
-754,
-443,
+["c:1519"] = {
+[1420] = {
+409,
+542,
 },
 },
-["c:2519"] = {
-[1434] = {
-323,
-278,
+["c:8587"] = {
+[1447] = {
+225,
+514,
 },
 },
-["c:259988"] = {
-[2548] = {
-696,
-259,
+["c:260383"] = {
+[1445] = {
+703,
+189,
 },
 },
 ["c:1495"] = {
@@ -12240,10 +12304,10 @@
 596,
 },
 },
-["c:4551"] = {
-[1458] = {
-634,
-485,
+["c:2134"] = {
+[1420] = {
+611,
+526,
 },
 },
 ["c:3188"] = {
@@ -12258,16 +12322,16 @@
 465,
 },
 },
-["c:1512"] = {
+["c:1515"] = {
 [1420] = {
-301,
-654,
+605,
+518,
 },
 },
-["c:2465"] = {
-[1434] = {
-321,
-292,
+["c:2686"] = {
+[1425] = {
+335,
+734,
 },
 },
 ["c:256728"] = {
@@ -12300,28 +12364,28 @@
 128,
 },
 },
-["c:5770"] = {
-[1456] = {
-755,
-311,
+["c:11900"] = {
+[1448] = {
+344,
+539,
 },
 },
-["c:9619"] = {
+["c:12959"] = {
 [1449] = {
-717,
-760,
+433,
+77,
 },
 },
-["c:8610"] = {
+["c:10361"] = {
 [1447] = {
-220,
-497,
+223,
+511,
 },
 },
-["c:1519"] = {
-[1420] = {
-409,
-542,
+["c:5885"] = {
+[1454] = {
+385,
+859,
 },
 },
 ["c:260428"] = {
@@ -12342,10 +12406,10 @@
 521,
 },
 },
-["c:2134"] = {
-[1420] = {
-611,
-526,
+["c:4551"] = {
+[1458] = {
+634,
+485,
 },
 },
 ["c:1547"] = {
@@ -12354,28 +12418,28 @@
 488,
 },
 },
-["c:2686"] = {
+["c:2649"] = {
 [1425] = {
-335,
-734,
+232,
+576,
 },
 },
-["c:10361"] = {
+["c:8610"] = {
 [1447] = {
-223,
-511,
-},
-},
-["c:2216"] = {
-[1424] = {
-615,
-192,
+220,
+497,
 },
 },
 ["c:11823"] = {
 [1443] = {
 232,
 702,
+},
+},
+["c:2216"] = {
+[1424] = {
+615,
+192,
 },
 },
 ["c:10665"] = {
@@ -12386,18 +12450,6 @@
 468,
 },
 },
-["c:1500"] = {
-[1420] = {
-618,
-524,
-},
-},
-["c:257057"] = {
-[2548] = {
-675,
-194,
-},
-},
 ["c:1508"] = {
 [1420] = {
 290,
@@ -12406,22 +12458,28 @@
 608,
 },
 },
+["c:257057"] = {
+[2548] = {
+675,
+194,
+},
+},
+["c:3344"] = {
+[1454] = {
+388,
+366,
+},
+},
 ["c:1570"] = {
 [1420] = {
 321,
 660,
 },
 },
-["c:246378"] = {
-[1420] = {
-221,
-447,
-},
-},
-["c:10922"] = {
-[1448] = {
+["c:259158"] = {
+[2548] = {
+473,
 513,
-822,
 },
 },
 ["c:256801"] = {
@@ -12430,22 +12488,28 @@
 718,
 },
 },
+["c:4046"] = {
+[1456] = {
+704,
+309,
+},
+},
 ["c:13718"] = {
 [1414] = {
 384,
 581,
 },
 },
-["c:14740"] = {
-[1425] = {
-804,
-815,
+["c:13697"] = {
+[1414] = {
+388,
+581,
 },
 },
-["c:2839"] = {
-[1434] = {
-283,
-746,
+["c:4706"] = {
+[1441] = {
+803,
+762,
 },
 },
 ["c:256799"] = {
@@ -12454,16 +12518,16 @@
 408,
 },
 },
-["c:258031"] = {
-[2548] = {
-604,
-478,
+["c:14737"] = {
+[1425] = {
+776,
+803,
 },
 },
-["c:7854"] = {
-[1444] = {
-745,
-429,
+["c:2839"] = {
+[1434] = {
+283,
+746,
 },
 },
 ["c:8393"] = {
@@ -12472,10 +12536,10 @@
 714,
 },
 },
-["c:14737"] = {
-[1425] = {
-776,
-803,
+["c:246143"] = {
+[1420] = {
+277,
+639,
 },
 },
 ["c:1935"] = {
@@ -12484,10 +12548,10 @@
 495,
 },
 },
-["c:261497"] = {
-[2548] = {
-740,
-253,
+["c:1569"] = {
+[1420] = {
+308,
+662,
 },
 },
 ["c:13717"] = {
@@ -12498,10 +12562,10 @@
 872,
 },
 },
-["c:4706"] = {
-[1441] = {
-803,
-762,
+["c:7854"] = {
+[1444] = {
+745,
+429,
 },
 },
 ["c:1499"] = {
@@ -12522,28 +12586,10 @@
 607,
 },
 },
-["c:1521"] = {
-[1420] = {
-619,
-527,
-},
-},
-["c:270582"] = {
-[1454] = {
-462,
-537,
-},
-},
-["c:272633"] = {
-[1412] = {
-335,
-226,
-},
-},
-["c:1509"] = {
-[1420] = {
-344,
-632,
+["c:262399"] = {
+[2548] = {
+303,
+691,
 },
 },
 ["c:9272"] = {
@@ -12552,10 +12598,28 @@
 74,
 },
 },
-["c:262399"] = {
-[2548] = {
-303,
-691,
+["c:1509"] = {
+[1420] = {
+344,
+632,
+},
+},
+["c:272633"] = {
+[1412] = {
+335,
+226,
+},
+},
+["c:270582"] = {
+[1454] = {
+462,
+537,
+},
+},
+["c:1521"] = {
+[1420] = {
+619,
+527,
 },
 },
 ["c:1520"] = {
@@ -12564,10 +12628,10 @@
 423,
 },
 },
-["c:1569"] = {
-[1420] = {
-308,
-662,
+["c:261497"] = {
+[2548] = {
+740,
+253,
 },
 },
 ["c:6784"] = {
@@ -12576,10 +12640,10 @@
 568,
 },
 },
-["c:246143"] = {
-[1420] = {
-277,
-639,
+["c:258031"] = {
+[2548] = {
+604,
+478,
 },
 },
 ["c:2858"] = {
@@ -12588,22 +12652,22 @@
 771,
 },
 },
-["c:13697"] = {
-[1414] = {
-388,
-581,
+["c:14740"] = {
+[1425] = {
+804,
+815,
 },
 },
-["c:4046"] = {
-[1456] = {
-704,
-309,
-},
-},
-["c:259158"] = {
-[2548] = {
-473,
+["c:10922"] = {
+[1448] = {
 513,
+822,
+},
+},
+["c:246378"] = {
+[1420] = {
+221,
+447,
 },
 },
 ["c:10666"] = {
@@ -12612,10 +12676,10 @@
 525,
 },
 },
-["c:3344"] = {
-[1454] = {
-388,
-366,
+["c:1500"] = {
+[1420] = {
+618,
+524,
 },
 },
 ["c:9165"] = {
@@ -12630,22 +12694,22 @@
 513,
 },
 },
-["c:12959"] = {
+["c:9619"] = {
 [1449] = {
-433,
-77,
+717,
+760,
 },
 },
-["c:2649"] = {
-[1425] = {
-232,
-576,
+["c:2465"] = {
+[1434] = {
+321,
+292,
 },
 },
-["c:1515"] = {
+["c:1512"] = {
 [1420] = {
-605,
-518,
+301,
+654,
 },
 },
 ["c:11139"] = {
@@ -12654,22 +12718,24 @@
 364,
 },
 },
-["c:8587"] = {
-[1447] = {
-225,
-514,
+["c:2519"] = {
+[1434] = {
+323,
+278,
 },
 },
-["c:5885"] = {
-[1454] = {
-385,
-859,
+["c:8020"] = {
+[1444] = {
+754,
+443,
 },
 },
-["c:11900"] = {
-[1448] = {
-344,
-539,
+["c:1525"] = {
+[1420] = {
+517,
+510,
+501,
+541,
 },
 },
 ["c:6546"] = {
@@ -12690,10 +12756,10 @@
 584,
 },
 },
-["c:13656"] = {
-[1443] = {
-622,
-396,
+["c:4708"] = {
+[1446] = {
+510,
+272,
 },
 },
 ["c:3615"] = {
@@ -12708,16 +12774,16 @@
 370,
 },
 },
-["c:3322"] = {
-[1454] = {
-523,
-624,
+["c:2927"] = {
+[1425] = {
+358,
+468,
 },
 },
-["c:9997"] = {
-[1449] = {
-437,
-84,
+["c:1743"] = {
+[1420] = {
+586,
+515,
 },
 },
 ["c:263316"] = {
@@ -12726,16 +12792,16 @@
 589,
 },
 },
-["c:1496"] = {
-[1420] = {
-582,
-516,
+["c:259961"] = {
+[2548] = {
+794,
+527,
 },
 },
-["c:2501"] = {
-[1434] = {
-278,
-771,
+["c:260931"] = {
+[2548] = {
+499,
+471,
 },
 },
 ["c:737"] = {
@@ -12744,16 +12810,16 @@
 772,
 },
 },
-["c:255993"] = {
-[2548] = {
-596,
-451,
+["c:11548"] = {
+[1447] = {
+113,
+781,
 },
 },
-["c:1656"] = {
+["c:251001"] = {
 [1420] = {
-446,
-321,
+652,
+601,
 },
 },
 ["c:1740"] = {
@@ -12762,10 +12828,12 @@
 656,
 },
 },
-["c:3403"] = {
-[1454] = {
-378,
-368,
+["o:164780"] = {
+[1449] = {
+690,
+289,
+729,
+467,
 },
 },
 ["c:260390"] = {
@@ -12786,16 +12854,16 @@
 404,
 },
 },
-["c:2118"] = {
-[1420] = {
-610,
-524,
+["c:10583"] = {
+[1449] = {
+452,
+59,
 },
 },
-["c:260995"] = {
-[2548] = {
-272,
-357,
+["c:696"] = {
+[1434] = {
+425,
+351,
 },
 },
 ["c:261208"] = {
@@ -12804,28 +12872,28 @@
 469,
 },
 },
-["c:4791"] = {
-[1445] = {
-352,
-307,
+["c:2536"] = {
+[1434] = {
+353,
+516,
 },
 },
-["c:256655"] = {
-[2548] = {
-587,
-447,
-},
-},
-["c:222856"] = {
+["c:7408"] = {
 [1446] = {
-430,
-413,
+524,
+284,
 },
 },
-["c:1553"] = {
-[1420] = {
-504,
-476,
+["c:268557"] = {
+[1412] = {
+327,
+242,
+},
+},
+["c:1387"] = {
+[1434] = {
+325,
+293,
 },
 },
 ["c:1531"] = {
@@ -12834,16 +12902,18 @@
 491,
 },
 },
-["c:14637"] = {
-[1444] = {
-448,
-434,
-},
-},
-["c:255897"] = {
+["c:260566"] = {
 [2548] = {
-771,
-528,
+786,
+537,
+},
+},
+["c:780"] = {
+[1434] = {
+472,
+397,
+472,
+310,
 },
 },
 ["c:246349"] = {
@@ -12858,16 +12928,16 @@
 448,
 },
 },
-["c:3621"] = {
-[1447] = {
-219,
-522,
+["c:2137"] = {
+[1420] = {
+603,
+528,
 },
 },
-["c:2498"] = {
-[1434] = {
-271,
-773,
+["c:8659"] = {
+[1454] = {
+555,
+342,
 },
 },
 ["c:270780"] = {
@@ -12876,16 +12946,16 @@
 779,
 },
 },
-["c:11756"] = {
-[1446] = {
-511,
-278,
+["c:265812"] = {
+[1420] = {
+572,
+554,
 },
 },
-["c:4453"] = {
-[1441] = {
-781,
-771,
+["c:11899"] = {
+[1445] = {
+356,
+318,
 },
 },
 ["c:1941"] = {
@@ -12902,22 +12972,22 @@
 784,
 },
 },
-["c:13699"] = {
-[1443] = {
-270,
-777,
+["c:255774"] = {
+[2548] = {
+237,
+632,
 },
 },
-["c:8420"] = {
-[1447] = {
-534,
-218,
+["c:7801"] = {
+[1425] = {
+267,
+485,
 },
 },
-["c:6522"] = {
-[1458] = {
-548,
-760,
+["c:12740"] = {
+[1450] = {
+322,
+665,
 },
 },
 },
@@ -13346,13 +13416,13 @@
 "Durable Hat of Spirit",
 2,
 },
-[260179] = {
-"Barkwoven Belt",
-2,
+[2030] = {
+"Gnarled Staff",
+1,
 },
-[260178] = {
-"Honor Guard's Plate",
-2,
+[11107] = {
+"A Small Pack",
+1,
 },
 [10688] = {
 "Empty Vial Labeled #2",
@@ -13370,8 +13440,8 @@
 "Refunded Ring",
 2,
 },
-[5939] = {
-"Sewing Gloves",
+[3030] = {
+"Razor Arrow",
 1,
 },
 [11858] = {
@@ -13386,12 +13456,12 @@
 "Renegotiated Ring",
 2,
 },
-[9238] = {
-"Uncracked Scarab Shell",
-1,
-},
 [7478] = {
 "Ranger Leggings of Power",
+2,
+},
+[270098] = {
+"Dank Shoulderpads",
 2,
 },
 [2528] = {
@@ -13402,17 +13472,17 @@
 "Apology Ring",
 2,
 },
-[11362] = {
-"Medium Quiver",
+[2534] = {
+"Rondel",
 1,
 },
 [270099] = {
 "Magister Cowl",
 3,
 },
-[17775] = {
-"Acumen Robes",
-2,
+[2533] = {
+"War Maul",
+1,
 },
 [2522] = {
 "Crescent Axe",
@@ -13438,32 +13508,32 @@
 "Scoutmaster's Eyepatch",
 2,
 },
-[9243] = {
-"Shriveled Heart",
+[8704] = {
+"OOX-09/HL Distress Beacon",
 2,
 },
-[10284] = {
-"Simple Flour",
-1,
+[11122] = {
+"Carrot on a Stick",
+2,
 },
 [17185] = {
 "Round Buckler",
 1,
 },
-[274641] = {
-"Theka's Last Breath",
-3,
+[246164] = {
+"Skullthumper",
+2,
 },
-[4400] = {
-"Heavy Stock",
-1,
+[274647] = {
+"Farraki Kris",
+3,
 },
 [279939] = {
 "Collecting Basket",
 1,
 },
-[4471] = {
-"Flint and Tinder",
+[2495] = {
+"Walking Stick",
 1,
 },
 [7005] = {
@@ -13482,13 +13552,13 @@
 "Notched Rib",
 1,
 },
-[17776] = {
-"Sprightring Helm",
-2,
-},
 [1630] = {
 "Broken Electro-lantern",
 0,
+},
+[17776] = {
+"Sprightring Helm",
+2,
 },
 [3108] = {
 "Heavy Throwing Dagger",
@@ -13526,18 +13596,6 @@
 "Scavenger Paw",
 1,
 },
-[2212] = {
-"Cracked Buckler",
-0,
-},
-[6530] = {
-"Nightcrawlers",
-1,
-},
-[8952] = {
-"Roasted Quail",
-1,
-},
 [9467] = {
 "Gahz'rilla Fang",
 3,
@@ -13545,6 +13603,18 @@
 [6532] = {
 "Bright Baubles",
 1,
+},
+[8952] = {
+"Roasted Quail",
+1,
+},
+[7552] = {
+"Falcon's Hook",
+2,
+},
+[274962] = {
+"Crocskin Waders",
+2,
 },
 [7556] = {
 "Twilight Orb of the Elder",
@@ -13554,9 +13624,9 @@
 "Embrace of the Lycan",
 3,
 },
-[254098] = {
-"Pattern: Frothing Gloves",
-3,
+[2649] = {
+"Flimsy Chain Belt",
+0,
 },
 [3274] = {
 "Flax Boots",
@@ -13574,37 +13644,37 @@
 "Thick-shelled Clam",
 1,
 },
-[2139] = {
-"Dirk",
-1,
-},
-[9533] = {
-"Masons Fraternity Ring",
-3,
-},
-[4508] = {
-"Blood-tinged Armor",
-2,
-},
-[2025] = {
-"Bearded Axe",
-1,
-},
-[2480] = {
-"Large Club",
-1,
-},
-[280459] = {
-"Crystal Infused Scale",
-1,
-},
-[9527] = {
-"Spellshifter Rod",
+[275051] = {
+"Twilight Barrier",
 2,
 },
 [9531] = {
 "Gemshale Pauldrons",
 2,
+},
+[4508] = {
+"Blood-tinged Armor",
+2,
+},
+[9527] = {
+"Spellshifter Rod",
+2,
+},
+[17189] = {
+"Metal Buckler",
+1,
+},
+[7073] = {
+"Broken Fang",
+0,
+},
+[19022] = {
+"Nat Pagle's Extreme Angler FC-5000",
+2,
+},
+[280459] = {
+"Crystal Infused Scale",
+1,
 },
 [1645] = {
 "Moonberry Juice",
@@ -13614,17 +13684,17 @@
 "Superior Mana Potion",
 1,
 },
-[4507] = {
-"Pit Fighter's Shield",
-2,
-},
-[275043] = {
-"Bloodmaster's Ring",
+[275044] = {
+"Bloodsport Band",
 3,
 },
-[274948] = {
-"Bottle of Powderfuse Port",
-2,
+[265358] = {
+"Stolen Ore",
+1,
+},
+[2028] = {
+"Hammer",
+1,
 },
 [6063] = {
 "Cold Steel Gauntlets",
@@ -13658,28 +13728,28 @@
 "Double Mail Boots",
 0,
 },
-[2029] = {
-"Cleaver",
-1,
+[6727] = {
+"Razzeric's Racing Grips",
+2,
 },
 [9591] = {
 "Resilient Sinew",
 1,
 },
-[5956] = {
-"Blacksmith Hammer",
+[18650] = {
+"Schematic: EZ-Thro Dynamite II",
 1,
 },
-[779] = {
-"Shiny Seashell",
-0,
-},
-[2469] = {
-"Studded Gloves",
+[2740] = {
+"Green Hills of Stranglethorn - Page 16",
 1,
 },
-[2468] = {
-"Studded Bracers",
+[5441] = {
+"Small Shot Pouch",
+1,
+},
+[5439] = {
+"Small Quiver",
 1,
 },
 [246265] = {
@@ -13690,8 +13760,8 @@
 "Jambiya",
 1,
 },
-[5042] = {
-"Red Ribboned Wrapping Paper",
+[3027] = {
+"Heavy Recurve Bow",
 1,
 },
 [2530] = {
@@ -13702,25 +13772,25 @@
 "Haunch of Meat",
 1,
 },
-[17713] = {
-"Blackstone Ring",
+[9639] = {
+"The Hand of Antu'sul",
 3,
 },
 [17705] = {
 "Thrash Blade",
 3,
 },
-[9639] = {
-"The Hand of Antu'sul",
+[17713] = {
+"Blackstone Ring",
 3,
 },
 [8151] = {
 "Flask of Mojo",
 1,
 },
-[2463] = {
-"Studded Doublet",
-1,
+[11864] = {
+"White Bone Spear",
+2,
 },
 [11184] = {
 "Blue Power Crystal",
@@ -13738,17 +13808,17 @@
 "Gem of the First Khan",
 1,
 },
-[12226] = {
-"Recipe: Crispy Bat Wing",
+[2026] = {
+"Rock Hammer",
 1,
 },
 [17777] = {
 "Relentless Chain",
 2,
 },
-[12252] = {
-"Staff of Protection",
-2,
+[5941] = {
+"Brass Scale Pants",
+1,
 },
 [3833] = {
 "Adept's Cloak",
@@ -13758,28 +13828,28 @@
 "Sturdy Cloth Trousers",
 1,
 },
-[11852] = {
-"Roamer's Leggings",
+[10830] = {
+"M73 Frag Grenade",
 1,
 },
-[9293] = {
-"Recipe: Magic Resistance Potion",
-2,
+[4399] = {
+"Wooden Stock",
+1,
 },
 [11850] = {
 "Short Duskbat Cape",
 1,
 },
-[8182] = {
-"Pellet Rifle",
+[3596] = {
+"Tattered Cloth Bracers",
 1,
 },
 [4604] = {
 "Forest Mushroom Cap",
 1,
 },
-[4544] = {
-"Mulgore Spice Bread",
+[2519] = {
+"Heavy Shot",
 1,
 },
 [274977] = {
@@ -13790,41 +13860,41 @@
 "Small Brown Pouch",
 1,
 },
-[4498] = {
-"Brown Leather Satchel",
+[2515] = {
+"Sharp Arrow",
 1,
 },
-[6723] = {
-"Medal of Courage",
+[4112] = {
+"Choker of the High Shaman",
 2,
 },
-[277115] = {
-"Apprentice's Mining Pack",
+[3025] = {
+"BKP 42 \"Ultra\"",
 1,
 },
-[2512] = {
-"Rough Arrow",
+[4470] = {
+"Simple Wood",
 1,
-},
-[4129] = {
-"Collection Plate",
-2,
-},
-[210] = {
-"Dirty Leather Boots",
-1,
-},
-[3857] = {
-"Coal",
-1,
-},
-[19039] = {
-"Zorbin's Water Resistant Hat",
-2,
 },
 [4117] = {
 "Scorching Sash",
 2,
+},
+[2321] = {
+"Fine Thread",
+1,
+},
+[2324] = {
+"Bleach",
+1,
+},
+[9791] = {
+"Ivycloth Tunic of the Hierophant",
+2,
+},
+[11284] = {
+"Accurate Slugs",
+1,
 },
 [2830] = {
 "Thurman's Remains",
@@ -13834,9 +13904,9 @@
 "Coarse Thread",
 1,
 },
-[2321] = {
-"Fine Thread",
-1,
+[4634] = {
+"Iron Lockbox",
+2,
 },
 [4636] = {
 "Strong Iron Lockbox",
@@ -13846,24 +13916,24 @@
 "Embalming Ichor",
 1,
 },
-[2324] = {
-"Bleach",
+[3857] = {
+"Coal",
 1,
 },
 [711] = {
 "Tattered Cloth Gloves",
 1,
 },
-[11285] = {
-"Jagged Arrow",
+[15373] = {
+"Wolf Rider's Headgear of the Falcon",
+2,
+},
+[5173] = {
+"Deathweed",
 1,
 },
-[11847] = {
-"Battered Cloak",
-1,
-},
-[9791] = {
-"Ivycloth Tunic of the Hierophant",
+[19039] = {
+"Zorbin's Water Resistant Hat",
 2,
 },
 [14905] = {
@@ -13882,21 +13952,21 @@
 "Scavenger Tunic",
 1,
 },
-[3466] = {
-"Strong Flux",
-1,
+[275011] = {
+"Thud Hammer",
+2,
 },
 [11859] = {
 "Jademoon Orb",
 2,
 },
-[5173] = {
-"Deathweed",
-1,
+[11863] = {
+"White Bone Shredder",
+2,
 },
-[11848] = {
-"Flax Belt",
-1,
+[818] = {
+"Tigerseye",
+2,
 },
 [714] = {
 "Dirty Leather Gloves",
@@ -13906,9 +13976,9 @@
 "Flax Bracers",
 1,
 },
-[250999] = {
-"Recipe: Potion of Beast Slaying",
-1,
+[6726] = {
+"Razzeric's Customized Seatbelt",
+2,
 },
 [272941] = {
 "Thick Logs",
@@ -13918,8 +13988,8 @@
 "Frayed Belt",
 0,
 },
-[2859] = {
-"Vile Fin Scale",
+[6217] = {
+"Copper Rod",
 1,
 },
 [3365] = {
@@ -13930,13 +14000,13 @@
 "Putrid Claw",
 1,
 },
-[6726] = {
-"Razzeric's Customized Seatbelt",
-2,
-},
-[6217] = {
-"Copper Rod",
+[21219] = {
+"Recipe: Sagefish Delight",
 1,
+},
+[11907] = {
+"Beastslayer",
+2,
 },
 [2858] = {
 "Darkhound Blood",
@@ -13954,25 +14024,25 @@
 "Leaded Vial",
 1,
 },
-[209] = {
-"Dirty Leather Pants",
+[1197] = {
+"Giant Mace",
 1,
 },
-[1198] = {
-"Claymore",
+[1708] = {
+"Sweet Nectar",
 1,
 },
-[851] = {
-"Cutlass",
-1,
+[4734] = {
+"Mistscape Mantle",
+2,
 },
 [1179] = {
 "Ice Cold Milk",
 1,
 },
-[2947] = {
-"Small Throwing Knife",
-1,
+[275009] = {
+"Emblem of Slamming",
+3,
 },
 [3889] = {
 "Russet Hat",
@@ -13986,21 +14056,21 @@
 "Augmented Chain Helm",
 1,
 },
-[2946] = {
-"Balanced Throwing Dagger",
-1,
+[279480] = {
+"Bigger Rock on Bigger Stick",
+3,
 },
 [3382] = {
 "Minor Troll's Blood Elixir",
 1,
 },
-[5253] = {
-"Goblin Igniter",
-2,
-},
-[3917] = {
-"Singing Blue Crystal",
+[2375] = {
+"Battered Leather Gloves",
 1,
+},
+[15616] = {
+"Bonelink Legplates of the Bandit",
+2,
 },
 [9931] = {
 "Brigade Girdle of Agility",
@@ -14014,17 +14084,17 @@
 "Undamaged Hippogryph Feather",
 1,
 },
-[2901] = {
-"Mining Pick",
-1,
+[279852] = {
+"Rock on Stick",
+3,
 },
 [8925] = {
 "Crystal Vial",
 1,
 },
-[3925] = {
-"Jon-Jon's Golden Spyglass",
-1,
+[274998] = {
+"Shadowlight Athame",
+3,
 },
 [2880] = {
 "Weak Flux",
@@ -14034,9 +14104,9 @@
 "Battered Leather Harness",
 1,
 },
-[4734] = {
-"Mistscape Mantle",
-2,
+[2371] = {
+"Battered Leather Belt",
+1,
 },
 [2372] = {
 "Battered Leather Pants",
@@ -14050,49 +14120,49 @@
 "Battered Leather Bracers",
 1,
 },
-[2375] = {
-"Battered Leather Gloves",
-1,
+[5253] = {
+"Goblin Igniter",
+2,
 },
 [2376] = {
 "Worn Heater Shield",
 1,
 },
-[18082] = {
-"Zum'rah's Vexing Cane",
+[17739] = {
+"Grovekeeper's Drape",
 3,
 },
 [852] = {
 "Mace",
 1,
 },
-[15616] = {
-"Bonelink Legplates of the Bandit",
+[12039] = {
+"Tundra Necklace of the Bear",
 2,
 },
 [3913] = {
 "Filled Soul Gem",
 1,
 },
-[2401] = {
-"Light Chain Boots",
+[11105] = {
+"Curled Map Parchment",
 1,
 },
 [853] = {
 "Hatchet",
 1,
 },
-[281261] = {
-"Crystal-flecked Cord",
-2,
+[4289] = {
+"Salt",
+1,
 },
 [1194] = {
 "Bastard Sword",
 1,
 },
-[9592] = {
-"Metallic Fragments",
-1,
+[15233] = {
+"Savage Axe of the Bandit",
+2,
 },
 [854] = {
 "Quarter Staff",
@@ -14106,24 +14176,24 @@
 "Tabar",
 1,
 },
-[2422] = {
-"Augmented Chain Gloves",
-1,
+[279860] = {
+"Convert's Bindings",
+2,
 },
-[1197] = {
-"Giant Mace",
+[2901] = {
+"Mining Pick",
 1,
 },
 [211786] = {
 "Scroll: CHAP BALK WELLES",
 1,
 },
-[274998] = {
-"Shadowlight Athame",
-3,
+[3925] = {
+"Jon-Jon's Golden Spyglass",
+1,
 },
-[2421] = {
-"Augmented Chain Bracers",
+[11185] = {
+"Green Power Crystal",
 1,
 },
 [279853] = {
@@ -14138,9 +14208,9 @@
 "Lifeless Stone",
 0,
 },
-[275004] = {
-"Chain of the Corruptor",
-3,
+[2417] = {
+"Augmented Chain Vest",
+1,
 },
 [2398] = {
 "Light Chain Armor",
@@ -14154,8 +14224,8 @@
 "Light Chain Leggings",
 1,
 },
-[11105] = {
-"Curled Map Parchment",
+[2401] = {
+"Light Chain Boots",
 1,
 },
 [2402] = {
@@ -14166,9 +14236,9 @@
 "Light Chain Gloves",
 1,
 },
-[4289] = {
-"Salt",
-1,
+[3937] = {
+"Crochet Boots",
+0,
 },
 [4291] = {
 "Silken Thread",
@@ -14178,8 +14248,8 @@
 "Melon Juice",
 1,
 },
-[3439] = {
-"Zombie Skin Boots",
+[2418] = {
+"Augmented Chain Leggings",
 1,
 },
 [275002] = {
@@ -14194,61 +14264,61 @@
 "Plans: Moonsteel Broadsword",
 1,
 },
-[15233] = {
-"Savage Axe of the Bandit",
+[7369] = {
+"Elder's Robe of the Channeler",
 2,
 },
 [290333] = {
 "Berdun's Trusty Rifle",
 2,
 },
-[3444] = {
-"Tiller's Vest",
+[2422] = {
+"Augmented Chain Gloves",
 1,
 },
-[12207] = {
-"Giant Egg",
-1,
-},
-[2930] = {
-"Essence of Pain",
-1,
-},
-[265806] = {
-"Riverweed",
-1,
-},
-[2417] = {
-"Augmented Chain Vest",
-1,
-},
-[2418] = {
-"Augmented Chain Leggings",
+[2421] = {
+"Augmented Chain Bracers",
 1,
 },
 [2419] = {
 "Augmented Chain Belt",
 1,
 },
-[2420] = {
-"Augmented Chain Boots",
+[265806] = {
+"Riverweed",
 1,
 },
-[17739] = {
-"Grovekeeper's Drape",
-3,
-},
-[279860] = {
-"Convert's Bindings",
-2,
+[2928] = {
+"Dust of Decay",
+1,
 },
 [279859] = {
 "Indoctrinated Choker",
 2,
 },
-[2928] = {
-"Dust of Decay",
+[2930] = {
+"Essence of Pain",
 1,
+},
+[2420] = {
+"Augmented Chain Boots",
+1,
+},
+[12207] = {
+"Giant Egg",
+1,
+},
+[3444] = {
+"Tiller's Vest",
+1,
+},
+[3439] = {
+"Zombie Skin Boots",
+1,
+},
+[275004] = {
+"Chain of the Corruptor",
+3,
 },
 [3447] = {
 "Cryptwalker Boots",
@@ -14258,21 +14328,21 @@
 "Hulkstone Pauldrons",
 2,
 },
-[7369] = {
-"Elder's Robe of the Channeler",
-2,
+[9592] = {
+"Metallic Fragments",
+1,
 },
-[3937] = {
-"Crochet Boots",
-0,
+[281261] = {
+"Crystal-flecked Cord",
+2,
 },
 [2429] = {
 "Russet Vest",
 1,
 },
-[11185] = {
-"Green Power Crystal",
-1,
+[18082] = {
+"Zum'rah's Vexing Cane",
+3,
 },
 [2431] = {
 "Russet Pants",
@@ -14282,61 +14352,61 @@
 "Russet Boots",
 1,
 },
-[12039] = {
-"Tundra Necklace of the Bear",
-2,
+[3917] = {
+"Singing Blue Crystal",
+1,
 },
 [2434] = {
 "Russet Gloves",
 1,
 },
-[279480] = {
-"Bigger Rock on Bigger Stick",
-3,
-},
-[275009] = {
-"Emblem of Slamming",
-3,
-},
-[2371] = {
-"Battered Leather Belt",
+[2946] = {
+"Balanced Throwing Dagger",
 1,
 },
-[279852] = {
-"Rock on Stick",
-3,
-},
-[1708] = {
-"Sweet Nectar",
+[2947] = {
+"Small Throwing Knife",
 1,
 },
-[11907] = {
-"Beastslayer",
-2,
+[851] = {
+"Cutlass",
+1,
 },
-[21219] = {
-"Recipe: Sagefish Delight",
+[1198] = {
+"Claymore",
+1,
+},
+[209] = {
+"Dirty Leather Pants",
+1,
+},
+[2859] = {
+"Vile Fin Scale",
+1,
+},
+[250999] = {
+"Recipe: Potion of Beast Slaying",
 1,
 },
 [267090] = {
 "Semblance of Twilight",
 2,
 },
-[818] = {
-"Tigerseye",
-2,
+[11848] = {
+"Flax Belt",
+1,
 },
-[275011] = {
-"Thud Hammer",
-2,
+[3466] = {
+"Strong Flux",
+1,
 },
-[11863] = {
-"White Bone Shredder",
-2,
+[11847] = {
+"Battered Cloak",
+1,
 },
-[15373] = {
-"Wolf Rider's Headgear of the Falcon",
-2,
+[11285] = {
+"Jagged Arrow",
+1,
 },
 [6419] = {
 "Glyphed Mitts",
@@ -14346,65 +14416,65 @@
 "Heavy Pavise",
 1,
 },
-[4634] = {
-"Iron Lockbox",
+[210] = {
+"Dirty Leather Boots",
+1,
+},
+[4129] = {
+"Collection Plate",
 2,
 },
-[11284] = {
-"Accurate Slugs",
+[2512] = {
+"Rough Arrow",
 1,
 },
-[4470] = {
-"Simple Wood",
+[277115] = {
+"Apprentice's Mining Pack",
 1,
 },
-[3025] = {
-"BKP 42 \"Ultra\"",
-1,
-},
-[4112] = {
-"Choker of the High Shaman",
+[6723] = {
+"Medal of Courage",
 2,
 },
-[2515] = {
-"Sharp Arrow",
+[4498] = {
+"Brown Leather Satchel",
 1,
 },
 [8766] = {
 "Morning Glory Dew",
 1,
 },
-[2519] = {
-"Heavy Shot",
+[4544] = {
+"Mulgore Spice Bread",
 1,
 },
-[3596] = {
-"Tattered Cloth Bracers",
+[8182] = {
+"Pellet Rifle",
 1,
 },
 [7974] = {
 "Zesty Clam Meat",
 1,
 },
-[4399] = {
-"Wooden Stock",
-1,
-},
-[10830] = {
-"M73 Frag Grenade",
-1,
-},
-[5941] = {
-"Brass Scale Pants",
-1,
-},
-[2026] = {
-"Rock Hammer",
-1,
-},
-[11864] = {
-"White Bone Spear",
+[9293] = {
+"Recipe: Magic Resistance Potion",
 2,
+},
+[11852] = {
+"Roamer's Leggings",
+1,
+},
+[12252] = {
+"Staff of Protection",
+2,
+},
+[12226] = {
+"Recipe: Crispy Bat Wing",
+1,
+},
+[2463] = {
+"Studded Doublet",
+1,
 },
 [2464] = {
 "Studded Belt",
@@ -14414,33 +14484,33 @@
 "Studded Pants",
 1,
 },
-[3027] = {
-"Heavy Recurve Bow",
+[5042] = {
+"Red Ribboned Wrapping Paper",
 1,
 },
 [2467] = {
 "Studded Boots",
 1,
 },
-[5439] = {
-"Small Quiver",
+[2468] = {
+"Studded Bracers",
 1,
 },
-[5441] = {
-"Small Shot Pouch",
+[2469] = {
+"Studded Gloves",
 1,
 },
-[2740] = {
-"Green Hills of Stranglethorn - Page 16",
+[779] = {
+"Shiny Seashell",
+0,
+},
+[5956] = {
+"Blacksmith Hammer",
 1,
 },
-[18650] = {
-"Schematic: EZ-Thro Dynamite II",
+[2029] = {
+"Cleaver",
 1,
-},
-[6727] = {
-"Razzeric's Racing Grips",
-2,
 },
 [7493] = {
 "Captain's Bracers of Stamina",
@@ -14450,17 +14520,17 @@
 "Archaeologist's Quarry Boots",
 2,
 },
-[2028] = {
-"Hammer",
-1,
+[274948] = {
+"Bottle of Powderfuse Port",
+2,
 },
-[265358] = {
-"Stolen Ore",
-1,
-},
-[275044] = {
-"Bloodsport Band",
+[275043] = {
+"Bloodmaster's Ring",
 3,
+},
+[4507] = {
+"Pit Fighter's Shield",
+2,
 },
 [17684] = {
 "Theradric Crystal Carving",
@@ -14470,37 +14540,37 @@
 "Broad Axe",
 1,
 },
-[17189] = {
-"Metal Buckler",
+[2480] = {
+"Large Club",
 1,
 },
-[19022] = {
-"Nat Pagle's Extreme Angler FC-5000",
-2,
+[2025] = {
+"Bearded Axe",
+1,
 },
-[7073] = {
-"Broken Fang",
-0,
+[9533] = {
+"Masons Fraternity Ring",
+3,
 },
-[275051] = {
-"Twilight Barrier",
-2,
+[2139] = {
+"Dirk",
+1,
 },
 [5471] = {
 "Stag Meat",
 1,
 },
-[2649] = {
-"Flimsy Chain Belt",
+[254098] = {
+"Pattern: Frothing Gloves",
+3,
+},
+[6530] = {
+"Nightcrawlers",
+1,
+},
+[2212] = {
+"Cracked Buckler",
 0,
-},
-[274962] = {
-"Crocskin Waders",
-2,
-},
-[7552] = {
-"Falcon's Hook",
-2,
 },
 [2488] = {
 "Gladius",
@@ -14530,24 +14600,24 @@
 "Stiletto",
 1,
 },
-[2495] = {
-"Walking Stick",
+[4471] = {
+"Flint and Tinder",
 1,
 },
-[274647] = {
-"Farraki Kris",
+[4400] = {
+"Heavy Stock",
+1,
+},
+[274641] = {
+"Theka's Last Breath",
 3,
 },
-[246164] = {
-"Skullthumper",
-2,
+[10284] = {
+"Simple Flour",
+1,
 },
-[11122] = {
-"Carrot on a Stick",
-2,
-},
-[8704] = {
-"OOX-09/HL Distress Beacon",
+[9243] = {
+"Shriveled Heart",
 2,
 },
 [250955] = {
@@ -14562,24 +14632,24 @@
 "Shiny Bauble",
 1,
 },
-[2533] = {
-"War Maul",
-1,
+[17775] = {
+"Acumen Robes",
+2,
 },
-[2534] = {
-"Rondel",
+[11362] = {
+"Medium Quiver",
 1,
 },
 [246165] = {
 "Driftwood Smasher",
 2,
 },
-[270098] = {
-"Dank Shoulderpads",
-2,
+[9238] = {
+"Uncracked Scarab Shell",
+1,
 },
-[3030] = {
-"Razor Arrow",
+[5939] = {
+"Sewing Gloves",
 1,
 },
 [4497] = {
@@ -14590,13 +14660,13 @@
 "Ornate Blunderbuss",
 1,
 },
-[11107] = {
-"A Small Pack",
-1,
+[260178] = {
+"Honor Guard's Plate",
+2,
 },
-[2030] = {
-"Gnarled Staff",
-1,
+[260179] = {
+"Barkwoven Belt",
+2,
 },
 },
 ["build"] = "1.60.1-",
