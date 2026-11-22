@@ -1,7 +1,7 @@
 -- Messenger: your in-game whispers as chats - bubbles, day separators, times,
 -- sounds and pop-ups. Whispers are kept only on this computer.
 local _, S = ...
-if S.ModuleRev then S:ModuleRev("Messenger", 1) end
+if S.ModuleRev then S:ModuleRev("Messenger", 3) end
 local UI = S.UI
 
 local setState          -- (marks a whisper read / deletes it - set up with the whisper log below)
@@ -940,15 +940,51 @@ local function logWhisper(other, mine, text)
 end
 -- should a message to this person go out as a whisper?
 function S:WhisperInstead() return true end
+-- WoW Forever names have two parts ("Karl Felgrin"). Sent without a realm, the game
+-- turns such a name into "Karl Felgrin-" (empty realm) and says nobody by that name is
+-- playing. So we send Name-Realm, the way the game handed the name to us; if the game
+-- still can't find them, we try once more with the name alone.
+local pendingRetry = {}   -- lower(name we sent) -> { alt, text, at }
+local function realmOf(n) return n and n:match("%-(.+)$") end
+local function sendTarget(who)
+  local t = S.Trim and S.Trim(who) or who
+  t = t:gsub("%-+$", "")                                -- "Name-" (empty realm) -> "Name"
+  if not realmOf(t) then
+    local r = realmOf(S.me) or (S.Realm and S.Realm())
+    if r and r ~= "" then t = t .. "-" .. r end
+  end
+  return t
+end
 function S:SendWhisper(who, text)
-  local target = who
-  -- same realm: the short name is enough
-  local realm = S.me and S.me:match("%-(.+)$")
-  if realm and who:sub(-#realm - 1) == "-" .. realm then target = S.Short(who) end
+  if type(who) ~= "string" or who == "" or not text or text == "" then return end
+  local target = sendTarget(who)
+  local alt = S.Short(target)
+  if alt ~= target then pendingRetry[target:lower()] = { alt = alt, text = text, at = GetTime() } end
   S.msgrSending = (S.msgrSending or 0) + 1
   C_Timer.After(3, function() S.msgrSending = math.max(0, (S.msgrSending or 0) - 1) end)
   if SendChatMessage then SendChatMessage(text, "WHISPER", nil, target) end
 end
+S.MsgSendTarget = sendTarget
+-- "No player named 'X' is currently playing." right after our whisper: retry once
+S:On("CHAT_MSG_SYSTEM", function(_, msg)
+  if not next(pendingRetry) then return end
+  if type(msg) ~= "string" or (issecretvalue and issecretvalue(msg)) or not ERR_CHAT_PLAYER_NOT_FOUND_S then return end
+  local pat = "^" .. ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1"):gsub("%%%%s", "(.+)") .. "$"
+  local said = msg:match(pat)
+  if not said then return end
+  local now = GetTime()
+  local saidShort = (S.Short(said) or said):lower()
+  for k, p in pairs(pendingRetry) do
+    if now - p.at > 5 then pendingRetry[k] = nil
+    elseif (S.Short(k) or k):lower() == saidShort then
+      pendingRetry[k] = nil
+      S.msgrSending = (S.msgrSending or 0) + 1
+      C_Timer.After(3, function() S.msgrSending = math.max(0, (S.msgrSending or 0) - 1) end)
+      if SendChatMessage then SendChatMessage(p.text, "WHISPER", nil, p.alt) end
+      return
+    end
+  end
+end)
 
 -- whispers the game flags as "potentially inappropriate": show them when you click,
 -- or right away if you turned hiding off (Settings)
@@ -996,7 +1032,7 @@ S:On("CHAT_MSG_WHISPER", function(_, text, sender, ...)
   local mode = S:MsgNotifyMode(who)
   if mode == "off" then return end
   if S.Notify then
-    S:Notify("wh:" .. e.id, { title = (S.DisplayName and S.DisplayName(who) or S.Short(who)) .. " (whisper)", text = S.db.global.streamer and "" or oneLine(text or "", 60),
+    S:Notify("wh:" .. e.id, { title = (S.DisplayName and S.DisplayName(who) or S.Short(who)) .. " (whisper)", text = (S.StreamerOn and S.StreamerOn("whispers") or (not S.StreamerOn and S.db.global.streamer)) and "" or oneLine(text or "", 60),
       icon = "Interface\\Icons\\INV_Letter_02", action = "whisper", arg = who, sound = false })
   end
   if mode == "popup" then S:MsgToast(who, oneLine(text or "", 110), nil) end
