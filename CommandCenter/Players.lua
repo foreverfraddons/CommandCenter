@@ -5,7 +5,7 @@
 --   * the player profile window (View profile), Add friend
 --   * /r in game chat opens the Messenger on the person you'd be replying to
 local _, S = ...
-if S.ModuleRev then S:ModuleRev("MessengerPlayers", 2) end
+if S.ModuleRev then S:ModuleRev("MessengerPlayers", 3) end
 local UI = S.UI
 
 local function G() return S.db.global end
@@ -19,9 +19,9 @@ local function short(n)
 end
 local function same(a, b)
   if not a or not b then return false end
-  if short(a):lower() == short(b):lower() then return true end
-  if S.SameName then return S.SameName(a, b) end
-  return false
+  -- the whole name, never just the first name (Core's S.SameName / S.Canon match first
+  -- names, which glued two different "Karl"s together)
+  return short(a):lower() == short(b):lower()
 end
 
 ---------------------------------------------------------------------------
@@ -971,7 +971,7 @@ function S.ByNickname(nick)
     if v:lower() == l then
       -- turn the stored short key back into a full name if we can
       for _, c in ipairs(S.Conversations and S:Conversations() or {}) do if key(c.with) == k then return c.with end end
-      return short(S.Full and S.Full(k:sub(1, 1):upper() .. k:sub(2)) or k)
+      return S.MsgResolve and S.MsgResolve(k) or k
     end
   end
 end
@@ -1002,7 +1002,7 @@ local function resolveName(txt)
   if not hit and S.MsgCandidates then
     for _, c in ipairs(S.MsgCandidates()) do if short(c.name):lower() == txt:lower() or c.name:lower() == txt:lower() then hit = c.name break end end
   end
-  return hit or short(S.Full and S.Full(txt:sub(1, 1):upper() .. txt:sub(2)) or txt)
+  return hit or (S.MsgResolve and S.MsgResolve(txt)) or txt
 end
 local function choose(name)
   if not name or not pickOpts then return end
@@ -1163,7 +1163,7 @@ function S.ServiceProviders()
   local out = {}
   for k, s in pairs(svcTable()) do
     if type(s) == "table" then
-      local nm = short(s._name or (S.Full and S.Full(k:sub(1, 1):upper() .. k:sub(2))) or k)
+      local nm = short(s._name or (S.MsgResolve and S.MsgResolve(k)) or k)
       out[#out + 1] = { name = nm, svc = s }
     end
   end
@@ -1281,7 +1281,7 @@ end
 local function capFull(k)
   if not k then return nil end
   if k:find("-", 1, true) then return k end
-  return short(S.Full and S.Full(k:sub(1, 1):upper() .. k:sub(2)) or k)
+  return S.MsgResolve and S.MsgResolve(k) or k
 end
 -- every character we know for this person (main first)
 function S.CharsOf(name)

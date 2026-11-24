@@ -1,7 +1,7 @@
 -- Messenger: your in-game whispers as chats - bubbles, day separators, times,
 -- sounds and pop-ups. Whispers are kept only on this computer.
 local _, S = ...
-if S.ModuleRev then S:ModuleRev("Messenger", 4) end
+if S.ModuleRev then S:ModuleRev("Messenger", 5) end
 local UI = S.UI
 
 -- One spelling per person. WoW Forever names have two parts ("Saphira Oakhallow") and the
@@ -16,6 +16,39 @@ end
 local MsgName = S.MsgName
 local function ME() return MsgName(S.me) or "?" end
 S.MsgMe = ME
+-- A name someone typed / a key -> the person's full name. Never guesses from the first
+-- name when a full name is given: two people can share a first name ("Karl Felgrin" in
+-- the guild, "Karl Ashby" outside it), so Core's first-name matching (S.Full / S.Canon /
+-- S:Resolve) is not used here.
+local function knownNames()
+  local out = {}
+  local g = S.db and S.db.global
+  local log = g and type(g.wlog) == "table" and g.wlog[ME()]
+  if type(log) == "table" then for k in pairs(log) do out[#out + 1] = k end end
+  if g and type(g.contacts) == "table" then for _, c in pairs(g.contacts) do if type(c) == "table" and c.name then out[#out + 1] = MsgName(c.name) end end end
+  for _, m in ipairs(S.roster and S.roster.list or {}) do if m.name then out[#out + 1] = MsgName(m.name) end end
+  return out
+end
+local function capWords(t) return (t:gsub("(%S)(%S*)", function(a, b) return a:upper() .. b end)) end
+function S.MsgResolve(n)
+  n = MsgName(n)
+  if type(n) ~= "string" or n == "" then return n end
+  local l = n:lower()
+  local names = knownNames()
+  -- the exact name (any case): use the spelling we know
+  for _, k in ipairs(names) do if k:lower() == l then return k end end
+  if n:find(" ", 1, true) then
+    return (n == l) and capWords(n) or n          -- a full name we haven't met yet
+  end
+  -- only a first name typed: fine if exactly one person we know has it
+  local hit, count = nil, 0
+  for _, k in ipairs(names) do
+    if (k:match("^(%S+)") or k):lower() == l and k ~= hit then hit, count = k, count + 1 end
+  end
+  if count == 1 then return hit end
+  return (n == l) and capWords(n) or n
+end
+local MsgResolve = S.MsgResolve
 local setState          -- (marks a whisper read / deletes it - set up with the whisper log below)
 function S:MailBody(rec)
   if not rec then return "" end
@@ -243,7 +276,7 @@ local function refreshSoon()
 end
 
 local function openChat(name, scroll)
-  if name and not (S.demoConvos and S.demoConvos[name]) then name = MsgName(S.Full and not name:find("-", 1, true) and S.Full(name) or name) end
+  if name and not (S.demoConvos and S.demoConvos[name]) then name = MsgResolve(name) end
   active = (name and S.MainOf) and S.MainOf(name) or name
   if active and S.UnhideConversation then S:UnhideConversation(active) end
   if win.input then win.input:SetText("") end
@@ -873,11 +906,11 @@ end
 function S:ShowMessenger(who, about)
   if not win then build() end
   if who and not (S.demoConvos and S.demoConvos[who]) and not (S.HasWhisperThread and S:HasWhisperThread(who)) then
-    who = S:Resolve(who)
+    who = MsgResolve(who)
     if MsgName(who) == ME() then S:Print("You can't whisper yourself.") who = nil end
   end
-  -- always the full Name-Realm, so it matches the conversation
-  if who and not (S.demoConvos and S.demoConvos[who]) then who = MsgName(S.Full and not who:find("-", 1, true) and S.Full(who) or who) end
+  -- one spelling per person, so it matches the conversation
+  if who and not (S.demoConvos and S.demoConvos[who]) then who = MsgName(who) end
   if who then active = S.MainOf and S.MainOf(who) or who; topic = (about and about ~= "") and about or nil
   elseif not active then
     local c = S:Conversations()[1]
@@ -1273,7 +1306,7 @@ function S.MsgPickName(q, exact)
       hit = c.name
     end
   end
-  hit = hit or S:Resolve(q, true)
+  hit = hit or MsgResolve(q)
   hit = MsgName(hit)
   if not hit or hit == ME() or isIgnored(hit) then
     UI:Alert("|cffffd100" .. (q or "") .. "|r\n\nThat player doesn't exist.")
