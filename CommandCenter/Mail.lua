@@ -1,9 +1,21 @@
 -- Messenger: your in-game whispers as chats - bubbles, day separators, times,
 -- sounds and pop-ups. Whispers are kept only on this computer.
 local _, S = ...
-if S.ModuleRev then S:ModuleRev("Messenger", 3) end
+if S.ModuleRev then S:ModuleRev("Messenger", 4) end
 local UI = S.UI
 
+-- One spelling per person. WoW Forever names have two parts ("Saphira Oakhallow") and the
+-- realm part is only a label each client makes up (it has even started coming through
+-- empty, as "Saphira Oakhallow-"). The Messenger keys, shows and whispers people by the
+-- name alone.
+function S.MsgName(n)
+  if type(n) ~= "string" or n == "" or (issecretvalue and issecretvalue(n)) then return n end
+  n = n:gsub("^%s+", ""):gsub("%s+$", ""):gsub("%-+$", "")
+  return n:match("^(.-)%-[^%-]+$") or n
+end
+local MsgName = S.MsgName
+local function ME() return MsgName(S.me) or "?" end
+S.MsgMe = ME
 local setState          -- (marks a whisper read / deletes it - set up with the whisper log below)
 function S:MailBody(rec)
   if not rec then return "" end
@@ -67,7 +79,7 @@ function S.MsgBuildConversations(includeHidden)
       if not c then c = { with = other, msgs = {}, unread = 0 }; by[other] = c end
       for i, e in ipairs(list) do
         e._key = "w:" .. other .. ":" .. i
-        e.unread = e.to == S.me and not e.read or false
+        e.unread = e.to == ME() and not e.read or false
         c.msgs[#c.msgs + 1] = e
         if e.unread then c.unread = c.unread + 1 end
       end
@@ -114,8 +126,8 @@ function S.MsgBuildConversations(includeHidden)
     end)
     c.last = c.msgs[#c.msgs]
     -- reply to the character that whispered last (an alt, maybe)
-    for i = #c.msgs, 1, -1 do local e = c.msgs[i]; if e.who ~= S.me then c.replyTo = e.who break end end
-    if not c.replyTo then for i = #c.msgs, 1, -1 do local e = c.msgs[i]; if e.to and e.to ~= S.me then c.replyTo = e.to break end end end
+    for i = #c.msgs, 1, -1 do local e = c.msgs[i]; if e.who ~= ME() then c.replyTo = e.who break end end
+    if not c.replyTo then for i = #c.msgs, 1, -1 do local e = c.msgs[i]; if e.to and e.to ~= ME() then c.replyTo = e.to break end end end
     out[#out + 1] = c
   end
   -- removed from the inbox: stays out until something newer happens
@@ -141,7 +153,8 @@ function S.MsgBuildConversations(includeHidden)
 end
 
 function S:Conversation(name)
-  if S.MainOf then name = S.MainOf(name) end
+  name = MsgName(name)
+  if S.MainOf then name = MsgName(S.MainOf(name)) end
   local list = S:Conversations(true)
   for _, c in ipairs(list) do if c.with == name then return c end end
   -- same character, other spelling (with / without realm)
@@ -230,7 +243,7 @@ local function refreshSoon()
 end
 
 local function openChat(name, scroll)
-  if name and not (S.demoConvos and S.demoConvos[name]) and not name:find("-", 1, true) and S.Full then name = S.Full(name) end
+  if name and not (S.demoConvos and S.demoConvos[name]) then name = MsgName(S.Full and not name:find("-", 1, true) and S.Full(name) or name) end
   active = (name and S.MainOf) and S.MainOf(name) or name
   if active and S.UnhideConversation then S:UnhideConversation(active) end
   if win.input then win.input:SetText("") end
@@ -468,7 +481,7 @@ function renderList()
     else
       local l = c.last
       local body = oneLine(S:MailBody(l), 40)
-      local pre = l.who == S.me and "You: " or ""
+      local pre = l.who == ME() and "You: " or ""
       r.prev:SetText((c.unread > 0 and "|cffffffff" or "|cff999999") .. pre .. body .. "|r")
       r.when:SetText(shortAgo(l.time))
     end
@@ -499,7 +512,7 @@ local function getBubble(i)
     GameTooltip:AddLine(S.date(self.msg.time, "%A %B %d, %Y at %H:%M"), 1, 1, 1)
     if realSubject(self.msg) then GameTooltip:AddLine("About: " .. realSubject(self.msg), 1, 0.82, 0) end
     if self.msg.whisper then GameTooltip:AddLine("In-game whisper", 1, 0.5, 1) end
-    if self.msg.who and self.msg.who ~= S.me and active and self.msg.who ~= active then GameTooltip:AddLine("From " .. S.Short(self.msg.who), 1, 0.82, 0) end
+    if self.msg.who and self.msg.who ~= ME() and active and self.msg.who ~= active then GameTooltip:AddLine("From " .. S.Short(self.msg.who), 1, 0.82, 0) end
     GameTooltip:AddLine("Right-click for options", 0.5, 0.5, 0.5)
     GameTooltip:Show()
   end)
@@ -581,7 +594,7 @@ function renderChat(toBottom)
       local t = getSep(ns); t:ClearAllPoints(); t:SetPoint("TOP", win.chatChild, "TOP", 0, -y); t:SetText(dayLabel(m.time or 0)); t:Show()
       y = y + 20
     end
-    local mine = m.who == S.me
+    local mine = m.who == ME()
     nb = nb + 1
     local b = getBubble(nb)
     b.msg, b.mine = m, mine
@@ -615,7 +628,7 @@ function renderChat(toBottom)
 
   -- "Seen" / "Sent" under my newest message
   local last = msgs[#msgs]
-  if last and last.who == S.me then
+  if last and last.who == ME() then
     local rs = S:Get("mailst", last._key .. "|" .. last.to)
     local txt
     if rs and rs.read then txt = "Seen " .. S.Ago(rs._t)
@@ -676,7 +689,7 @@ local function send()
   if body == "" then return end
   local demo = S.demoConvos and S.demoConvos[active]
   if demo then                                   -- tour example chat: stays on your screen only
-    demo.msgs[#demo.msgs + 1] = { who = S.me, to = active, time = S.now(), plain = body, _key = "demo" .. #demo.msgs + 1 }
+    demo.msgs[#demo.msgs + 1] = { who = ME(), to = active, time = S.now(), plain = body, _key = "demo" .. #demo.msgs + 1 }
     S.MsgInvalidate()
     win.input:SetText(""); renderList(); renderChat(true)
     if S.TourEvent then S:TourEvent("demoSent", active) end
@@ -861,10 +874,10 @@ function S:ShowMessenger(who, about)
   if not win then build() end
   if who and not (S.demoConvos and S.demoConvos[who]) and not (S.HasWhisperThread and S:HasWhisperThread(who)) then
     who = S:Resolve(who)
-    if who == S.me then S:Print("You can't whisper yourself.") who = nil end
+    if MsgName(who) == ME() then S:Print("You can't whisper yourself.") who = nil end
   end
   -- always the full Name-Realm, so it matches the conversation
-  if who and not (S.demoConvos and S.demoConvos[who]) and not who:find("-", 1, true) and S.Full then who = S.Full(who) end
+  if who and not (S.demoConvos and S.demoConvos[who]) then who = MsgName(S.Full and not who:find("-", 1, true) and S.Full(who) or who) end
   if who then active = S.MainOf and S.MainOf(who) or who; topic = (about and about ~= "") and about or nil
   elseif not active then
     local c = S:Conversations()[1]
@@ -889,18 +902,59 @@ end)
 -- Whispers, kept only on this computer (never shared)
 ---------------------------------------------------------------------------
 local MAX_WHISPERS = 200
+-- Old saved chats used "Name-Realm" / "Name-" keys: fold them into one key per person
+-- (and per character of yours), merging the messages in time order.
+local function mergeInto(dst, src)
+  local have = {}
+  for _, e in ipairs(dst) do if e.id then have[e.id] = true end end
+  for _, e in ipairs(src) do if not (e.id and have[e.id]) then dst[#dst + 1] = e end end
+  table.sort(dst, function(a, b)
+    if (a.time or 0) ~= (b.time or 0) then return (a.time or 0) < (b.time or 0) end
+    return tostring(a.id or "") < tostring(b.id or "")
+  end)
+end
+local function tidyWlog(g)
+  if type(g.wlog) ~= "table" then return end
+  local mine = {}
+  for k, threads in pairs(g.wlog) do
+    local nk = MsgName(k)
+    if type(threads) == "table" then
+      mine[nk] = mine[nk] or {}
+      for other, list in pairs(threads) do
+        if type(list) == "table" then
+          local no = MsgName(other)
+          for _, e in ipairs(list) do e.who = MsgName(e.who); e.to = MsgName(e.to) end
+          mine[nk][no] = mine[nk][no] or {}
+          mergeInto(mine[nk][no], list)
+        end
+      end
+    end
+  end
+  g.wlog = mine
+end
+local function tidyPeople(g)
+  local p = type(g.msgr) == "table" and type(g.msgr.people) == "table" and g.msgr.people
+  if not p then return end
+  local out = {}
+  for k, v in pairs(p) do
+    local nk = MsgName(k)
+    if type(v) == "table" then out[nk] = out[nk] or {}; for f, x in pairs(v) do if out[nk][f] == nil then out[nk][f] = x end end
+    else out[nk] = v end
+  end
+  g.msgr.people = out
+end
+local tidied = false
 local function whisperLog()
   local g = S.db.global
+  if not tidied and S.me then tidied = true; tidyWlog(g); tidyPeople(g) end
   g.wlog = type(g.wlog) == "table" and g.wlog or {}
-  local me = S.me or "?"
+  local me = ME()
   g.wlog[me] = type(g.wlog[me]) == "table" and g.wlog[me] or {}
   return g.wlog[me]
 end
 local function fullName(n)
   if not n or n == "" then return nil end
-  if n:find("-", 1, true) then return n end
-  local realm = (GetNormalizedRealmName and GetNormalizedRealmName()) or (S.me and S.me:match("%-(.+)$"))
-  return realm and (n .. "-" .. realm) or n
+  return MsgName(n)
 end
 function S:WhisperThreads()
   return whisperLog()
@@ -919,7 +973,7 @@ setState = function(key, fields)
 end
 function S:UnreadWhispers()
   local n = 0
-  for _, list in pairs(whisperLog()) do for _, e in ipairs(list) do if e.to == S.me and not e.read then n = n + 1 end end end
+  for _, list in pairs(whisperLog()) do for _, e in ipairs(list) do if e.to == ME() and not e.read then n = n + 1 end end end
   return n
 end
 local wid = 0
@@ -931,7 +985,7 @@ local function logWhisper(other, mine, text)
   log[other] = log[other] or {}
   if isNew and S.AutoLookup then C_Timer.After(0, function() S:AutoLookup(other) end) end
   wid = wid + 1
-  local e = { who = mine and S.me or other, to = mine and other or S.me, time = S.now(), plain = text, whisper = true,
+  local e = { who = mine and ME() or other, to = mine and other or ME(), time = S.now(), plain = text, whisper = true,
     read = mine, id = tostring(S.now()) .. "." .. wid }
   table.insert(log[other], e)
   while #log[other] > MAX_WHISPERS do table.remove(log[other], 1) end
@@ -940,26 +994,18 @@ local function logWhisper(other, mine, text)
 end
 -- should a message to this person go out as a whisper?
 function S:WhisperInstead() return true end
--- WoW Forever names have two parts ("Karl Felgrin"). Sent without a realm, the game
--- turns such a name into "Karl Felgrin-" (empty realm) and says nobody by that name is
--- playing. So we send Name-Realm, the way the game handed the name to us; if the game
--- still can't find them, we try once more with the name alone.
+-- Whisper by the name alone ("Karl Felgrin"): that's how the game's own /w works on
+-- WoW Forever. The realm forms ("Name-Realm", "Name-") come back as "No player named
+-- ... is currently playing". If that still happens, we try once more with the exact
+-- spelling the game last gave us for that person (rawName).
 local pendingRetry = {}   -- lower(name we sent) -> { alt, text, at }
-local function realmOf(n) return n and n:match("%-(.+)$") end
-local function sendTarget(who)
-  local t = S.Trim and S.Trim(who) or who
-  t = t:gsub("%-+$", "")                                -- "Name-" (empty realm) -> "Name"
-  if not realmOf(t) then
-    local r = realmOf(S.me) or (S.Realm and S.Realm())
-    if r and r ~= "" then t = t .. "-" .. r end
-  end
-  return t
-end
+local rawName = {}        -- MsgName -> spelling from the last whisper event
+local function sendTarget(who) return MsgName(who) end
 function S:SendWhisper(who, text)
   if type(who) ~= "string" or who == "" or not text or text == "" then return end
   local target = sendTarget(who)
-  local alt = S.Short(target)
-  if alt ~= target then pendingRetry[target:lower()] = { alt = alt, text = text, at = GetTime() } end
+  local alt = rawName[target]
+  if alt and alt ~= target and alt:sub(-1) ~= "-" then pendingRetry[target:lower()] = { alt = alt, text = text, at = GetTime() } end
   S.msgrSending = (S.msgrSending or 0) + 1
   C_Timer.After(3, function() S.msgrSending = math.max(0, (S.msgrSending or 0) - 1) end)
   if SendChatMessage then SendChatMessage(text, "WHISPER", nil, target) end
@@ -973,10 +1019,10 @@ S:On("CHAT_MSG_SYSTEM", function(_, msg)
   local said = msg:match(pat)
   if not said then return end
   local now = GetTime()
-  local saidShort = (S.Short(said) or said):lower()
+  local saidShort = (MsgName(said) or said):lower()
   for k, p in pairs(pendingRetry) do
     if now - p.at > 5 then pendingRetry[k] = nil
-    elseif (S.Short(k) or k):lower() == saidShort then
+    elseif k == saidShort then
       pendingRetry[k] = nil
       S.msgrSending = (S.msgrSending or 0) + 1
       C_Timer.After(3, function() S.msgrSending = math.max(0, (S.msgrSending or 0) - 1) end)
@@ -1020,6 +1066,7 @@ S:On("CHAT_MSG_WHISPER", function(_, text, sender, ...)
   if not flagged and lineID and C_ChatInfo and C_ChatInfo.IsChatLineCensored then
     local ok, c = pcall(C_ChatInfo.IsChatLineCensored, lineID); flagged = ok and c == true
   end
+  rawName[MsgName(sender)] = sender
   local e, who = logWhisper(sender, false, text or "")
   if flagged then
     e.censored, e.placeholder, e.lineID = true, placeholder, lineID
@@ -1042,6 +1089,7 @@ S:On("CHAT_MSG_WHISPER_INFORM", function(_, text, target)
   if not S.db or not target then return end
   if issecretvalue and (issecretvalue(text) or issecretvalue(target)) then return end
   local _, who = logWhisper(target, true, text or "")
+  if who then rawName[who] = rawName[who] or target end
   if S.MarkHeardFrom then S.MarkHeardFrom(who) end   -- the game only confirms a whisper to someone online
   -- whispered from game chat (not the Messenger): open the Messenger on them
   if (S.msgrSending or 0) == 0 and S.db.global.msgOpenOnWhisper ~= false and not (win and win:IsShown() and active == (S.MainOf and S.MainOf(who) or who)) then
@@ -1080,8 +1128,7 @@ function S:ClearConversation(name)
   if not name then return end
   S.MsgInvalidate()
   local g = S.db.global
-  local log = type(g.wlog) == "table" and g.wlog[S.me]
-  if type(log) ~= "table" then return end
+  local log = whisperLog()
   local main = S.MainOf and S.MainOf(name) or name
   for other in pairs(log) do
     if other == name or (S.MainOf and S.MainOf(other) == main) then log[other] = nil end
@@ -1095,9 +1142,7 @@ end
 ---------------------------------------------------------------------------
 local function fullNameOf(n)
   if not n or n == "" then return nil end
-  if n:find("-", 1, true) then return n end
-  local realm = (GetNormalizedRealmName and GetNormalizedRealmName()) or (S.me and S.me:match("%-(.+)$"))
-  return realm and (n .. "-" .. realm) or n
+  return MsgName(n)
 end
 local function isIgnored(name)
   local short = S.Short(name)
@@ -1111,7 +1156,7 @@ local function candidates()
   local seen, out = {}, {}
   local function add(name, src, tag)
     name = fullNameOf(name)
-    if name and name ~= S.me and not seen[name] then seen[name] = true; out[#out + 1] = { name = name, src = src, tag = tag } end
+    if name and name ~= ME() and not seen[name] then seen[name] = true; out[#out + 1] = { name = name, src = src, tag = tag } end
   end
   for _, c in ipairs(S:Conversations()) do if not (S.demoConvos and S.demoConvos[c.with]) then add(c.with, "chat") end end
   for _, m in ipairs(S.roster.list or {}) do add(m.name, "guild") end
@@ -1229,7 +1274,8 @@ function S.MsgPickName(q, exact)
     end
   end
   hit = hit or S:Resolve(q, true)
-  if not hit or hit == S.me or isIgnored(hit) then
+  hit = MsgName(hit)
+  if not hit or hit == ME() or isIgnored(hit) then
     UI:Alert("|cffffd100" .. (q or "") .. "|r\n\nThat player doesn't exist.")
     return nil
   end

@@ -5,16 +5,23 @@
 --   * the player profile window (View profile), Add friend
 --   * /r in game chat opens the Messenger on the person you'd be replying to
 local _, S = ...
-if S.ModuleRev then S:ModuleRev("MessengerPlayers", 1) end
+if S.ModuleRev then S:ModuleRev("MessengerPlayers", 2) end
 local UI = S.UI
 
 local function G() return S.db.global end
 local function clean(v) if issecretvalue and issecretvalue(v) then return nil end return v end
-local function short(n) return n and (n:match("^(.-)%-[^%-]+$") or n) or n end
+-- the name alone: "Name-Realm" and "Name-" (empty realm, WoW Forever) -> "Name"
+local function short(n)
+  if type(n) ~= "string" then return n end
+  if S.MsgName then return S.MsgName(n) end
+  n = n:gsub("%-+$", "")
+  return n:match("^(.-)%-[^%-]+$") or n
+end
 local function same(a, b)
   if not a or not b then return false end
+  if short(a):lower() == short(b):lower() then return true end
   if S.SameName then return S.SameName(a, b) end
-  return short(a):lower() == short(b):lower()
+  return false
 end
 
 ---------------------------------------------------------------------------
@@ -660,6 +667,38 @@ local function hookBox(box)
     end
   end)
 end
+-- Saved names from before: "jean heels-" / "Name-Realm" keys and values -> the name alone
+local function tidyNames()
+  local g = G()
+  local function rekey(t, lower, fixVal)
+    if type(t) ~= "table" then return end
+    local moves = {}
+    for k, v in pairs(t) do
+      local nk = type(k) == "string" and short(k) or k
+      if lower and type(nk) == "string" then nk = nk:lower() end
+      if fixVal then v = fixVal(v) ; t[k] = v end
+      if nk ~= k then moves[#moves + 1] = { k, nk, v } end
+    end
+    for _, m in ipairs(moves) do
+      t[m[1]] = nil
+      if t[m[2]] == nil then t[m[2]] = m[3]
+      elseif type(t[m[2]]) == "table" and type(m[3]) == "table" then
+        for f, x in pairs(m[3]) do if t[m[2]][f] == nil then t[m[2]][f] = x end end
+      end
+    end
+  end
+  local function fixName(v) if type(v) == "string" then return short(v) end; return v end
+  local function fixRec(v) if type(v) == "table" then if v.name then v.name = short(v.name) end; if v._name then v._name = short(v._name) end end; return v end
+  rekey(g.people, false, nil)
+  rekey(g.nicknames, true, nil)
+  rekey(g.altOf, true, fixName)
+  rekey(g.services, true, fixRec)
+  rekey(g.contacts, true, fixRec)
+  rekey(g.avatars, true, nil)
+  rekey(g.hiddenConvos, true, nil)
+end
+S.MsgTidyNames = tidyNames
+S:Listen("LOGIN", function() if S.db then pcall(tidyNames) end end)
 S:Listen("LOGIN", function()
   for i = 1, (NUM_CHAT_WINDOWS or 10) do hookBox(_G["ChatFrame" .. i .. "EditBox"]) end
 end)
@@ -932,7 +971,7 @@ function S.ByNickname(nick)
     if v:lower() == l then
       -- turn the stored short key back into a full name if we can
       for _, c in ipairs(S.Conversations and S:Conversations() or {}) do if key(c.with) == k then return c.with end end
-      return S.Full and S.Full(k:sub(1, 1):upper() .. k:sub(2)) or k
+      return short(S.Full and S.Full(k:sub(1, 1):upper() .. k:sub(2)) or k)
     end
   end
 end
@@ -940,7 +979,7 @@ function S.SetAltOf(alt, main)
   if not alt then return end
   local _, alts = idTables()
   if main and key(S.MainOf(main)) == key(alt) then S:Print("That would make them their own main.") return end
-  alts[key(alt)] = main
+  alts[key(alt)] = main and short(main) or nil
   S:Fire("MSGR_STYLE"); S:Fire("PLAYER_INFO")
 end
 function S.AltsOf(main)
@@ -963,7 +1002,7 @@ local function resolveName(txt)
   if not hit and S.MsgCandidates then
     for _, c in ipairs(S.MsgCandidates()) do if short(c.name):lower() == txt:lower() or c.name:lower() == txt:lower() then hit = c.name break end end
   end
-  return hit or (S.Full and S.Full(txt:sub(1, 1):upper() .. txt:sub(2))) or txt
+  return hit or short(S.Full and S.Full(txt:sub(1, 1):upper() .. txt:sub(2)) or txt)
 end
 local function choose(name)
   if not name or not pickOpts then return end
@@ -1124,7 +1163,7 @@ function S.ServiceProviders()
   local out = {}
   for k, s in pairs(svcTable()) do
     if type(s) == "table" then
-      local nm = s._name or (S.Full and S.Full(k:sub(1, 1):upper() .. k:sub(2))) or k
+      local nm = short(s._name or (S.Full and S.Full(k:sub(1, 1):upper() .. k:sub(2))) or k)
       out[#out + 1] = { name = nm, svc = s }
     end
   end
@@ -1242,7 +1281,7 @@ end
 local function capFull(k)
   if not k then return nil end
   if k:find("-", 1, true) then return k end
-  return S.Full and S.Full(k:sub(1, 1):upper() .. k:sub(2)) or k
+  return short(S.Full and S.Full(k:sub(1, 1):upper() .. k:sub(2)) or k)
 end
 -- every character we know for this person (main first)
 function S.CharsOf(name)
