@@ -1,7 +1,7 @@
 -- Messenger: your in-game whispers as chats - bubbles, day separators, times,
 -- sounds and pop-ups. Whispers are kept only on this computer.
 local _, S = ...
-if S.ModuleRev then S:ModuleRev("Messenger", 5) end
+if S.ModuleRev then S:ModuleRev("Messenger", 6) end
 local UI = S.UI
 
 -- One spelling per person. WoW Forever names have two parts ("Saphira Oakhallow") and the
@@ -358,6 +358,8 @@ local function getRow(i)
           S:SetMsgPerson(who, "pinned", not (S:MsgPerson(who) or {}).pinned or "default"); refreshSoon()
         end },
         { text = "Set nickname...", func = function() C_Timer.After(0, function() if S.AskNickname then S:AskNickname(who) end end) end },
+        { text = (S.NoteOf and S.NoteOf(who)) and "Edit note..." or "Add a note...", tip = "Your own note about them - only you see it. Shows on their profile.",
+          func = function() C_Timer.After(0, function() if S.AskNote then S:AskNote(who) end end) end },
         { text = "Set as alt of...", tip = "Mark this character as an alt of their main - it then shows under the main's name.",
           func = function() C_Timer.After(0, function() if S.AskAltOf then S:AskAltOf(who) end end) end },
         { text = "Unlink an alt...", disabled = not (S.AltsOf and #S.AltsOf(who) > 0), func = function()

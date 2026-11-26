@@ -5,7 +5,7 @@
 --   * the player profile window (View profile), Add friend
 --   * /r in game chat opens the Messenger on the person you'd be replying to
 local _, S = ...
-if S.ModuleRev then S:ModuleRev("MessengerPlayers", 3) end
+if S.ModuleRev then S:ModuleRev("MessengerPlayers", 4) end
 local UI = S.UI
 
 local function G() return S.db.global end
@@ -529,6 +529,8 @@ function S:RefreshPlayer()
     if i.bnet then add("Battle.net", (i.tag or "") .. (i.client and i.client ~= "WoW" and ("  |cff888888" .. i.client .. "|r") or "")) end
   add("Friend", i.friend and "|cff55ff55On your friends list|r" or (i.bnet and "|cff00aaffBattle.net friend|r") or "No")
   add("Nickname", S.NicknameOf and S.NicknameOf(who))
+  local note = S.NoteOf and S.NoteOf(who)
+  if note then rows[#rows + 1] = { "My note", note, true } end
   if S.ServiceNames then local sv = S.ServiceNames(who); if sv ~= "" then add("Services", sv) end end
   local main = S.MainOf and S.MainOf(who)
   if main and short(main):lower() ~= short(who):lower() then add("Alt of", S.DisplayName(main) .. (S.DisplayName(main) ~= short(main) and ("  |cff888888(" .. short(main) .. ")|r") or "")) end
@@ -541,16 +543,44 @@ function S:RefreshPlayer()
   add("Guild note", i.gnote)
   if i.fromMemory and not i.unit and not i.friend then add("Last seen", ago(i.seen)) end
   if i.whoAt then add("Looked up", ago(i.whoAt)) end
+  local y = -128
   for n, r in ipairs(rows) do
     local row = pwin.rows[n]
     if not row then
       row = CreateFrame("Frame", nil, pwin); row:SetSize(372, 20)
-      row:SetPoint("TOPLEFT", 20, -128 - (n - 1) * 22)
-      row.k = UI:Text(row, "", "small"); row.k:SetPoint("LEFT"); row.k:SetWidth(96)
-      row.v = UI:Text(row, "", "normal"); row.v:SetPoint("LEFT", 104, 0); row.v:SetWidth(268); row.v:SetWordWrap(false)
+      row.k = UI:Text(row, "", "small"); row.k:SetPoint("TOPLEFT", 0, -4); row.k:SetWidth(96); row.k:SetJustifyH("LEFT")
+      row.v = UI:Text(row, "", "normal"); row.v:SetPoint("TOPLEFT", 104, -3); row.v:SetWidth(268); row.v:SetJustifyH("LEFT")
+      if row.v.SetJustifyV then row.v:SetJustifyV("TOP") end
       pwin.rows[n] = row
     end
-    row.k:SetText("|cffffd100" .. r[1] .. "|r"); row.v:SetText(r[2]); row:Show()
+    row:ClearAllPoints(); row:SetPoint("TOPLEFT", 20, y)
+    row.k:SetText("|cffffd100" .. r[1] .. "|r")
+    -- the note may take up to 3 lines (hover the row to read all of it)
+    row.v:SetWordWrap(r[3] and true or false)
+    if row.v.SetMaxLines then row.v:SetMaxLines(r[3] and 3 or 1) end
+    row.v:SetHeight(0); row.v:SetText(r[2])
+    local h = 20
+    if r[3] then
+      local one = select(2, row.v:GetFont()) or 12
+      local th = math.min(row.v:GetStringHeight() or one, (one + 2) * 3)
+      row.v:SetHeight(th); h = math.max(20, th + 6)
+    else
+      row.v:SetHeight(14)
+    end
+    row:SetHeight(h)
+    row.full = r[3] and r[2] or nil
+    if not row.tipSet then
+      row.tipSet = true
+      row:EnableMouse(true)
+      row:SetScript("OnEnter", function(self)
+        if not self.full then return end
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT"); GameTooltip:AddLine("My note", 1, 0.82, 0)
+        GameTooltip:AddLine(self.full, 1, 1, 1, true); GameTooltip:AddLine("Change it with the Note button.", 0.6, 0.6, 0.6, true); GameTooltip:Show()
+      end)
+      row:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    end
+    row:Show()
+    y = y - h - 2
   end
   for n = #rows + 1, #pwin.rows do pwin.rows[n]:Hide() end
   pwin.addFriend:SetEnabled(not i.friend)
@@ -565,7 +595,7 @@ function S:ShowPlayer(name)
   if not name then return end
   who = name
   if not pwin then
-    pwin = UI:Window("CC_Player", "Player", 412, 486)
+    pwin = UI:Window("CC_Player", "Player", 412, 516)
     pwin.av = pwin:CreateTexture(nil, "ARTWORK"); pwin.av:SetSize(64, 64); pwin.av:SetPoint("TOPLEFT", 20, -44)
     local avBtn = CreateFrame("Button", nil, pwin); avBtn:SetAllPoints(pwin.av)
     avBtn:SetScript("OnClick", function() S:PickAvatar(who) end)
@@ -586,6 +616,8 @@ function S:ShowPlayer(name)
     pwin.ctB:SetPoint("LEFT", svcB, "RIGHT", 6, 0)
     local picB = btn("Picture...", 90, function() S:PickAvatar(who) end, "Pick any icon in the game as their picture.")
     picB:SetPoint("LEFT", pwin.ctB, "RIGHT", 6, 0)
+    local noteB = btn("Note...", 66, function() S:AskNote(who) end, "Write a note about them - only you see it. It shows on their profile (and on all their alts).")
+    noteB:SetPoint("LEFT", picB, "RIGHT", 6, 0)
     pwin.invite = btn("Invite", 70, function() if S.PartyInvite then S:PartyInvite(who) end end, "Invite to your group.")
     pwin.invite:SetPoint("LEFT", msg, "RIGHT", 6, 0)
     pwin.addFriend = btn("Add friend", 96, function() S:AddFriend(who) end, "Put them on your friends list.")
@@ -695,6 +727,7 @@ local function tidyNames()
   rekey(g.services, true, fixRec)
   rekey(g.contacts, true, fixRec)
   rekey(g.avatars, true, nil)
+  rekey(g.pnotes, true, nil)
   rekey(g.hiddenConvos, true, nil)
 end
 S.MsgTidyNames = tidyNames
@@ -1089,6 +1122,33 @@ function S:AskAltOf(alt)
       S:Print(short(alt) .. " is now an alt of |cffffd100" .. S.DisplayName(main) .. "|r.")
     end })
 end
+-- Your own note about someone (only you see it, never sent anywhere). Saved on the
+-- main, so it shows on all their alts: g.pnotes[short lower main] = { text, t }
+local function notesTable() local g = G(); g.pnotes = type(g.pnotes) == "table" and g.pnotes or {}; return g.pnotes end
+function S.NoteOf(name)
+  if not name or not S.db then return nil end
+  local n = notesTable()[key(S.MainOf(name) or name)]
+  return n and n.text
+end
+function S.NoteTime(name)
+  if not name or not S.db then return nil end
+  local n = notesTable()[key(S.MainOf(name) or name)]
+  return n and n.t
+end
+function S.SetNote(name, txt)
+  if not name then return end
+  txt = S.Trim(txt or ""):gsub("|", "/")
+  notesTable()[key(S.MainOf(name) or name)] = (txt ~= "") and { text = txt, t = time() } or nil
+  S:Fire("MSGR_STYLE"); S:Fire("PLAYER_INFO")
+end
+function S:AskNote(name)
+  if not name then return end
+  local shown = S.DisplayName and S.DisplayName(name) or short(name)
+  UI:Prompt("Your note about |cffffd100" .. shown .. "|r - only you see it (leave empty to remove):", S.NoteOf(name) or "", function(txt)
+    S.SetNote(name, txt)
+  end)
+end
+
 function S:AskNickname(name)
   UI:Prompt("Nickname for |cffffd100" .. short(name) .. "|r (leave empty to remove):", S.NicknameOf(name) or "", function(txt)
     S.SetNickname(name, txt)
