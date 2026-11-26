@@ -197,9 +197,10 @@ end
 local help
 function S:SetStreamerMode(on)
   G().streamer = on and true or false
+  S:StreamNameRefresh()
   if not on then return end
   if not help then
-    help = UI:Window("CC_StreamerHelp", "Streamer mode", 460, 300)
+    help = UI:Window("CC_StreamerHelp", "Streamer mode", 460, 340)
     help:SetFrameStrata("DIALOG")
     help.text = UI:Text(help, "", "normal")
     help.text:SetPoint("TOPLEFT", 18, -42); help.text:SetWidth(424); help.text:SetJustifyH("LEFT"); help.text:SetWordWrap(true)
@@ -207,7 +208,8 @@ function S:SetStreamerMode(on)
       "|cffffd100Pop-ups:|r the text of new messages is hidden (blurred) so your stream can't read it. Chat only says who it's from.\n\n" ..
       "|cffffd100The Messages window:|r OBS and other streaming programs capture the whole game picture, so an addon can't hide " ..
       "a window from them.\n\nInstead, move and shrink the Messages window so it sits exactly where your webcam box covers the " ..
-      "game on stream. Drag its title bar to move it and the corner grip to resize it. It remembers the spot.")
+      "game on stream. Drag its title bar to move it and the corner grip to resize it. It remembers the spot.\n\n" ..
+      "|cffffd100Your name:|r shown as \"" .. S.StreamAlias() .. "\" everywhere (change it in Settings, or /ccenter streamername <name>). The name over your character is hidden.")
     local arrange = UI:PrimaryButton(help, "Arrange Messages window", 190, 26, function()
       S:ShowMessenger()
       S:Print("Drag the Messages window under your webcam box; use the corner grip to resize it.")
@@ -218,6 +220,209 @@ function S:SetStreamerMode(on)
   end
   help:Show(); help:Raise()
 end
+
+---------------------------------------------------------------------------
+-- Streamer mode: hide your character name everywhere it's shown
+---------------------------------------------------------------------------
+-- Every text line in the game is a FontString, so one hook on FontString:SetText /
+-- SetFormattedText catches your name wherever it's drawn - unit frames, nameplates,
+-- Command Center's own windows, other addons. Chat lines go through a chat filter and
+-- tooltips through a tooltip hook. Nothing is changed while it's off.
+local function secret(v) return issecretvalue and issecretvalue(v) end
+local myName
+-- each streamer-mode feature has its own switch (all on by default)
+S.STREAMER_FEATURES = {
+  { key = "whispers", var = "streamerWhispers", label = "Hide what whispers say (pop-ups, notification list, chat)",
+    tip = "Pop-ups blur the text and the notification list only says who wrote." },
+  { key = "messenger", var = "streamerMsgrSpot", label = "Keep the Messenger window where I put it (under my webcam)",
+    tip = "The dock won't pull the Messenger window next to it, so it stays tucked behind your webcam box." },
+  { key = "name", var = "streamerHideName", label = "Hide my name (shows the name below instead)",
+    tip = "Your character name and surname are replaced everywhere they're shown: unit frames, nameplates, chat, tooltips, windows." },
+  { key = "overhead", var = "streamerOverhead", label = "Hide the name over my character",
+    tip = "The game draws that name itself, so it can only be switched off (the game's 'My name' option), not renamed." },
+}
+local FEAT = {}
+for _, f in ipairs(S.STREAMER_FEATURES) do FEAT[f.key] = f.var end
+-- is streamer mode on, and this part of it switched on?
+function S.StreamerOn(feature)
+  local g = S.db and S.db.global
+  if not (g and g.streamer) then return false end
+  local var = FEAT[feature]
+  return var == nil or g[var] ~= false
+end
+function S.StreamHidingName() return S.StreamerOn("name") end
+function S.StreamAlias()
+  local a = S.db and S.db.global.streamerAlias
+  if type(a) ~= "string" or not a:find("%S") then a = "Streamer" end
+  return a
+end
+local function esc(t) return (t:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")) end
+-- WoW Forever characters also have a surname (secondary name); find yours, never the realm
+local mySurname, surnameTried = nil, 0
+local function surname()
+  if mySurname or GetTime() - surnameTried < 5 then return mySurname end
+  surnameTried = GetTime()
+  myName = myName or UnitName("player")
+  local realm = GetRealmName and GetRealmName() or ""
+  local function good(v)
+    return type(v) == "string" and not secret(v) and v ~= "" and v ~= myName and v ~= realm and v:gsub("%s", "") ~= realm:gsub("%s", "")
+  end
+  local cands = {}
+  local _, second = UnitName("player"); cands[#cands + 1] = second
+  for _, fn in ipairs({ "UnitSecondaryName", "UnitSurname", "UnitLastName" }) do
+    local f = _G[fn]; if type(f) == "function" then local ok, v = pcall(f, "player"); if ok then cands[#cands + 1] = v end end
+  end
+  if C_PlayerInfo and type(C_PlayerInfo.GetSecondaryName) == "function" then
+    local ok, v = pcall(C_PlayerInfo.GetSecondaryName, "player"); if ok then cands[#cands + 1] = v end
+  end
+  if S.UFFullName then
+    local ok, full = pcall(S.UFFullName, "player")
+    if ok and type(full) == "string" and myName and full:sub(1, #myName + 1) == myName .. " " then cands[#cands + 1] = full:sub(#myName + 2) end
+  end
+  for _, v in ipairs(cands) do if good(v) then mySurname = v; break end end
+  return mySurname
+end
+S.StreamSurname = surname
+-- a name (Name or Name-Realm) -> your alias if it's you
+function S.StreamName(name)
+  if not S.StreamHidingName() or type(name) ~= "string" or secret(name) then return name end
+  myName = myName or UnitName("player")
+  if myName and name:match("^([^%-]+)") == myName then return S.StreamAlias() end
+  return name
+end
+-- any text: your name (and Name-Realm) replaced by the alias
+function S.StreamText(text)
+  if not S.StreamHidingName() or type(text) ~= "string" or secret(text) then return text end
+  myName = myName or UnitName("player")
+  if not myName or myName == "" then return text end
+  local sur = surname()
+  if not text:find(myName, 1, true) and not (sur and text:find(sur, 1, true)) then return text end
+  local alias = (S.StreamAlias():gsub("%%", "%%%%"))
+  local e = esc(myName)
+  if sur then
+    local es = esc(sur)
+    text = text:gsub(e .. "[%s%-]+" .. es .. "%f[%A]", alias)     -- Name Surname / Name-Surname
+  end
+  text = text:gsub(e .. "%-[^%s|:,%.!%?%]%)]+", alias)          -- Name-Realm
+  text = text:gsub("%f[%a]" .. e .. "%f[%A]", alias)               -- Name on its own
+  if sur then text = text:gsub("%f[%a]" .. esc(sur) .. "%f[%A]", "") :gsub("  +", " ") end  -- a surname left on its own
+  return text
+end
+-- every FontString
+local busy = false
+-- kept in a plain variable: this runs for every text change in the whole game, so it has
+-- to cost next to nothing while name hiding is off (updated by S:StreamNameRefresh / login)
+local nameActive = false
+local function doSet(fs)
+  local ok, t = pcall(fs.GetText, fs)
+  if not ok or type(t) ~= "string" or secret(t) then return end
+  myName = myName or UnitName("player")
+  if not myName then return end
+  if not t:find(myName, 1, true) then
+    local sur = surname()
+    if not (sur and t:find(sur, 1, true)) then return end
+  end
+  local n = S.StreamText(t)
+  if n ~= t then busy = true; pcall(fs.SetText, fs, n); busy = false end
+end
+local timedSet = S.PerfWrap and S.PerfWrap("Toasts  streamer name (every text change)", doSet) or doSet
+local function onSet(fs)
+  if busy or not nameActive then return end
+  timedSet(fs)
+end
+do
+  local probe = UIParent:CreateFontString()
+  local meta = getmetatable(probe)
+  local idx = meta and meta.__index
+  if type(idx) == "table" then
+    if idx.SetText then hooksecurefunc(idx, "SetText", onSet) end
+    if idx.SetFormattedText then hooksecurefunc(idx, "SetFormattedText", onSet) end
+  end
+end
+-- chat lines: the speaker's name and the text
+local CHAT_EVENTS = { "CHAT_MSG_SAY", "CHAT_MSG_YELL", "CHAT_MSG_EMOTE", "CHAT_MSG_TEXT_EMOTE", "CHAT_MSG_GUILD", "CHAT_MSG_OFFICER",
+  "CHAT_MSG_PARTY", "CHAT_MSG_PARTY_LEADER", "CHAT_MSG_RAID", "CHAT_MSG_RAID_LEADER", "CHAT_MSG_RAID_WARNING",
+  "CHAT_MSG_INSTANCE_CHAT", "CHAT_MSG_INSTANCE_CHAT_LEADER", "CHAT_MSG_WHISPER", "CHAT_MSG_WHISPER_INFORM", "CHAT_MSG_CHANNEL",
+  "CHAT_MSG_SYSTEM", "CHAT_MSG_ACHIEVEMENT", "CHAT_MSG_GUILD_ACHIEVEMENT", "CHAT_MSG_LOOT", "CHAT_MSG_MONSTER_SAY",
+  "CHAT_MSG_MONSTER_WHISPER", "CHAT_MSG_MONSTER_EMOTE", "CHAT_MSG_MONSTER_YELL", "CHAT_MSG_RAID_BOSS_EMOTE", "CHAT_MSG_RAID_BOSS_WHISPER" }
+local function chatFilter(_, _, msg, author, ...)
+  if not S.StreamHidingName() or secret(msg) or secret(author) then return false end
+  local m2, a2 = S.StreamText(msg), S.StreamName(author)
+  if m2 ~= msg or a2 ~= author then return false, m2, a2, ... end
+  return false
+end
+-- (S.AddChatFilter: the chat-filter function the chat frames really use on this client)
+local addFilter = S.AddChatFilter or ChatFrame_AddMessageEventFilter
+if addFilter then
+  for _, ev in ipairs(CHAT_EVENTS) do pcall(addFilter, ev, chatFilter) end
+end
+-- tooltips (yours, when you mouse over yourself or your name)
+local function fixTooltip(tt)
+  if not S.StreamHidingName() or not tt or not tt.GetName or not tt:GetName() then return end
+  for i = 1, math.min(tt:NumLines() or 0, 6) do
+    local fs = _G[tt:GetName() .. "TextLeft" .. i]
+    if fs then onSet(fs) end
+  end
+end
+if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall and Enum and Enum.TooltipDataType then
+  TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tt) pcall(fixTooltip, tt) end)
+elseif GameTooltip and GameTooltip.HookScript then
+  pcall(GameTooltip.HookScript, GameTooltip, "OnTooltipSetUnit", function(tt) pcall(fixTooltip, tt) end)
+end
+-- the name over your character in the world is drawn by the game itself, not as text an
+-- addon can change - so it's switched off (the game's "My name" option, CVar UnitNameOwn)
+-- while your name is hidden, and put back the way it was afterwards
+local ownPending = false
+local function applyOwnName()
+  if not (GetCVar and SetCVar) then return end
+  if InCombatLockdown and InCombatLockdown() then ownPending = true; return end
+  ownPending = false
+  local g = G()
+  if S.StreamerOn("overhead") then
+    if g.streamerOwnNamePrev == nil then g.streamerOwnNamePrev = GetCVar("UnitNameOwn") or "1" end
+    if GetCVar("UnitNameOwn") ~= "0" then pcall(SetCVar, "UnitNameOwn", "0") end
+  elseif g.streamerOwnNamePrev ~= nil then
+    pcall(SetCVar, "UnitNameOwn", g.streamerOwnNamePrev)
+    g.streamerOwnNamePrev = nil
+  end
+end
+S.StreamApplyOwnName = applyOwnName
+S:On("PLAYER_LOGIN", function() nameActive = S.StreamHidingName(); C_Timer.After(1, applyOwnName) end)
+S:On("PLAYER_REGEN_ENABLED", function() if ownPending then applyOwnName() end end)
+
+-- names already on screen when it's switched on
+function S:StreamNameRefresh()
+  nameActive = S.StreamHidingName()
+  applyOwnName()
+  if not S.StreamHidingName() then
+    S:Print("Your name shows again as things update (a /reload puts every spot back).")
+    return
+  end
+  local f = EnumerateFrames and EnumerateFrames()
+  local n = 0
+  while f and n < 20000 do
+    n = n + 1
+    local ok, regs = pcall(function() return { f:GetRegions() } end)
+    if ok then for _, r in ipairs(regs) do if r.GetObjectType and r:GetObjectType() == "FontString" then onSet(r) end end end
+    f = EnumerateFrames(f)
+  end
+  S:Fire("STREAMER_NAME")
+end
+function S:SetStreamerAlias(text)
+  G().streamerAlias = (type(text) == "string" and text:find("%S")) and S.Trim(text) or nil
+  S:StreamNameRefresh()
+end
+S:AddCommand("streamername", "[name]", "Streamer mode: the name shown instead of yours (empty = turn name hiding off/on)", function(arg)
+  arg = arg and S.Trim(arg) or ""
+  if arg == "" then
+    G().streamerHideName = G().streamerHideName == false
+    S:Print("Hide my name in streamer mode: " .. (G().streamerHideName ~= false and "|cff55ff55on|r" or "|cffff5555off|r") .. ".")
+  else
+    S:SetStreamerAlias(arg)
+    S:Print("In streamer mode your name shows as |cffffd100" .. S.StreamAlias() .. "|r.")
+  end
+  S:StreamNameRefresh()
+end)
 
 S:AddCommand("streamer", "", "Streamer mode on / off", function()
   S:SetStreamerMode(not G().streamer)

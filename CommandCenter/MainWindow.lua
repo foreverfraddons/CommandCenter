@@ -60,6 +60,7 @@ local function roundIcon(parent, size, key)
   return f
 end
 
+local drag   -- the home tile being dragged (see dragStart below)
 local function makeTile(parent)
   local t = CreateFrame("Button", nil, parent, BackdropTemplateMixin and "BackdropTemplate" or nil)
   -- outer glow (shown on hover)
@@ -89,14 +90,14 @@ local function makeTile(parent)
     local lvl = UI:AnimLevel()
     if lvl ~= "minimal" then
       self.haloTex:SetAlpha(lvl == "flashy" and 0.55 or 0.3)
-      if self.home then self:ClearAllPoints(); self:SetPoint("TOPLEFT", self.home[1], self.home[2] + 3) end
+      if self.home and not (drag and drag.tile == self) then self:ClearAllPoints(); self:SetPoint("TOPLEFT", self.home[1], self.home[2] + 3) end
     end
     if lvl == "flashy" and PlaySound and SOUNDKIT and SOUNDKIT.U_CHAT_SCROLL_BUTTON then PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON) end
   end)
   t:SetScript("OnLeave", function(self)
     self.__hot = false; paint(self)
     self.haloTex:SetAlpha(0)
-    if self.home then self:ClearAllPoints(); self:SetPoint("TOPLEFT", self.home[1], self.home[2]) end
+    if self.home and not (drag and drag.tile == self) then self:ClearAllPoints(); self:SetPoint("TOPLEFT", self.home[1], self.home[2]) end
   end)
   return t
 end
@@ -109,6 +110,24 @@ local HEAD_H = 68
 local BODY_W = S.CW + 8
 local BODY_H = 34 + 8 + 30 + 8 + S.CH + 18     -- back row, tabs row, content panel
 
+-- Home pages, like apps on a phone: 4 x 3 tiles per page, the mouse wheel (or the dots)
+-- flips pages, drag a tile to move it - hold it at the left / right edge to take it to
+-- another page. Saved: S.db.global.homeSlots = { [tile id] = slot } (slot 1 = page 1 top
+-- left; 13 = page 2 top left). Tools without a saved slot fill the first free ones.
+local COLS, ROWS = 4, 3
+local PER = COLS * ROWS
+local homePage = 1
+local function homeSlots()
+  local g = S.db and S.db.global
+  if not g then return {} end
+  if type(g.homeSlots) ~= "table" then
+    g.homeSlots = {}
+    -- the older saved order (one list) becomes slots 1, 2, 3...
+    if type(g.homeOrder) == "table" then for i, id in ipairs(g.homeOrder) do g.homeSlots[id] = i end end
+    g.homeOrder = nil
+  end
+  return g.homeSlots
+end
 local function homeTiles()
   local list = {}
   for _, label in ipairs(S.ToolLabels and S:ToolLabels() or {}) do
@@ -118,22 +137,259 @@ local function homeTiles()
         badgeText = t.tileTag, subsText = t.desc, action = function() S:ToolToggle(label) end }
     end
   end
+  -- give every tile a slot: its saved one if free, else the first free slot
+  local saved, taken = homeSlots(), {}
+  for _, sec in ipairs(list) do
+    local sl = tonumber(saved[sec.id])
+    if sl and sl >= 1 and not taken[sl] then sec.slot = sl; taken[sl] = true end
+  end
+  local nextFree = 1
+  for _, sec in ipairs(list) do
+    if not sec.slot then
+      while taken[nextFree] do nextFree = nextFree + 1 end
+      sec.slot = nextFree; taken[nextFree] = true
+    end
+  end
+  table.sort(list, function(x, y) return x.slot < y.slot end)
   return list
 end
-local function refreshHome(animate)
+local function pageCount(list, extra)
+  local maxSlot = 0
+  for _, sec in ipairs(list) do if sec.slot > maxSlot then maxSlot = sec.slot end end
+  return math.max(1, math.ceil(maxSlot / PER)) + (extra and 1 or 0)
+end
+local function slotXY(slot, grid)
+  local i = (slot - 1) % PER
+  local col, row = i % COLS, math.floor(i / COLS)
+  return col * (grid.tw + grid.gap), -56 - row * (grid.th + grid.gap)   -- (56: the greeting + its hint line above)
+end
+local function slotPage(slot) return math.floor((slot - 1) / PER) + 1 end
+-- put `id` at slot `to`; whoever is there moves one along (and so on) until a free slot
+local function placeAt(map, id, to)
+  local at = {}
+  for k, v in pairs(map) do if k ~= id then at[v] = k end end
+  map[id] = to
+  local carry, sl = at[to], to
+  while carry do
+    sl = sl + 1
+    local nextCarry = at[sl]
+    map[carry] = sl
+    carry = nextCarry
+  end
+end
+-- empty pages in between are removed (later pages move up)
+local function compact(map)
+  local used = {}
+  for _, v in pairs(map) do used[slotPage(v)] = true end
+  local maxPage = 0
+  for pg in pairs(used) do if pg > maxPage then maxPage = pg end end
+  local shift, newOf = 0, {}
+  for pg = 1, maxPage do
+    if not used[pg] then shift = shift + 1 end
+    newOf[pg] = pg - shift
+  end
+  for k, v in pairs(map) do map[k] = v - (slotPage(v) - newOf[slotPage(v)]) * PER end
+end
+
+local refreshHome
+local function cursorInHome()
+  local home = main.home
+  local s = home:GetEffectiveScale() or 1
+  local cx, cy = GetCursorPosition()
+  return cx / s - (home:GetLeft() or 0), cy / s - (home:GetTop() or 0)
+end
+local function slotUnder(x, y, grid)
+  local col = math.max(0, math.min(COLS - 1, math.floor((x + grid.gap / 2) / (grid.tw + grid.gap))))
+  local row = math.max(0, math.min(ROWS - 1, math.floor((-56 - y + grid.gap / 2) / (grid.th + grid.gap))))
+  return (homePage - 1) * PER + row * COLS + col + 1
+end
+-- lay the tiles of the current page out (map = slots to show, e.g. a drag preview)
+local function layoutPage(map, skip)
+  local grid = main.homeGrid
+  if not grid then return end
+  for _, t in ipairs(main.homeTilesShown or {}) do
+    if t ~= skip then
+      local sl = map[t.secId]
+      if sl and slotPage(sl) == homePage then
+        local x, y = slotXY(sl, grid)
+        t.home = { x, y }
+        t:ClearAllPoints(); t:SetPoint("TOPLEFT", x, y); t:Show()
+      else
+        t:Hide()
+      end
+    end
+  end
+end
+local function paintDots(n)
+  local d = main.homeDots
+  if not d then return end
+  for i, dot in ipairs(d.dots) do dot:SetShown(i <= n) end
+  for i = #d.dots + 1, n do
+    local dot = CreateFrame("Button", nil, d)
+    dot:SetSize(14, 14)
+    dot.t = dot:CreateTexture(nil, "ARTWORK"); dot.t:SetPoint("CENTER"); dot.t:SetSize(8, 8); dot.t:SetTexture(UI.ART.disc)
+    dot:SetScript("OnClick", function() S:HomePage(i) end)
+    d.dots[i] = dot
+  end
+  local th = UI:Theme()
+  for i = 1, n do
+    local dot = d.dots[i]
+    dot:ClearAllPoints(); dot:SetPoint("CENTER", d, "CENTER", (i - (n + 1) / 2) * 18, 0)
+    if i == homePage then dot.t:SetVertexColor(C(th.gold)); dot.t:SetSize(10, 10)
+    else dot.t:SetVertexColor(C(th.muted, 0.6)); dot.t:SetSize(7, 7) end
+  end
+  d:SetShown(n > 1 or drag ~= nil)
+end
+-- slide the page in from the side it comes from
+local function slideIn(dir)
+  if UI:AnimLevel() == "minimal" or not main.homeTilesShown then return end
+  local list = {}
+  for _, t in ipairs(main.homeTilesShown) do if t:IsShown() and t.home and not (drag and drag.tile == t) then list[#list + 1] = t end end
+  main.homeSlide = main.homeSlide or CreateFrame("Frame", nil, main.home)
+  local w, p = (BODY_W + 40) * dir, 0
+  main.homeSlide:SetScript("OnUpdate", function(self, el)
+    p = math.min(1, p + el / 0.18)
+    local e = 1 - (1 - p) * (1 - p)
+    for _, t in ipairs(list) do t:ClearAllPoints(); t:SetPoint("TOPLEFT", t.home[1] + w * (1 - e), t.home[2]) end
+    if p >= 1 then self:SetScript("OnUpdate", nil) end
+  end)
+end
+function S:HomePage(n, quiet)
+  if not main or not main.home then return end
+  local total = drag and drag.pages or pageCount(homeTiles())
+  n = math.max(1, math.min(total, n or 1))
+  if n == homePage then return end
+  local dir = n > homePage and 1 or -1
+  homePage = n
+  if drag then
+    drag.to, drag.preview = nil, nil
+    layoutPage(drag.map, drag.tile)
+  else
+    refreshHome(false)
+  end
+  paintDots(total)
+  if not quiet then slideIn(dir) end
+  if PlaySound and SOUNDKIT and SOUNDKIT.IG_ABILITY_PAGE_TURN then PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN) end
+end
+local EDGE, EDGE_WAIT = 26, 0.55
+local function dragUpdate()
+  if not drag then return end
+  local t, grid = drag.tile, main.homeGrid
+  local x, y = cursorInHome()
+  t:ClearAllPoints(); t:SetPoint("TOPLEFT", x - drag.dx, y - drag.dy)
+  -- hold it at the left / right edge to change page
+  local edge = (x < EDGE and -1) or (x > BODY_W - EDGE and 1) or nil
+  if edge then
+    if drag.edge ~= edge then drag.edge, drag.edgeAt = edge, GetTime() end
+    main.homeEdge:ClearAllPoints()
+    main.homeEdge:SetPoint(edge < 0 and "LEFT" or "RIGHT", main.home, edge < 0 and "LEFT" or "RIGHT", 0, -20)
+    main.homeEdge:Show()
+    if GetTime() - drag.edgeAt >= EDGE_WAIT then
+      drag.edgeAt = GetTime()
+      local target = homePage + edge
+      if target >= 1 and target <= drag.pages then S:HomePage(target) end
+    end
+    return
+  end
+  drag.edge = nil; main.homeEdge:Hide()
+  local to = slotUnder(x, y, grid)
+  if to ~= drag.to then
+    drag.to = to
+    local preview = {}
+    for k, v in pairs(drag.map) do preview[k] = v end
+    placeAt(preview, t.secId, to)
+    drag.preview = preview
+    layoutPage(preview, t)
+  end
+end
+local function dragStart(t)
+  if not main.homeGrid or not t.secId then return end
+  local map = {}
+  for _, x in ipairs(main.homeTilesShown or {}) do map[x.secId] = x.slot end
+  local x, y = cursorInHome()
+  drag = { tile = t, map = map, dx = x - t.home[1], dy = y - t.home[2] }
+  -- one empty page after the last, to start a new page
+  local list = {}
+  for _, x2 in ipairs(main.homeTilesShown or {}) do list[#list + 1] = { slot = x2.slot } end
+  drag.pages = pageCount(list, true)
+  t:SetFrameLevel(t:GetFrameLevel() + 20)
+  t.haloTex:SetAlpha(0.6)
+  main.homeDrag = main.homeDrag or CreateFrame("Frame", nil, main.home)
+  main.homeDrag:SetScript("OnUpdate", dragUpdate)
+  paintDots(drag.pages)
+end
+local function dragStop()
+  if not drag then return end
+  local d = drag
+  drag = nil
+  if main.homeDrag then main.homeDrag:SetScript("OnUpdate", nil) end
+  if main.homeEdge then main.homeEdge:Hide() end
+  d.tile:SetFrameLevel(math.max(1, d.tile:GetFrameLevel() - 20))
+  d.tile.justDragged = GetTime()
+  local map = d.preview or d.map
+  if not d.preview and d.to == nil then
+    -- dropped right after a page change: first free slot on this page, else the end of it
+    map = {}
+    for k, v in pairs(d.map) do map[k] = v end
+    local used = {}
+    for k, v in pairs(map) do if k ~= d.tile.secId then used[v] = true end end
+    local first = (homePage - 1) * PER + 1
+    local spot
+    for sl = first, first + PER - 1 do if not used[sl] then spot = sl; break end end
+    placeAt(map, d.tile.secId, spot or (first + PER - 1))
+  end
+  compact(map)
+  S.db.global.homeSlots = map
+  homePage = math.min(homePage, pageCount((function() local l = {} for _, v in pairs(map) do l[#l + 1] = { slot = v } end return l end)()))
+  refreshHome(false)
+end
+function S:ResetHomeOrder()
+  if S.db then S.db.global.homeSlots = {}; S.db.global.homeOrder = nil end
+  homePage = 1
+  refreshHome(false)
+end
+S:AddCommand("tiles", "reset", "Home window: put the tool tiles back in their normal order", function(arg)
+  if (arg or ""):lower():find("reset") then S:ResetHomeOrder(); S:Print("Home tiles are back in their normal order.")
+  else S:Print("Drag a tile on the home window to move it (hold it at the edge for another page). /ccenter tiles reset puts them back.") end
+end)
+refreshHome = function(animate)
   if not main or not main.home then return end
   local list = homeTiles()
   local gap = 12
-  local cols = 4
-  local rows = math.max(1, math.ceil(#list / cols))
-  local tw = math.floor((BODY_W - gap * (cols - 1)) / cols)
-  local th2 = math.floor((BODY_H - 46 - gap * (rows - 1)) / rows)
+  local tw = math.floor((BODY_W - gap * (COLS - 1)) / COLS)
+  local th2 = math.floor((BODY_H - 56 - 22 - gap * (ROWS - 1)) / ROWS)   -- 22 = the page dots
+  main.homeGrid = { cols = COLS, tw = tw, th = th2, gap = gap }
+  main.homeTilesShown = {}
+  local pages = pageCount(list)
+  if homePage > pages then homePage = pages end
+  -- page dots + the edge arrow shown while dragging
+  if not main.homeDots then
+    main.homeDots = CreateFrame("Frame", nil, main.home); main.homeDots.dots = {}
+    main.homeDots:SetSize(200, 16); main.homeDots:SetPoint("BOTTOM", main.home, "BOTTOM", 0, 2)
+    main.homeEdge = CreateFrame("Frame", nil, main.home); main.homeEdge:SetSize(22, 120); main.homeEdge:SetFrameLevel(main.home:GetFrameLevel() + 30)
+    main.homeEdge.t = main.homeEdge:CreateTexture(nil, "OVERLAY"); main.homeEdge.t:SetAllPoints(); main.homeEdge.t:SetTexture(UI.ART.glow)
+    main.homeEdge.t:SetVertexColor(C(UI:Theme().gold, 0.8)); main.homeEdge:Hide()
+    -- the mouse wheel flips pages (down / right = next)
+    main.home:EnableMouseWheel(true)
+    main.home:SetScript("OnMouseWheel", function(_, delta) S:HomePage(homePage + (delta < 0 and 1 or -1)) end)
+  end
   for i, sec in ipairs(list) do
     local t = tiles[i] or makeTile(main.home)
     tiles[i] = t
-    local col, row = (i - 1) % cols, math.floor((i - 1) / cols)
-    t.home = { col * (tw + gap), -46 - row * (th2 + gap) }
-    t:ClearAllPoints(); t:SetPoint("TOPLEFT", t.home[1], t.home[2]); t:SetSize(tw, th2)
+    t.secId, t.slot = sec.id, sec.slot
+    main.homeTilesShown[i] = t
+    if not t.dragReady then
+      t.dragReady = true
+      t:RegisterForDrag("LeftButton")
+      t:SetScript("OnDragStart", function(self) dragStart(self) end)
+      t:SetScript("OnDragStop", function() dragStop() end)
+      t:SetScript("OnHide", function(self) if drag and drag.tile == self then dragStop() end end)
+      t:EnableMouseWheel(true)
+      t:SetScript("OnMouseWheel", function(_, delta) if not drag then S:HomePage(homePage + (delta < 0 and 1 or -1)) end end)
+    end
+    local x, y = slotXY(sec.slot, main.homeGrid)
+    t.home = { x, y }
+    t:ClearAllPoints(); t:SetPoint("TOPLEFT", x, y); t:SetSize(tw, th2)
     t.name:SetWidth(tw - 20); t.live:SetWidth(tw - 20); t.subs:SetWidth(tw - 24)
     -- the description gets whatever room is left under the name and status line
     local room = math.max(12, th2 - (18 + 44 + 8 + 22 + 4 + 14 + 4) - 12)
@@ -166,18 +422,20 @@ local function refreshHome(animate)
     local n = 0
     if sec.tool == "Messenger" and S.UnreadMail then n = S:UnreadMail() end
     t.badge:SetCount(n)
-    t:SetScript("OnClick", function()
+    t:SetScript("OnClick", function(self)
+      if self.justDragged and GetTime() - self.justDragged < 0.3 then return end   -- that was a drag, not a click
       if PlaySound and SOUNDKIT and SOUNDKIT.IG_CHARACTER_INFO_TAB then PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB) end
       if sec.action then sec.action() else S:SelectTab(sec.pages[1][1]) end
     end)
-    t:Show()
-    if animate then UI:Animate(t, "tile", (i - 1) * 0.05) end
+    t:SetShown(slotPage(sec.slot) == homePage)
+    if animate and t:IsShown() then UI:Animate(t, "tile", (((sec.slot - 1) % PER)) * 0.05) end
   end
   for i = #list + 1, #tiles do tiles[i]:Hide() end
+  paintDots(pages)
   local hour = tonumber(date("%H")) or 12
   local hello = (hour >= 5 and hour < 12) and "Good morning" or ((hour >= 12 and hour < 18) and "Good afternoon" or "Good evening")
   main.hello:SetText(hello .. ", " .. (S.Short(S.me or "") or "friend"))
-  main.helloSub:SetText("Click a tool to open or close it")
+  main.helloSub:SetText("Click a tool to open or close it - drag tiles to move them - scroll for more pages")
 end
 
 S.SectionOf = sectionOf
@@ -365,7 +623,11 @@ local function createMain()
   -- home view: greeting + tiles
   main.home = CreateFrame("Frame", nil, body); main.home:SetAllPoints()
   main.hello = main.home:CreateFontString(nil, "OVERLAY"); UI:SetFont(main.hello, "head", FS(20)); main.hello:SetPoint("TOPLEFT", 2, -6)
-  main.helloSub = main.home:CreateFontString(nil, "OVERLAY"); UI:SetFont(main.helloSub, "body", FS(13)); main.helloSub:SetPoint("TOPRIGHT", -2, -12); main.helloSub:SetJustifyH("RIGHT")
+  main.hello:SetPoint("RIGHT", -2, 0); main.hello:SetJustifyH("LEFT"); main.hello:SetWordWrap(false)
+  -- the hint goes on its own line under the greeting (side by side they ran into each other)
+  main.helloSub = main.home:CreateFontString(nil, "OVERLAY"); UI:SetFont(main.helloSub, "body", FS(13))
+  main.helloSub:SetPoint("TOPLEFT", main.hello, "BOTTOMLEFT", 0, -3); main.helloSub:SetPoint("RIGHT", -2, 0)
+  main.helloSub:SetJustifyH("LEFT"); main.helloSub:SetWordWrap(false)
 
   -- LIVE event indicator (top right of the home screen): shows while an event is live;
   -- click it to join / take part
@@ -597,10 +859,15 @@ S:Listen("NOTIFY", function() S:RefreshCurrent() end)
 ---------------------------------------------------------------------------
 local mm
 local function placeMinimap()
-  local a = math.rad(S.db.global.minimap.angle or 200)
-  local r = (Minimap:GetWidth() / 2) + 6
+  local deg = S.db.global.minimap.angle or 200
+  local x, y
+  if S.MinimapEdge then x, y = S.MinimapEdge(deg, 6)   -- follows the minimap's shape (Minimap.lua)
+  else
+    local a, r = math.rad(deg), (Minimap:GetWidth() / 2) + 6
+    x, y = math.cos(a) * r, math.sin(a) * r
+  end
   mm:ClearAllPoints()
-  mm:SetPoint("CENTER", Minimap, "CENTER", math.cos(a) * r, math.sin(a) * r)
+  mm:SetPoint("CENTER", Minimap, "CENTER", x, y)
 end
 
 -- right-click menu on the minimap button
@@ -613,6 +880,7 @@ function S:MinimapMenu(anchor)
     { text = "Settings", func = function() S:ShowMain("settings") end },
     { text = "Messenger", func = function() if S.ShowMessenger then S:ShowMessenger() end end },
     { text = "Messenger settings", func = function() if S.ShowMessengerSettings then S:ShowMessengerSettings() end end },
+    { text = "Minimap settings", func = function() if S.ShowMinimapSettings then S:ShowMinimapSettings() end end },
     { text = "Other", title = true },
     { text = "Mark notifications read", disabled = (S.UnreadNotifs and S:UnreadNotifs() or 0) == 0, func = function() S:MarkAllNotifs() end },
     { text = "Hide minimap button", func = function()
@@ -663,7 +931,9 @@ function S:UpdateMinimap()
     mm:SetScript("OnLeave", function() GameTooltip:Hide() end)
   end
   placeMinimap()
-  mm:SetShown(not S.db.global.minimap.hide)
+  -- with the minimap drawer on, the zone bar's box button carries this button's menu and badge
+  local drawer = S.MinimapDrawerOn and S.MinimapDrawerOn()
+  mm:SetShown(not S.db.global.minimap.hide and not drawer)
 end
 
 S:Listen("LOGIN", function() UI:ApplyTheme() end)

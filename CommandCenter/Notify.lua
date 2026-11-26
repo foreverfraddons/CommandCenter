@@ -132,7 +132,7 @@ local function buildPanel(main)
     { title = "What", w = 250, get = function(n)
       local txt = n.text
       -- streamer mode: never show what a message says
-      if S.db.global.streamer and (n.action == "mail" or n.action == "whisper") then txt = "|cff666666(hidden - streamer mode)|r" end
+      if (S.StreamerOn and S.StreamerOn("whispers") or (not S.StreamerOn and S.db.global.streamer)) and (n.action == "mail" or n.action == "whisper") then txt = "|cff666666(hidden - streamer mode)|r" end
       return (n.read and "|cffaaaaaa" or "|cffffffff") .. (n.title or "") .. "|r" .. (txt and txt ~= "" and ("  |cff888888" .. txt .. "|r") or "")
     end },
     { title = "When", w = 64, get = function(n) return S.Ago(n.time) end },
@@ -142,7 +142,7 @@ local function buildPanel(main)
   end, onEnter = function(n, f)
     GameTooltip:SetOwner(f, "ANCHOR_LEFT")
     GameTooltip:SetText(n.title or "", 1, 0.82, 0)
-    if n.text and not (S.db.global.streamer and (n.action == "mail" or n.action == "whisper")) then GameTooltip:AddLine(n.text, 1, 1, 1, true) end
+    if n.text and not ((S.StreamerOn and S.StreamerOn("whispers") or (not S.StreamerOn and S.db.global.streamer)) and (n.action == "mail" or n.action == "whisper")) then GameTooltip:AddLine(n.text, 1, 1, 1, true) end
     GameTooltip:AddLine(S.date(n.time, "%Y-%m-%d %H:%M"), 0.6, 0.6, 0.6)
     GameTooltip:Show()
   end })

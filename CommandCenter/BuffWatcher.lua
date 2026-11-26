@@ -1,9 +1,10 @@
 -- BuffWatcher: the buffs and weapon enchants you want to keep up.
 --   * a missing one shows in a small movable tracker and (optionally) glows softly
 --     on your action bars, so you put it up before the pull
---   * buffs marked "keep up in combat" are handed to Rotational as top priority
+--   * out of combat only: buffs can't be read in a fight on Forever
 -- Lists belong to your class (every character of that class shares them).
 local _, S = ...
+if S.ModuleRev then S:ModuleRev("BuffWatcher", 3) end
 local UI = S.UI
 
 local function G() return S.db.global end
@@ -18,7 +19,13 @@ local COLORS = { blue = { 0.3, 0.6, 1 }, cyan = { 0.2, 0.95, 1 }, green = { 0.3,
 -- Settings
 ---------------------------------------------------------------------------
 local function myClass() local _, cls = UnitClass("player"); return cls or "UNKNOWN" end
-local function store()
+-- Profiles: each class has named lists; a profile can belong to one specialization
+-- and is picked automatically when you're that spec (dual talents), otherwise the one
+-- this character last chose.
+--   classes[CLASS] = { profiles = { [name] = { list } }, order, specs = { [spec] = profile },
+--                      autoSwitch, imported, specsClean }
+local function entrySig(e) return tostring(e.spell or ("item" .. tostring(e.item))) .. ":" .. (e.kind or "aura") end
+local function classData()
   local g = G()
   g.buffWatch = type(g.buffWatch) == "table" and g.buffWatch or {}
   local w = g.buffWatch
@@ -26,30 +33,188 @@ local function store()
   w.classes = type(w.classes) == "table" and w.classes or {}
   local cls = myClass()
   local c = w.classes[cls]
-  if type(c) ~= "table" then
-    c = { list = {} }
-    w.classes[cls] = c
+  if type(c) ~= "table" then c = {}; w.classes[cls] = c end
+  c.profiles = type(c.profiles) == "table" and c.profiles or {}
+  c.order = type(c.order) == "table" and c.order or {}
+  c.specs = type(c.specs) == "table" and c.specs or {}
+  -- profiles saved without an order entry (or the other way round)
+  local inOrder = {}
+  for i = #c.order, 1, -1 do
+    local n = c.order[i]
+    if type(c.profiles[n]) ~= "table" or inOrder[n] then table.remove(c.order, i) else inOrder[n] = true end
   end
-  c.list = c.list or {}
+  for n, p in pairs(c.profiles) do if type(p) == "table" and not inOrder[n] then c.order[#c.order + 1] = n end end
+  -- an older single list (from before profiles, or written by an older version):
+  -- into "Default" when there are no profiles yet, otherwise kept only if it has
+  -- buffs none of the profiles have
+  if type(c.list) == "table" then
+    if #c.order == 0 then
+      c.profiles.Default = { list = c.list }; c.order[1] = "Default"
+    elseif #c.list > 0 then
+      local have = {}
+      for _, n in ipairs(c.order) do for _, e in ipairs(c.profiles[n].list or {}) do have[entrySig(e)] = true end end
+      local extra = false
+      for _, e in ipairs(c.list) do if not have[entrySig(e)] then extra = true end end
+      if extra and not c.profiles["Older list"] then c.profiles["Older list"] = { list = c.list }; c.order[#c.order + 1] = "Older list" end
+    end
+    c.list = nil
+  end
+  if #c.order == 0 then c.profiles.Default = { list = {} }; c.order[1] = "Default" end
+  for _, n in ipairs(c.order) do c.profiles[n].list = type(c.profiles[n].list) == "table" and c.profiles[n].list or {} end
+  -- spec assignments to profiles that are gone, or named like the class
+  local loc = UnitClass("player")
+  for sp, n in pairs(c.specs) do
+    if not c.profiles[n] or (loc and sp:lower() == loc:lower()) or sp:lower() == cls:lower() then c.specs[sp] = nil end
+  end
+  c.specsClean = true
+  if c.autoSwitch == nil then c.autoSwitch = true end
   -- once: bring over the buffs from your Rotational setups
   if not c.imported and S.RotClassStore then
     c.imported = true
     local ok, rc = pcall(S.RotClassStore)
     if ok and type(rc) == "table" then
+      local list = c.profiles[c.order[1]].list
       local seen = {}
-      for _, e in ipairs(c.list) do seen[(e.spell or 0) .. ":" .. (e.kind or "aura")] = true end
+      for _, e in ipairs(list) do seen[entrySig(e)] = true end
       for _, name in ipairs(rc.order or {}) do
         local prof = rc.profiles and rc.profiles[name]
         for _, b in ipairs(type(prof) == "table" and prof.buffs or {}) do
-          local key = (b.spell or 0) .. ":" .. (b.kind or "aura")
-          if b.spell and not seen[key] then seen[key] = true; c.list[#c.list + 1] = { spell = b.spell, kind = b.kind or "aura", combat = b.combat } end
+          local key = entrySig({ spell = b.spell, kind = b.kind })
+          if b.spell and not seen[key] then seen[key] = true; list[#list + 1] = { spell = b.spell, kind = b.kind or "aura", combat = b.combat } end
         end
       end
     end
   end
   return c, w.look
 end
+local function charKey() return (S.me or "?") .. ":" .. myClass() end
+local function curSpec() return S.CurrentSpec and S.CurrentSpec() or nil end
+-- the profile in use: by spec (auto switch), else this character's pick, else the first
+local function activeName(c)
+  c = c or classData()
+  if c.autoSwitch ~= false then
+    local sp = curSpec()
+    local n = sp and c.specs[sp]
+    if n and c.profiles[n] then return n, true end
+  end
+  local g = G()
+  g.bwChar = type(g.bwChar) == "table" and g.bwChar or {}
+  local n = g.bwChar[charKey()]
+  if n and c.profiles[n] then return n, false end
+  return c.order[1], false
+end
+local function store()
+  local c, look = classData()
+  return c.profiles[activeName(c)], look, c
+end
 S.BuffWatchStore = store
+
+local function refresh() if S.RefreshBuffWatcher then S:RefreshBuffWatcher() end end
+local lastActive
+-- order, active name, { [spec] = profile }
+function S.BuffWatchProfiles()
+  local c = classData()
+  local n, bySpec = activeName(c)
+  return c.order, n, c.specs, bySpec
+end
+-- the specs a profile is assigned to (only ever one, but older saves may have more)
+function S.BuffWatchSpecsOf(name)
+  local c, out = classData(), {}
+  for sp, n in pairs(c.specs) do if n == name then out[#out + 1] = sp end end
+  table.sort(out)
+  return out
+end
+function S.BuffWatchUseProfile(name)
+  local c = classData()
+  if not c.profiles[name] then return false end
+  local g = G()
+  g.bwChar = type(g.bwChar) == "table" and g.bwChar or {}
+  g.bwChar[charKey()] = name
+  lastActive = activeName(c)
+  refresh()
+  return true
+end
+local function copyTable(t) if type(t) ~= "table" then return t end local o = {} for k, v in pairs(t) do o[k] = copyTable(v) end return o end
+function S.BuffWatchNewProfile(name, copyFrom)
+  local c = classData()
+  name = S.Trim(name or "")
+  if name == "" or c.profiles[name] then return false end
+  c.profiles[name] = { list = (copyFrom and c.profiles[copyFrom]) and copyTable(c.profiles[copyFrom].list) or {} }
+  c.order[#c.order + 1] = name
+  S.BuffWatchUseProfile(name)
+  return true
+end
+function S.BuffWatchRenameProfile(old, new)
+  local c = classData()
+  new = S.Trim(new or "")
+  if new == "" or c.profiles[new] or not c.profiles[old] then return false end
+  c.profiles[new], c.profiles[old] = c.profiles[old], nil
+  for i, n in ipairs(c.order) do if n == old then c.order[i] = new end end
+  for sp, n in pairs(c.specs) do if n == old then c.specs[sp] = new end end
+  for k, n in pairs(G().bwChar or {}) do if n == old and k:sub(-#myClass() - 1) == ":" .. myClass() then G().bwChar[k] = new end end
+  lastActive = activeName(c)
+  refresh()
+  return true
+end
+function S.BuffWatchDeleteProfile(name)
+  local c = classData()
+  if not c.profiles[name] or #c.order <= 1 then return false end
+  c.profiles[name] = nil
+  for i = #c.order, 1, -1 do if c.order[i] == name then table.remove(c.order, i) end end
+  for sp, n in pairs(c.specs) do if n == name then c.specs[sp] = nil end end
+  lastActive = activeName(c)
+  refresh()
+  return true
+end
+-- a profile is for ONE specialization, and a specialization uses one profile
+function S.BuffWatchAssignSpec(spec, name, on)
+  local c = classData()
+  if not spec or not c.profiles[name] then return false end
+  if on == false then
+    if c.specs[spec] == name then c.specs[spec] = nil end
+  else
+    for sp, n in pairs(c.specs) do if n == name then c.specs[sp] = nil end end
+    c.specs[spec] = name
+  end
+  lastActive = activeName(c)
+  refresh()
+  return true
+end
+function S.BuffWatchClearSpec(name)
+  local c = classData()
+  for sp, n in pairs(c.specs) do if n == name then c.specs[sp] = nil end end
+  lastActive = activeName(c)
+  refresh()
+end
+function S.BuffWatchAutoSwitch(v)
+  local c = classData()
+  if v ~= nil then c.autoSwitch = v and true or false; lastActive = activeName(c); refresh() end
+  return c.autoSwitch ~= false
+end
+-- talents changed: switch profile if your spec now uses another one
+local switchPending
+local function checkSwitch()
+  switchPending = nil
+  if not S.db then return end
+  local n, bySpec = activeName()
+  if lastActive and n ~= lastActive then
+    S:Print("BuffWatcher: using the profile |cffffd100" .. n .. "|r" .. (bySpec and (" (" .. (curSpec() or "?") .. ")") or "") .. ".")
+    refresh()
+  end
+  lastActive = n
+end
+-- (Rotational, loaded first, clears its spec cache on these too; we look again a moment later)
+for _, ev in ipairs({ "TRAIT_CONFIG_UPDATED", "TRAIT_CONFIG_LIST_UPDATED", "ACTIVE_COMBAT_CONFIG_CHANGED", "TRAIT_TREE_CHANGED",
+  "CHARACTER_POINTS_CHANGED", "PLAYER_TALENT_UPDATE", "PLAYER_SPECIALIZATION_CHANGED", "ACTIVE_TALENT_GROUP_CHANGED", "PLAYER_ENTERING_WORLD" }) do
+  S:On(ev, function(e)
+    if switchPending then return end
+    switchPending = true
+    C_Timer.After(e == "PLAYER_ENTERING_WORLD" and 3 or 0.8, function()   -- (after Rotational's 0.5 s talent re-read limit)
+      if S.RotSpecs then pcall(S.RotSpecs, S, true) end      -- fresh look at the talents
+      checkSwitch()
+    end)
+  end)
+end
 function S.BuffWatchAddItem(item, kind, cond)
   if not item then return end
   local c = store()
@@ -196,9 +361,9 @@ local function missingList(onlyCombat)
 end
 S.BuffWatchMissingList = missingList
 -- for Rotational: "keep up in combat" buffs that have dropped
+-- (removed 2026-11-26: buffs can't be read in combat on Forever, and Rotational is removed for now)
 function S.BuffWatchCombatPicks()
-  if not combat() then return {} end
-  return missingList(true)
+  return {}
 end
 
 ---------------------------------------------------------------------------
@@ -274,7 +439,7 @@ local function trackerIcon(i)
   b.count = b:CreateFontString(nil, "OVERLAY"); b.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE"); b.count:SetPoint("BOTTOMRIGHT", -1, 2)
   b:SetScript("OnUpdate", function(self, el)
     self.t = (self.t or 0) + el
-    local _, look = store()
+    local look = (G().buffWatch or {}).look or {}
     local a = S.RotAnimAlpha and S.RotAnimAlpha(look.anim or "pulse", self.t, look.speed or 3) or 1
     self.glow:SetAlpha((look.strength or 0.45) * a + 0.2)
   end)
@@ -455,7 +620,7 @@ local function apply()
         else
           situationEnded(entryKey(b))      -- ready to warn again next time
         end
-      elseif watchable(b) and (not fighting or b.combat) and missing(b) then list[#list + 1] = b end
+      elseif watchable(b) and not fighting and missing(b) then list[#list + 1] = b end   -- (nothing in combat: buffs can't be read there)
     end
   end
   -- glow on the bars (spells only)
@@ -662,7 +827,7 @@ end)
 -- The window
 ---------------------------------------------------------------------------
 local win
-local W, H = 520, 770
+local W, H = 520, 850
 local function rows() local out = {}; for i, v in ipairs(store().list) do out[i] = { pos = i, ref = v } end return out end
 function S:RefreshBuffWatcher()
   if not win or not win:IsShown() then return end
@@ -674,12 +839,91 @@ function S:RefreshBuffWatcher()
   win.strength:SetValue(math.floor((look.strength or 0.45) * 100)); win.size:SetValue(look.size or 36); win.speed:SetValue(look.speed or 3)
   win.color:SetValue(look.color or "blue"); win.color.value = look.color or "blue"
   win.anim:SetValue(look.anim or "pulse"); win.anim.value = look.anim or "pulse"
+  -- profile row + what it's for
+  local _, active, _, bySpec = S.BuffWatchProfiles()
+  win.profBtn:SetText(active or "?")
+  local mine = S.BuffWatchSpecsOf(active)
+  local cur = S.CurrentSpec and S.CurrentSpec()
+  local auto = S.BuffWatchAutoSwitch()
+  win.info:SetText("|cffaaaaaaFor:|r " .. (#mine > 0 and table.concat(mine, ", ") or "no particular spec")
+    .. "  |cffaaaaaa- your specialization:|r " .. (cur or "|cff888888unknown|r")
+    .. (bySpec and "  |cff55ff55(switched automatically)|r" or ""))
+  win.auto:SetChecked(auto)
 end
 local function build()
   local k = K()
   win = UI:Window("CC_BuffWatcher", "BuffWatcher", W, H)
   win:SetFrameStrata("HIGH")
-  local y = -40
+  -- profiles: one list per specialization (or any you make)
+  local clsName = UnitClass("player") or "class"
+  local pl = UI:Text(win, "Profile", "small"); pl:SetPoint("TOPLEFT", 16, -45)
+  UI:Tip(pl, "Profiles", { "Every " .. clsName .. " you play shares these lists.", "Give a profile a specialization (Spec...) and it's used whenever you're that spec." })
+  win.profBtn = UI:Button(win, "", 140, 22, function(self)
+    local order, active = S.BuffWatchProfiles()
+    local items = { { text = clsName .. " profiles", title = true } }
+    for _, n in ipairs(order) do
+      local sp = S.BuffWatchSpecsOf(n)
+      items[#items + 1] = { text = n .. (#sp > 0 and ("  |cff888888(" .. table.concat(sp, ", ") .. ")|r") or ""), checked = n == active, func = function()
+        S.BuffWatchUseProfile(n)
+        local _, now2, _, bySpec = S.BuffWatchProfiles()
+        if now2 ~= n and bySpec then
+          UI:Alert("Your specialization (" .. (S.CurrentSpec() or "?") .. ") uses the profile '" .. now2 .. "'.\n\nChange that with Spec..., or untick \"Switch profile automatically\".")
+        end
+      end }
+    end
+    UI:Menu(self, items)
+  end)
+  win.profBtn:SetPoint("TOPLEFT", 66, -41)
+  local newB = UI:Button(win, "New", 44, 22, function()
+    UI:Prompt("Name for the new profile (e.g. a specialization):", "", function(name)
+      if not S.BuffWatchNewProfile(name) then UI:Alert("That name is empty or already used.") end
+    end)
+  end, "A new empty profile.")
+  newB:SetPoint("LEFT", win.profBtn, "RIGHT", 6, 0)
+  local copyB = UI:Button(win, "Copy", 44, 22, function()
+    local _, from = S.BuffWatchProfiles()
+    UI:Prompt("Name for the copy of '" .. from .. "':", from .. " 2", function(name)
+      if not S.BuffWatchNewProfile(name, from) then UI:Alert("That name is empty or already used.") end
+    end)
+  end, "A copy of this profile to change.")
+  copyB:SetPoint("LEFT", newB, "RIGHT", 4, 0)
+  local renB = UI:Button(win, "Rename", 58, 22, function()
+    local _, cur = S.BuffWatchProfiles()
+    UI:Prompt("New name for '" .. cur .. "':", cur, function(name)
+      if not S.BuffWatchRenameProfile(cur, name) then UI:Alert("That name is empty or already used.") end
+    end)
+  end)
+  renB:SetPoint("LEFT", copyB, "RIGHT", 4, 0)
+  local delB = UI:Button(win, "|cffff7777Delete|r", 54, 22, function()
+    local order, cur = S.BuffWatchProfiles()
+    if #order <= 1 then UI:Alert("You need at least one profile.") return end
+    UI:Confirm("Delete the profile '" .. cur .. "'?", function() S.BuffWatchDeleteProfile(cur) end, "Delete")
+  end)
+  delB:SetPoint("LEFT", renB, "RIGHT", 4, 0)
+  local specB = UI:Button(win, "Spec...", 58, 22, function(self)
+    local _, cur, specs = S.BuffWatchProfiles()
+    local list = S:RotSpecs()
+    local items = { { text = "Use '" .. cur .. "' when I'm...", title = true } }
+    if #list == 0 then
+      items[#items + 1] = { text = "The game didn't list your specs - type /ccenter specs", disabled = true }
+    end
+    local any = false
+    for _, sp in ipairs(list) do
+      local mine = specs[sp.name] == cur
+      any = any or mine
+      local other = specs[sp.name] and specs[sp.name] ~= cur and ("  |cff888888(now: " .. specs[sp.name] .. ")|r") or ""
+      items[#items + 1] = { text = sp.name .. "  |cff888888" .. (sp.points or 0) .. " points|r" .. other, checked = mine,
+        func = function() S.BuffWatchAssignSpec(sp.name, cur) end }
+    end
+    items[#items + 1] = { text = "No particular spec", checked = not any, func = function() S.BuffWatchClearSpec(cur) end }
+    UI:Menu(self, items)
+  end, "Which specialization this profile is for. It's used automatically whenever you're that spec.")
+  specB:SetPoint("LEFT", delB, "RIGHT", 4, 0)
+  win.info = UI:Text(win, "", "small"); win.info:SetPoint("TOPLEFT", 16, -70); win.info:SetWidth(W - 32); win.info:SetJustifyH("LEFT")
+  win.auto = UI:Check(win, "Switch profile automatically when I change specs (dual talents)", true, function(v) S.BuffWatchAutoSwitch(v) end,
+    "On: the profile given to your current specialization is used. Off: this character keeps the profile you pick.")
+  win.auto:SetPoint("TOPLEFT", 16, -86)
+  local y = -114
   local hint = UI:Text(win, "|cffaaaaaaBuffs, weapon enchants, food, elixirs, flasks and potion buffs to keep up. A missing one shows in the tracker (click it to cast / use) and glows on your bars, out of combat.|r", "small")
   hint:SetPoint("TOPLEFT", 16, y); hint:SetWidth(W - 32); hint:SetJustifyH("LEFT"); y = y - 34
   local function isItemKind() return ITEM_KINDS[win.kind.value or ""] ~= nil end
@@ -691,7 +935,7 @@ local function build()
   win.kind:SetPoint("TOPLEFT", 16, y)
   -- spells: the shared spell box; items: a box that takes a name or an item dragged from your bags
   win.spellAdd = k.spellBox(win, 210, "e.g. Arcane Intellect / Windfury Weapon", function(id)
-    S.BuffWatchAdd(id, win.kind.value or "aura", win.inCombat:GetChecked() and true or nil, win.cond.value)
+    S.BuffWatchAdd(id, win.kind.value or "aura", nil, win.cond.value)
   end)
   win.spellAdd:SetPoint("LEFT", win.kind, "RIGHT", 6, 0)
   local function addItem(id)
@@ -737,19 +981,13 @@ local function build()
   end, "For a buff with a situation: a warning on screen when it happens and the buff is missing (see Warnings...). Applies to the one selected in the list.")
   win.warnOn:SetPoint("LEFT", win.cond, "RIGHT", 10, 0)
   y = y - 30
-  win.inCombat = UI:Check(win, "Keep it up in combat too (Rotational: top priority when it drops)", false, function(v)
-    local e = win.tbl.selected and win.tbl.selected.ref
-    if e then e.combat = v or nil; S:RefreshBuffWatcher() end
-  end, "Lightning Shield: when it runs out mid-fight, Rotational makes it the next spell. Applies to new buffs and to the one selected in the list.")
-  win.inCombat:SetPoint("TOPLEFT", 16, y); y = y - 24
   win.barOn = UI:Check(win, "Timer bar (how long it has left)", true, function(v)
     local e = win.tbl.selected and win.tbl.selected.ref
     if e then e.bar = v or nil; S:RefreshBuffWatcher() end
   end, "A bar counting down this buff's time. Applies to the one selected in the list (new buffs get one).")
   win.barOn:SetPoint("TOPLEFT", 16, y); y = y - 28
   win.tbl = UI:Table(win, W - 32, 200, {
-    { title = "Buff", w = 170, get = function(r) return "|T" .. entryIcon(r.ref) .. ":16:16:0:0:64:64:5:59:5:59|t  " .. entryName(r.ref) end },
-    { title = "In combat", w = 64, get = function(r) return r.ref.combat and "|cff55ff55yes|r" or "|cff555555-|r" end },
+    { title = "Buff", w = 234, get = function(r) return "|T" .. entryIcon(r.ref) .. ":16:16:0:0:64:64:5:59:5:59|t  " .. entryName(r.ref) end },
     { title = "Bar", w = 40, get = function(r) return r.ref.bar and "|cff55ff55yes|r" or "|cff555555-|r" end },
     { title = "Checked on", w = 110, get = function(r)
         local what = ({ aura = "you", main = "main-hand weapon", off = "off-hand weapon" })[r.ref.kind or "aura"] or ITEM_KINDS[r.ref.kind or ""] or "?"
@@ -761,7 +999,7 @@ local function build()
         return missing(r.ref) and "|cffff5555no|r" or "|cff55ff55yes|r"
       end },
   }, { selectable = true, emptyText = "No buffs yet - add one above.", onClick = function(r)
-    win.inCombat:SetChecked(r.ref.combat and true or false); win.barOn:SetChecked(r.ref.bar and true or false)
+    win.barOn:SetChecked(r.ref.bar and true or false)
     win.cond:SetValue(r.ref.cond or "always"); win.cond.value = r.ref.cond or "always"
     win.warnOn:SetChecked(r.ref.warn ~= false)
   end })

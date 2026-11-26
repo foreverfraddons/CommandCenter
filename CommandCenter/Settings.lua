@@ -108,7 +108,32 @@ local function build(p)
     cb:SetPoint("TOPLEFT", 0, y); y = y - 24
     return cb
   end
+  ctl.debug = check("Debug mode (performance tools)", "debugMode",
+    "Turns on Command Center's performance tools: the overlay, /ccenter perf and the deep check. Off (the normal setting) Command Center measures and records nothing about performance. /ccenter debug toggles it.",
+    function(v)
+      if S.PerfDebug then S:PerfDebug(v) end
+      if ctl.perfOv then ctl.perfOv:SetChecked(g.perfOverlay and true or false) end
+    end)
+  ctl.perfOv = check("    Show the performance overlay (frames per second, lag, what's using time)", "perfOverlay",
+    "Needs Debug mode. A small box you can move: your FPS and frame time, stutters, latency, which addons use the most time per frame and what inside Command Center is busiest. /ccenter fps toggles it.",
+    function(v)
+      if S.PerfOverlay then S:PerfOverlay(v) end
+      if ctl.perfOv then ctl.perfOv:SetChecked(g.perfOverlay and true or false) end
+    end)
+  if not S.ROTATIONAL_REMOVED then   -- (Rotational removed for now)
+  ctl.rotOn = check("Use Rotational (experimental: glows the button to press next)", "rotationalOn",
+    "Off: Rotational stops completely - no glows, no next-spell icon, no work while you play - and its tile leaves the home window. Your Rotational settings are kept for when you turn it back on.",
+    function(v)
+      g.rotationalOff = not v or nil
+      if S.HideRotational and not v then pcall(S.HideRotational, S) end
+      -- (the home tiles are rebuilt when you go back to the home view)
+    end)
+  ctl.rotOn:SetChecked(not g.rotationalOff)
+  end
   check("Show minimap button", "minimapShown", nil, function(v) g.minimap.hide = not v; S:UpdateMinimap() end):SetChecked(not g.minimap.hide)
+  ctl.mmLook = UI:Button(c, "Minimap...", 120, 22, function() S:ShowMinimapSettings() end,
+    "Command Center's look on the minimap: shape (square to round), size, zone bar, clock, coordinates, mouse-wheel zoom, moving it.")
+  ctl.mmLook:SetPoint("TOPLEFT", S.CW - 160, y + 26)
   y = y - 10
 
   local ms = S:BuildMessengerSettings(c, S.CW - 40)
@@ -136,6 +161,22 @@ local function build(p)
   ctl.streamer = check2("Streamer mode", "streamer",
     "Hides what new whispers say in pop-ups, the notification list and chat, and helps you tuck the Messenger window behind your webcam on stream.",
     function(v) S:SetStreamerMode(v) end)
+  -- each part of streamer mode on its own switch
+  ctl.streamerParts = {}
+  for _, f in ipairs(S.STREAMER_FEATURES or {}) do
+    if g[f.var] == nil then g[f.var] = true end
+    ctl.streamerParts[f.key] = check2("     " .. f.label, f.var, f.tip,
+      function() if S.StreamNameRefresh then S:StreamNameRefresh() end end)
+    if f.key == "name" then
+      local al = UI:Text(c, "Show instead:", "small"); al:SetPoint("TOPLEFT", 40, y - 5)
+      ctl.streamerAlias = UI:Edit(c, 170, 22, "Streamer")
+      ctl.streamerAlias:SetPoint("TOPLEFT", 130, y)
+      ctl.streamerAlias:SetText(g.streamerAlias or "")
+      ctl.streamerAlias:SetScript("OnEnterPressed", function(self) self:ClearFocus(); if S.SetStreamerAlias then S:SetStreamerAlias(self:GetText()) end end)
+      ctl.streamerAlias:SetScript("OnEditFocusLost", function(self) if S.SetStreamerAlias and (g.streamerAlias or "") ~= S.Trim(self:GetText() or "") then S:SetStreamerAlias(self:GetText()) end end)
+      y = y - 28
+    end
+  end
   ctl.notifPopups = UI:Check(c, "Show notifications as pop-ups", S.db.global.notifPopups ~= false, function(v) S.db.global.notifPopups = v and true or false end,
     "Everything that lands in the notification bell (reminders, whispers...) also pops up. Only Command Center's - never other addons.")
   ctl.notifPopups:SetPoint("TOPLEFT", 0, y); y = y - 24

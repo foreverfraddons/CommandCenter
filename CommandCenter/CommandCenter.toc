@@ -1,6 +1,6 @@
 ## Interface: 16001, 120007
 ## Title: |cff4fd1c5Command|r |cffe0b04aCenter|r
-## Notes: Utility hub and interface upgrade: dock, border bar and quick bar, BiB (built-in bag), damage meter, Button Box, screenshots, reminders, messenger, summoner, rotation helper - all in one place and styled your way.
+## Notes: Utility hub and interface upgrade: dock, border bar and quick bar, BiB (built-in bag), damage meter, Button Box, screenshots, reminders, messenger, summoner, rotation helper, unit frames - all in one place and styled your way.
 ## Author: Fatedfr
 ## Version: 3.0.7
 ## SavedVariables: CommandCenterDB, CommandCenterCollect
@@ -8,6 +8,8 @@
 ## IconTexture: Interface\AddOns\CommandCenter\icon.tga
 
 Core.lua
+Revisions.lua
+Perf.lua
 Serializer.lua
 UI.lua
 MainWindow.lua
@@ -23,6 +25,7 @@ Tools.lua
 Blizzard.lua
 QuickBar.lua
 Plugins.lua
+Minimap.lua
 Toasts.lua
 Reminders.lua
 Screenshot.lua
@@ -35,4 +38,8 @@ ItemMenu.lua
 Meter.lua
 Rotational.lua
 BuffWatcher.lua
+HealAssist.lua
+UnitFrames.lua
+CCPlates.lua
+Radialz.lua
 SmartChat.lua

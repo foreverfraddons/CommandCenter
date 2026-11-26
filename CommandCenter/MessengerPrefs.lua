@@ -2,7 +2,7 @@
 -- notification sounds, per-person overrides, and the pop-up toast.
 -- Saved per account in CommandCenterDB.global.msgr.
 local _, S = ...
-if S.ModuleRev then S:ModuleRev("MessengerPrefs", 1) end
+if S.ModuleRev then S:ModuleRev("MessengerPrefs", 2) end
 local UI = S.UI
 
 S.MSG_PRESETS = {
@@ -354,7 +354,7 @@ function S:MsgToast(who, text, key, preview)
   toast.who, toast.key, toast.preview = who, key, preview
   if S.MsgSetAvatar then S.MsgSetAvatar(toast.av, who) end
   toast.name:SetText(S:ColorName(who) .. (S.ServiceIcons and S.ServiceIcons(who) or "") .. (toast.count > 1 and ("  |cffaaaaaa(" .. toast.count .. " new)|r") or ""))
-  local streamer = S.db.global.streamer and not preview
+  local streamer = (S.StreamerOn and S.StreamerOn("whispers") or (not S.StreamerOn and S.db.global.streamer)) and not preview
   toast.text:SetText(streamer and "" or (text or ""))
   toast.blur:SetShown(streamer and true or false)
   if streamer then local w = (toast.blur:GetWidth() or 240); toast.blur.bar1:SetWidth(w * 0.92); toast.blur.bar2:SetWidth(w * 0.6) end

@@ -260,7 +260,7 @@ local STEPS = {
               GRY .. "Turn off in Settings > Smart message suggestions.|r" } },
 
   { title = "Tools and shortcuts", tag = "optional",
-    text = "The " .. GOLD .. "toolbox|r turns every tool on and off: BiB, Damage Meter, Messenger, Button Box, Screenshot, Reminders, Summoner, Rotational and the Guide. Click a row to open or close it - a " .. GRN .. "green edge|r means it's open.\n\n" ..
+    text = "The " .. GOLD .. "toolbox|r turns every tool on and off: BiB, Damage Meter, Messenger, Button Box, Screenshot, Reminders, Summoner and the Guide. Click a row to open or close it - a " .. GRN .. "green edge|r means it's open.\n\n" ..
       "Drag rows to reorder, drag one out to remove it (the " .. GOLD .. "+|r brings it back). Right-click a tool to make a round shortcut you can put anywhere on your screen.",
     target = function() local m = main(); return m and m.toolsBtn end, demo = "tools", cursor = true,
     lines = { "Click a row: open / close that tool", "Drag a row out: remove it (the + brings it back)", "Right-click: shortcut icon for your screen" } },
@@ -307,10 +307,9 @@ local STEPS = {
     lines = { "Pop-up + text across the screen + a sound", "Change or test any reminder in its window", cmd("/ccenter reminders") } },
 
   { title = "More tools", tag = "optional",
-    text = GOLD .. "Summoner|r (warlocks): collect 123s from your group and summon them with one click - with your soul shards and who still needs a summon.\n\n" ..
-      GOLD .. "Rotational|r " .. GRY .. "(experimental)|r: set up your rotation and the right button glows when it's time to press it, with proc pop-ups. So far only tested on Enhancement Shaman.",
+    text = GOLD .. "Summoner|r (warlocks): collect 123s from your group and summon them with one click - with your soul shards and who still needs a summon.",
     target = function() local m = main(); return m and m.toolsBtn end,
-    lines = { cmd("/ccenter summon"), cmd("/ccenter rotation") } },
+    lines = { cmd("/ccenter summon") } },
 
   { title = "Dock, border bar and your other buttons", tag = "optional",
     text = "Want Command Center to be your whole bar? " .. GOLD .. "Dock mode|r and " .. GOLD .. "border mode|r put everything in one row. Then you can add:\n\n" ..

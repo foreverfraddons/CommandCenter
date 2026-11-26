@@ -27,17 +27,47 @@ local function report(err)
 end
 S.report = report
 
+-- which module file registered a handler (for /ccenter perf)
+local owners = {}
+local function callerFile()
+  local st = debugstack and debugstack(3, 1, 0) or ""
+  return st:match("([%w_]+)%.lua") or "?"
+end
+-- /ccenter perf: while S.perf is set, every handler's time is added up per module + event
+local profClock = debugprofilestop
+local function profRun(rec, key, fn, ...)
+  local g0, t0 = collectgarbage("count"), profClock()
+  local ok, err = pcall(fn, ...)
+  local dt, dg = profClock() - t0, collectgarbage("count") - g0
+  local r = rec[key]
+  if not r then r = { t = 0, n = 0, max = 0, g = 0 }; rec[key] = r end
+  r.t = r.t + dt; r.n = r.n + 1; if dt > r.max then r.max = dt end
+  if dg > 0 then r.g = (r.g or 0) + dg end           -- garbage made (KB); a collection mid-call reads as 0
+  return ok, err
+end
+
 function S:On(event, fn)
   if not handlers[event] then
     handlers[event] = {}
+    owners[event] = {}
     pcall(eventFrame.RegisterEvent, eventFrame, event) -- unknown events in this client are ignored
   end
   table.insert(handlers[event], fn)
+  table.insert(owners[event], callerFile() .. "  " .. event)   -- (the key, made once - no garbage while measuring)
 end
 
 eventFrame:SetScript("OnEvent", function(_, event, ...)
   local list = handlers[event]
   if not list then return end
+  local perf = S.perf
+  if perf then
+    local own = owners[event]
+    for i = 1, #list do
+      local ok, err = profRun(perf, own[i], list[i], event, ...)
+      if not ok then report(err) end
+    end
+    return
+  end
   for i = 1, #list do
     local ok, err = pcall(list[i], event, ...)
     if not ok then report(err) end
@@ -45,16 +75,44 @@ eventFrame:SetScript("OnEvent", function(_, event, ...)
 end)
 
 local bus = {}
+local busOwners = {}
 function S:Listen(msg, fn)
   bus[msg] = bus[msg] or {}
+  busOwners[msg] = busOwners[msg] or {}
   table.insert(bus[msg], fn)
+  table.insert(busOwners[msg], callerFile() .. "  (msg) " .. msg)
 end
 function S:Fire(msg, ...)
   local list = bus[msg]
   if not list then return end
+  local perf = S.perf
+  if perf then
+    local own = busOwners[msg]
+    for i = 1, #list do
+      local ok, err = profRun(perf, own[i], list[i], ...)
+      if not ok then report(err) end
+    end
+    return
+  end
   for i = 1, #list do
     local ok, err = pcall(list[i], ...)
     if not ok then report(err) end
+  end
+end
+-- modules can time their own OnUpdate / ticker work for /ccenter perf:
+--   frame:SetScript("OnUpdate", S.PerfWrap("UnitFrames  OnUpdate", fn))
+function S.PerfWrap(name, fn)
+  return function(...)
+    local perf = S.perf
+    if not perf then return fn(...) end
+    local g0, t0 = collectgarbage("count"), profClock()
+    local a, b, c = fn(...)
+    local dt, dg = profClock() - t0, collectgarbage("count") - g0
+    local r = perf[name]
+    if not r then r = { t = 0, n = 0, max = 0, g = 0 }; perf[name] = r end
+    r.t = r.t + dt; r.n = r.n + 1; if dt > r.max then r.max = dt end
+    if dg > 0 then r.g = (r.g or 0) + dg end
+    return a, b, c
   end
 end
 
@@ -687,7 +745,13 @@ S:AddCommand("blocked", "", "List actions the game blocked (for bug reports)", f
   S:Print("Blocked actions (newest first):")
   for _, l in ipairs(log) do print("  " .. l) end
 end)
-S:AddCommand("debug", "", "Toggle debug messages", function()
-  S.db.global.debug = not S.db.global.debug
-  S:Print("Debug " .. (S.db.global.debug and "on" or "off"))
+-- /ccenter debug [on|off] = Debug mode (performance tools, Perf.lua); /ccenter debug messages = the old debug chat lines
+S:AddCommand("debug", "[on|off|messages]", "Debug mode (performance tools); 'messages' toggles debug chat lines", function(arg)
+  arg = arg and S.Trim(arg):lower() or ""
+  if arg == "messages" or not S.PerfDebug then
+    S.db.global.debug = not S.db.global.debug
+    S:Print("Debug messages " .. (S.db.global.debug and "on" or "off"))
+    return
+  end
+  if arg == "on" then S:PerfDebug(true) elseif arg == "off" then S:PerfDebug(false) else S:PerfDebug() end
 end)

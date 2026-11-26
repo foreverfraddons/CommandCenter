@@ -941,7 +941,7 @@ end
 -- the toolbox asks: is the cursor over the dock / border bar?
 -- which window a dock icon opens (so it can come out of the icon)
 local TOOL_WINDOWS = { Messenger = "CC_Messenger", Reminders = "CC_Reminders", Guide = "CC_Guide", Screenshot = "CC_Snap",
-  Summoner = "CC_Summoner", ["Button Box"] = "CC_ButtonBox", ["Damage Meter"] = "CC_Meter", Rotational = "CC_Rotational", BuffWatcher = "CC_BuffWatcher", ItemMenu = "CC_ItemMenu", BiB = "CC_BiB",
+  Summoner = "CC_Summoner", ["Button Box"] = "CC_ButtonBox", ["Damage Meter"] = "CC_Meter", Rotational = "CC_Rotational", BuffWatcher = "CC_BuffWatcher", Radialz = "CC_Radialz", HealAssist = "CC_HealAssist", ["Unit Frames"] = "CC_UnitFrames", CCPlates = "CC_Plates", ItemMenu = "CC_ItemMenu", BiB = "CC_BiB", Minimap = "CC_MinimapSettings",
   ["Guided tour"] = "CC_Tutorial" }
 function S:DockWindowFor(it)
   if not it then return nil end
@@ -1128,7 +1128,7 @@ local function dockIcon(key, secure)
         if it.click then it.click(self, btn) end
         w = _G[wname]
         -- (a window you've put somewhere yourself, like the damage meter, stays where you put it)
-        if w and w:IsShown() and not w.ccOwnSpot and not (wname == "CC_Messenger" and S.db.global.streamer) then
+        if w and w:IsShown() and not w.ccOwnSpot and not (wname == "CC_Messenger" and (S.StreamerOn and S.StreamerOn("messenger") or (not S.StreamerOn and S.db.global.streamer))) then
           w.__fromDock = true
           pinToDock(w)
           genie(w, true)
@@ -1773,6 +1773,8 @@ local function build(m)
     function() return drawerOpen() and "Fold the page away and keep just the quickbar." or "Bring the page back." end)
   arrow:HookScript("OnUpdate", function(self, el)
     local target = arrowTarget()
+    if self.angle == target and self.shownAngle == target then return end   -- settled: nothing to redraw
+    self.shownAngle = target
     local diff = target - self.angle
     while diff > math.pi do diff = diff - 2 * math.pi end
     while diff < -math.pi do diff = diff + 2 * math.pi end
@@ -1887,7 +1889,11 @@ local function build(m)
     if main:IsShown() and not anim then S.db.global.qbCollapsed = true end
   end)
 
-  main:HookScript("OnUpdate", function(self, el)
+  main:HookScript("OnUpdate", S.PerfWrap and S.PerfWrap("QuickBar  dock/border OnUpdate", function(self, el)
+    if self.qbDragging then showHint(currentHintEdge()) end
+    if isDock() then dockUpdate(el) elseif isBorder() then updateStates(el) end
+    if self.qbReorder then reorderUpdate() end
+  end) or function(self, el)
     if self.qbDragging then showHint(currentHintEdge()) end
     if isDock() then dockUpdate(el) elseif isBorder() then updateStates(el) end
     if self.qbReorder then reorderUpdate() end

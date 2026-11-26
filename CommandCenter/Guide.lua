@@ -330,7 +330,7 @@ local CH = {
 
   { part = "The tools" },
   { title = "Tools and shortcuts", tag = "opt", anim = "tools",
-    text = "The " .. GOLD .. "toolbox|r turns every tool on and off: BiB, Damage Meter, Messenger, Button Box, Screenshot, Reminders, Summoner, Rotational, BuffWatcher, ItemMenu and this Guide. Click a row to open or close it (green edge = open). Drag rows to reorder, drag one out to remove it, the + brings it back. Right-click a tool for a round shortcut you can put anywhere - or drag it onto your dock / border bar.",
+    text = "The " .. GOLD .. "toolbox|r turns every tool on and off: BiB, Damage Meter, Messenger, Button Box, Screenshot, Reminders, Summoner, BuffWatcher, Radialz, HealAssist, ItemMenu, Minimap, Unit Frames, CCPlates and this Guide. Click a row to open or close it (green edge = open). Drag rows to reorder, drag one out to remove it, the + brings it back. Right-click a tool for a round shortcut you can put anywhere - or drag it onto your dock / border bar.",
     show = function() if S.ShowTools then S:ShowTools() end end },
   { title = "BiB - Built-in Bag", tag = "opt",
     text = "Tools > " .. GOLD .. "BiB|r (" .. cmd("/ccenter bib") .. "): all your bags in one window. Turn it on in " .. GOLD .. "Settings > Bags (BiB)|r and it opens instead of the game's bags - B, Shift-B, the bag buttons, vendors, mail, the bank, the auction house.\n\n" ..
@@ -351,7 +351,8 @@ local CH = {
     show = function() S:ShowMessenger() end },
   { title = "Button Box", tag = "opt",
     text = "Tools > " .. GOLD .. "Button Box|r (" .. cmd("/ccenter box") .. "): a box you fill with any icons - tools, the game's menu buttons and bags, other addons' minimap icons. The " .. GOLD .. "+|r picks icons; drag to reorder, drag one out to remove it, drag the corner to make it wider. The cog changes the icon size.\n\n" ..
-      "Drag icons between the box and your dock / border bar - each thing lives in one place. An addon icon in the box (or on your bar) hides its own minimap button.",
+      "Drag icons between the box and your dock / border bar - each thing lives in one place. An addon icon in the box (or on your bar) hides its own minimap button.\n\n" ..
+      GOLD .. "Groups:|r drag one icon onto the middle of another (it glows) and they go into a group, like apps on a phone. Click a group to open it and type its name at the top; drag icons onto it to add them, drag them out to take them out. Right-click a group to rename or ungroup it.",
     show = function() if S.ShowButtonBox then S:ShowButtonBox() end end },
   { title = "Screenshots", tag = "opt",
     text = "Tools > " .. GOLD .. "Screenshot|r (" .. cmd("/ccenter screenshot") .. "): sliders for brightness, contrast, gamma, view distance, shadows and more change the world live. " .. GOLD .. "Take picture|r hides the whole interface, takes the shot and brings it back. Optional: hide names and nameplates, a 3 second countdown. Settings go back to how they were when you close it, unless you tick " .. GOLD .. "Keep|r. Not possible in combat.",
@@ -365,12 +366,32 @@ local CH = {
   { title = "ItemMenu", tag = "opt",
     text = "Tools > " .. GOLD .. "ItemMenu|r (" .. cmd("/ccenter itemmenu") .. "): Alt + right-click an item in your bags (or right-click an item link in chat) for a menu - open all, preview, copy link, Wowhead link, where it comes from (uses Questie when installed), link in chat, mark as unwanted (deleted automatically whenever it lands in your bags) and delete. The key is your choice in its settings.",
     show = function() if S.ShowItemMenu then S:ShowItemMenu() end end },
+  { title = "Minimap", tag = "opt",
+    text = "Tools > " .. GOLD .. "Minimap|r (" .. cmd("/ccenter map") .. "): the minimap in your theme - square, rounded or round, any size, a themed border, a zone bar (click: world map), a clock (click: stopwatch and alarm) and coordinates.\n\n" ..
+      "Zoom with the mouse wheel; it zooms back out by itself after a while. Other addons' minimap buttons get your theme's ring, and can stay hidden until you hover the minimap. " ..
+      GOLD .. "Unlock to move|r drags it anywhere (right-click to lock). Questicus pins and buttons, LibDBIcon buttons and the border bar all follow the shape.",
+    show = function() if S.ShowMinimapSettings then S:ShowMinimapSettings() end end },
   { title = "BuffWatcher", tag = "opt",
-    text = "Tools > " .. GOLD .. "BuffWatcher|r (" .. cmd("/ccenter buffs") .. "): the buffs and weapon enchants you want to keep up. A missing one shows in a small tracker (shift-drag to move) and glows on your bars out of combat. Mark one \"keep up in combat\" and Rotational makes it the next spell when it drops.",
+    text = "Tools > " .. GOLD .. "BuffWatcher|r (" .. cmd("/ccenter buffs") .. "): the buffs and weapon enchants you want to keep up. A missing one shows in a small tracker (shift-drag to move) and glows on your bars out of combat.",
     show = function() if S.ShowBuffWatcher then S:ShowBuffWatcher() end end },
-  { title = "Rotational (experimental)", tag = "opt",
-    text = "Tools > " .. GOLD .. "Rotational|r (" .. cmd("/ccenter rotation") .. "): set up your rotation and the right button glows when it's time to press it - priorities, an opener, proc pop-ups, dispels and a low-health sequence, with a fully adjustable glow. Still in development: so far only tested on Enhancement Shaman.",
-    show = function() if S.ShowRotational then S:ShowRotational() end end },
+  { title = "Radialz", tag = "opt",
+    text = "Tools > " .. GOLD .. "Radialz|r (" .. cmd("/ccenter radialz") .. "): an extra action bar shaped like a wheel. Press " .. GOLD .. "mouse button 5|r and it opens at the mouse; left-click a slot to use it. " ..
+      "Press the key again, Escape, right-click the centre or click outside to close it; left-click the centre to go back a page. Drag spells, items and macros onto its slots (in the window or on the open wheel), " ..
+      "or type macro text. A slot can " .. GOLD .. "open another page|r - a second wheel - so one key reaches dozens of actions. The Look tab sets the size, roundness, colour, names, cooldowns and animation; " ..
+      "the Key tab picks another key and where it opens. It works in combat; changes to the wheel wait until combat ends.",
+    show = function() if S.ShowRadialz then S:ShowRadialz() end end },
+  { title = "HealAssist", tag = "opt",
+    text = "Tools > " .. GOLD .. "HealAssist|r (" .. cmd("/ccenter heal") .. "): healing frames like HealBot - click a frame to heal that person, and bind every mouse button with Shift / Ctrl / Alt. A " .. GOLD .. "smart|r click picks the rank from how much health they're missing (Ranks tab: e.g. 5% = Rank 1, 10% = Rank 2). An " .. GOLD .. "auto|r click switches to Chain Heal / Prayer of Healing when the people around them are hurt too, with the rank from the whole group. The game only lets the rank change out of combat; in a fight smart clicks cast your combat choice and the frames show the gauged rank (marks on the bar, badge). " .. cmd("/ccenter heal check") .. " lists your ranks.",
+    show = function() if S.ShowHealAssist then S:ShowHealAssist() end end },
+  { title = "Unit Frames", tag = "opt",
+    text = "Tools > " .. GOLD .. "Unit Frames|r (" .. cmd("/ccenter frames") .. "): your own player, target, target of target, focus, pet, party, raid and boss frames in the Command Center theme. Tick " .. GOLD .. "Use Command Center unit frames|r, then " .. GOLD .. "Unlock frames|r to drag them (right-click a box for its settings) and " .. GOLD .. "Test mode|r to fill them with made-up players. Each frame has its own size, bars and text, portrait (3D, 2D or class icon), buffs and debuffs, cast bar, icons, highlights (target, aggro, debuffs you can remove) and fading. Extras: incoming heals, combo points, druid mana, energy ticks / five-second rule. The game's frames are hidden for the ones you use.",
+    show = function() if S.ShowUnitFrames then S:ShowUnitFrames() end end },
+  { title = "CCPlates (nameplates)", tag = "opt",
+    text = "Tools > " .. GOLD .. "CCPlates|r (" .. cmd("/ccenter plates") .. "): nameplates in the Command Center theme. Tick " .. GOLD .. "Use CCPlates|r, pick a " .. GOLD .. "Look|r (Command Center, Slim, Classic block, Glass pill, Clean, Bold) and fine-tune it - the preview on the right shows every change. " ..
+      "Colours: class, reaction, tapped grey, threat for tanks or damage / healers (automatic from your role), execute range with a marker, and your own colour for any mob by name. " ..
+      "Cast bars turn green while your interrupt is ready, grey with a shield when they can't be interrupted, and say Interrupted. Your target grows, glows or gets arrows, and the others fade. " ..
+      "The game's own debuff row is moved onto the plate (it keeps working in a fight), plus raid marks, a ! on quest mobs, combo points and names-only friendly plates. Turn nameplates on with V.",
+    show = function() if S.ShowPlates then S:ShowPlates() end end },
   { title = "Streamer mode", tag = "opt",
     text = "For streamers: pop-ups, the notification list and chat stop showing what whispers say. Streaming programs record the whole game, so no addon can hide a window from them - instead, drag the Messenger window under your webcam box and use its corner grip to resize it. " .. cmd("/ccenter streamer"),
     show = function() S:ShowMain("settings") end },

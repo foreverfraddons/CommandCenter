@@ -7,6 +7,17 @@ local UI = S.UI
 
 local OWN = { CommandCenter = true }
 local QMARK = "Interface\\Icons\\INV_Misc_QuestionMark"
+-- Our own addons wear the theme inside Command Center: their minimap icon / launcher shows a
+-- white glyph tinted with the theme gold (like every Command Center tool). On their own they
+-- keep their personal icons - this only changes what the dock / border bar / Button Box draws.
+local NATIVE = {
+  Questicus = "Interface\\AddOns\\Questicus\\Media\\i_questicus",
+  StinkyFart = "Interface\\AddOns\\CommandCenter\\Media\\UI\\i_stinkyfart",
+  Radialz = "Interface\\AddOns\\CommandCenter\\Media\\UI\\i_radialz",
+  HealAssist = "Interface\\AddOns\\CommandCenter\\Media\\UI\\i_heal",
+}
+local FULL = { 0, 1, 0, 1 }
+S.NativeIcons = NATIVE
 
 local function G() return S.db.global end
 local function selected()
@@ -22,7 +33,11 @@ end
 ---------------------------------------------------------------------------
 -- Installed addons
 ---------------------------------------------------------------------------
+-- cached: the list only changes when an addon loads (rebuilding it scanned every addon's
+-- title with several gsubs - the Minimap's box fill called it every few seconds)
+local installedCache
 function S:InstalledAddons()
+  if installedCache then return installedCache end
   local out = {}
   local CA = C_AddOns
   local num = (CA and CA.GetNumAddOns and CA.GetNumAddOns()) or (GetNumAddOns and GetNumAddOns()) or 0
@@ -36,8 +51,11 @@ function S:InstalledAddons()
     end
   end
   table.sort(out, function(a, b) return a.n < b.n end)
+  installedCache = out
   return out
 end
+local guessCache = {}   -- frame name -> owner addon / false (quest and map pins are named frames too)
+S:On("ADDON_LOADED", function() installedCache = nil; wipe(guessCache) end)
 
 -- which installed addon an icon most likely belongs to
 local function stem(n)
@@ -109,8 +127,9 @@ function S:PluginSources()
     if not parent or not parent.GetChildren then return end
     for _, c in ipairs({ parent:GetChildren() }) do
       local n = c.GetName and c:GetName()
-      if n and not skipName(n) and not seen[stem(n)] and c.GetObjectType and c:GetObjectType() == "Button" then
-        local owner = guessAddon(n, addons)
+      if n and guessCache[n] ~= false and c.GetObjectType and c:GetObjectType() == "Button" and not skipName(n) and not seen[stem(n)] then
+        local owner = guessCache[n]
+        if owner == nil then owner = guessAddon(n, addons) or false; guessCache[n] = owner end
         if owner then
           out[#out + 1] = { id = "btn:" .. n, name = pretty(n), kind = "button", frame = c, owner = owner }
           seen[stem(n)] = true
@@ -163,6 +182,11 @@ local function makeItem(src)
       if not ok then failed(src, err) end
     end
     it.tip = function(tt) tt:AddLine(src.name, 1, 0.82, 0) end
+  end
+  local glyph = src.owner and NATIVE[src.owner]
+  if glyph then
+    it.iconFn = function() return glyph, FULL end
+    it.tint, it.color = true, nil
   end
   return it
 end

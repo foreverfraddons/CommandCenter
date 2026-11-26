@@ -5,7 +5,7 @@
 -- Bag clicks are caught through the game's own modified-click handler, so the item
 -- isn't used when you open the menu (unless you pick "no modifier").
 local _, S = ...
-if S.ModuleRev then S:ModuleRev("ItemMenu", 2) end
+if S.ModuleRev then S:ModuleRev("ItemMenu", 3) end
 local UI = S.UI
 
 local function G() return S.db.global end
@@ -880,6 +880,8 @@ local function showMenu(link, bag, slot)
       add({ text = "|cffff5555Delete multiple|r  |cff888888(Ctrl+Alt+Left-click)|r", disabled = combat(), func = function() askDelete(id, link, bag, slot) end })
     end
   end
+  -- other tools add their own lines here (BiB: "Track in BiB's bank")
+  for _, fn in ipairs(S.ItemMenuExtras or {}) do pcall(fn, add, id, link, bag, slot) end
   UI:Menu(nil, items)
 end
 S.ItemMenuShow = showMenu

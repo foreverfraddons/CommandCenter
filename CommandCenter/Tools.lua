@@ -45,6 +45,8 @@ local TOOLS = {
   { label = "Rotational", name = "Rotational |cffff9933EXPERIMENTAL|r", tileTag = "|cffff9933Experimental|r", desc = "The right button glows when it's time to press it", icon = UI.ICON.rotation, tint = true,
     tip = "This is in development and has only been tested and working on Enhancement Shaman.",
     available = function() return S.ShowRotational ~= nil end,
+    removed = function() return S.ROTATIONAL_REMOVED end,   -- (removed for now, see Rotational.lua)
+    switchedOff = function() return S.RotationalOn ~= nil and not S.RotationalOn() end,
     isOn = function() return shown("CC_Rotational") end,
     set = function(on) if on then S:ShowRotational() else S:HideRotational() end end },
   { label = "ItemMenu", desc = "Right-click items for open all, links, sources, auto delete", icon = UI.ICON.itemmenu, tint = true,
@@ -55,6 +57,30 @@ local TOOLS = {
     available = function() return S.ShowBuffWatcher ~= nil end,
     isOn = function() return shown("CC_BuffWatcher") end,
     set = function(on) if on then S:ShowBuffWatcher() else S:HideBuffWatcher() end end },
+  { label = "Radialz", desc = "A radial action bar: spells, items and macros on a wheel, with pages", icon = UI.ICON.radialz, tint = true,
+    tip = "Mouse button 5 opens the wheel at the mouse, left-click a slot to use it. /ccenter radialz",
+    available = function() return S.ShowRadialz ~= nil end,
+    isOn = function() return shown("CC_Radialz") end,
+    set = function(on) if on then S:ShowRadialz() else S:HideRadialz() end end },
+  { label = "HealAssist", desc = "HealBot-style healing frames: click to heal, the right rank picked for you", icon = UI.ICON.heal, tint = true,
+    tip = "Smart clicks pick the spell rank from how much health is missing (your steps on the Ranks tab). /ccenter heal",
+    available = function() return S.ShowHealAssist ~= nil end,
+    isOn = function() return shown("CC_HealAssist") end,
+    set = function(on) if on then S:ShowHealAssist() else S:HideHealAssist() end end },
+  { label = "Minimap", desc = "Your theme on the minimap: shape, size, zone bar, clock, coordinates", icon = UI.ICON.minimap, tint = true,
+    available = function() return S.ShowMinimapSettings ~= nil end,
+    isOn = function() return shown("CC_MinimapSettings") end,
+    set = function(on) if on then S:ShowMinimapSettings() else S:HideMinimapSettings() end end },
+  { label = "Unit Frames", desc = "Player, target, party, raid and boss frames in your theme", icon = UI.ICON.unitframes, tint = true,
+    tip = "Turn them on inside the window (\"Use Command Center unit frames\"). Unlock to drag them, Test mode to preview.",
+    available = function() return S.ShowUnitFrames ~= nil end,
+    isOn = function() return shown("CC_UnitFrames") end,
+    set = function(on) if on then S:ShowUnitFrames() else S:HideUnitFrames() end end },
+  { label = "CCPlates", desc = "Nameplates in your theme: threat, casts, execute, target glow", icon = UI.ICON.plates, tint = true,
+    tip = "Turn them on inside the window (\"Use CCPlates\"). Pick a Look, the preview shows every change.",
+    available = function() return S.ShowPlates ~= nil end,
+    isOn = function() return shown("CC_Plates") end,
+    set = function(on) if on then S:ShowPlates() else S:HidePlates() end end },
   { label = "Guide", desc = "Every tool and setting explained", icon = UI.ICON.book, tint = true,
     available = function() return S.ShowGuide ~= nil end,
     isOn = function() return shown("CC_Guide") end,
@@ -104,6 +130,8 @@ local function hidden() local g = S.db.global; g.toolsHidden = type(g.toolsHidde
 local function added() local g = S.db.global; g.toolsAdded = type(g.toolsAdded) == "table" and g.toolsAdded or {}; return g.toolsAdded end
 local function allowed(t)
   if t.officer and not S:IsOfficer() then return false end
+  if t.removed then local ok, gone = pcall(t.removed); if ok and gone then return false end end
+  if t.switchedOff then local ok, off = pcall(t.switchedOff); if ok and off then return false end end   -- (turned off in Settings)
   if t.class then local _, c = UnitClass("player"); if c ~= t.class then return false end end
   return true
 end
@@ -255,6 +283,7 @@ function S:HasToolShortcut(label) return scRec(label) ~= nil end
 function S:ToolInfo(label)
   local t = byLabel[label]
   if not t then return end
+  if t.removed then local ok, gone = pcall(t.removed); if ok and gone then return end end   -- (dock / box / shortcuts skip it)
   local okA, avail = pcall(t.available)
   local okO, on = pcall(t.isOn)
   return t, okA and avail and true or false, okO and on and true or false

@@ -15,10 +15,22 @@
 -- buttons - it only makes them glow.
 local _, S = ...
 local UI = S.UI
+if S.ModuleRev then S:ModuleRev("Rotational", 6) end
 
 local function G() return S.db.global end
+-- the whole tool on / off (Settings > Behaviour "Use Rotational"; g.rotationalOff). Off: no deciding,
+-- no glows, no next-spell icon, no tile. (Spec detection, the button list and cast tracking stay on:
+-- BuffWatcher uses them)
+-- REMOVED FOR NOW (user, 2026-11-26: "remove rotational from command center for now"): the tool is
+-- gone from Command Center (no tile, Tools row, dock icon, window, setting or Guide page) and never
+-- decides or glows. The file still loads because BuffWatcher and HealAssist use its spell helpers
+-- (S.RotKit, S.RotSpecs, cast tracking). To bring it back: set S.ROTATIONAL_REMOVED = false.
+S.ROTATIONAL_REMOVED = true
+function S.RotationalOn() return not S.ROTATIONAL_REMOVED and not (S.db and S.db.global.rotationalOff) end
 local function combat() return (InCombatLockdown and InCombatLockdown()) or (UnitAffectingCombat and UnitAffectingCombat("player")) end
 local function secret(v) return issecretvalue ~= nil and issecretvalue(v) end
+-- a table we may read (in combat the game hands out secret tables: type() says "table" but ipairs / pairs / # fail)
+local function readable(t) return type(t) == "table" and not secret(t) end
 local function now() return GetTime() end
 
 ---------------------------------------------------------------------------
@@ -28,7 +40,7 @@ local function spellInfo(x)
   if x == nil or x == "" then return nil end
   if C_Spell and C_Spell.GetSpellInfo then
     local ok, t = pcall(C_Spell.GetSpellInfo, tonumber(x) or x)
-    if ok and type(t) == "table" and t.spellID then return t.spellID, t.name, t.iconID end
+    if ok and readable(t) and t.spellID then return t.spellID, t.name, t.iconID end
   end
   if GetSpellInfo then
     local ok, name, _, icon, _, _, _, id = pcall(GetSpellInfo, tonumber(x) or x)
@@ -62,38 +74,237 @@ local function myClass() local loc, cls = UnitClass("player"); return cls or "UN
 local function talentGroup()
   return (GetActiveTalentGroup and GetActiveTalentGroup()) or (C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup and C_SpecializationInfo.GetActiveSpecGroup()) or 1
 end
--- your class's specializations: { { name=, points= } } (points when the game says)
-function S:RotSpecs()
+-- your class's specializations: { { name=, points= } }
+-- WoW: Forever has no talent tabs: the whole class is ONE trait tree (C_Traits) with the
+-- three classic specializations side by side, and the specialization API only knows the
+-- class itself. So: talent tabs if the game has them, else named sub trees, else the one
+-- tree split into its three columns by where the talents sit. Points = talents bought.
+local CLASS_TREES = {
+  WARRIOR = { "Arms", "Fury", "Protection" }, PALADIN = { "Holy", "Protection", "Retribution" },
+  HUNTER = { "Beast Mastery", "Marksmanship", "Survival" }, ROGUE = { "Assassination", "Combat", "Subtlety" },
+  PRIEST = { "Discipline", "Holy", "Shadow" }, SHAMAN = { "Elemental", "Enhancement", "Restoration" },
+  MAGE = { "Arcane", "Fire", "Frost" }, WARLOCK = { "Affliction", "Demonology", "Destruction" },
+  DRUID = { "Balance", "Feral Combat", "Restoration" },
+}
+S.ROT_CLASS_TREES = CLASS_TREES
+local function isClassName(name)
+  if type(name) ~= "string" then return true end
+  local loc, cls = UnitClass("player")
+  local n = name:lower()
+  return n == "" or n == tostring(loc or ""):lower() or n == tostring(cls or ""):lower()
+end
+local specLog                -- lines for /ccenter specs
+local function slog(...)
+  if not specLog then return end
+  local t = {}
+  for i = 1, select("#", ...) do local v = select(i, ...); t[#t + 1] = secret(v) and "SECRET" or tostring(v) end
+  specLog[#specLog + 1] = table.concat(t, " ")
+end
+local function pc(fn, ...) if type(fn) ~= "function" then return nil end local r = { pcall(fn, ...) } if r[1] then return unpack(r, 2) end end
+
+-- 1) old talent tabs (GetTalentTabInfo)
+local function talentTabs()
   local out = {}
-  local n = GetNumSpecializations and GetNumSpecializations() or 0
-  if n and n > 0 and GetSpecializationInfo then
-    local cur = GetSpecialization and GetSpecialization()
-    for i = 1, n do
-      local ok, _, name = pcall(GetSpecializationInfo, i)
-      if ok and type(name) == "string" then out[#out + 1] = { name = name, points = (cur == i) and 100 or 0 } end
-    end
-    if #out > 0 then return out end
-  end
-  local tabs = GetNumTalentTabs and GetNumTalentTabs() or 0
+  local tabs = pc(GetNumTalentTabs) or 0
   for i = 1, tabs do
     local r = { pcall(GetTalentTabInfo, i) }
     if r[1] then
       local name, pts
       for j = 2, #r do
         local v = r[j]
-        if type(v) == "string" and not name and not v:find("[\\/]") and v ~= "" then name = v end
-        if type(v) == "number" and v <= 100 and not pts and j > 2 then pts = v end
+        if type(v) == "string" and not name and not v:find("[\\/]") and v ~= "" and not tonumber(v) then name = v end
+        if type(v) == "number" and v <= 100 and not pts and j > 3 then pts = v end
       end
-      if name then out[#out + 1] = { name = name, points = pts or 0 } end
+      if not pts and GetNumTalents and GetTalentInfo then
+        pts = 0
+        for k = 1, (pc(GetNumTalents, i) or 0) do
+          local rr = { pcall(GetTalentInfo, i, k) }
+          if rr[1] and type(rr[6]) == "number" then pts = pts + rr[6] end
+        end
+      end
+      if name and not isClassName(name) then out[#out + 1] = { name = name, points = pts or 0 } end
+    end
+  end
+  slog("talent tabs:", tabs, "named:", #out)
+  return out
+end
+
+-- 2) the specialization API (dual-spec style); only counts if it names real specs
+local function specAPI()
+  local out = {}
+  local SI = C_SpecializationInfo
+  local n = pc(GetNumSpecializations) or (SI and pc(SI.GetNumSpecializationsForClassID, select(3, UnitClass("player")))) or 0
+  local cur = pc(GetSpecialization) or (SI and pc(SI.GetSpecialization))
+  local info = GetSpecializationInfo or (SI and SI.GetSpecializationInfo)
+  local raw = {}
+  for i = 1, (tonumber(n) or 0) do
+    local _, name = pc(info, i)
+    raw[#raw + 1] = tostring(name)
+    if type(name) == "string" and not isClassName(name) then out[#out + 1] = { name = name, points = (cur == i) and 100 or 0 } end
+  end
+  slog("spec API: count", n, "current", cur, "names", table.concat(raw, ", "))
+  return out
+end
+
+-- 3) the trait tree
+local function nodeList(configID, treeID)
+  local nodes = {}
+  local ids = pc(C_Traits.GetTreeNodes, treeID) or {}
+  for _, nodeID in ipairs(ids) do
+    local ni = pc(C_Traits.GetNodeInfo, configID, nodeID)
+    if type(ni) == "table" and not secret(ni) then
+      local pts = tonumber(ni.ranksPurchased) or tonumber(ni.currentRank) or 0
+      local entry = ni.activeEntry and ni.activeEntry.entryID or (type(ni.entryIDs) == "table" and ni.entryIDs[1])
+      nodes[#nodes + 1] = { id = nodeID, x = tonumber(ni.posX), y = tonumber(ni.posY), pts = pts, sub = ni.subTreeID, entry = entry }
+    end
+  end
+  return nodes
+end
+local function talentName(configID, entryID)
+  if not entryID then return "?" end
+  local e = pc(C_Traits.GetEntryInfo, configID, entryID)
+  local def = type(e) == "table" and e.definitionID and pc(C_Traits.GetDefinitionInfo, e.definitionID)
+  if type(def) ~= "table" then return "?" end
+  if type(def.overrideName) == "string" and def.overrideName ~= "" then return def.overrideName end
+  if def.spellID then return spellName(def.spellID) end
+  return "?"
+end
+-- split talents into 3 groups at the two widest gaps along x (or y if that balances better)
+local function splitTree(nodes)
+  local best
+  for _, axis in ipairs({ "x", "y" }) do
+    local list = {}
+    for _, n in ipairs(nodes) do if n[axis] then list[#list + 1] = n end end
+    if #list >= 6 then
+      table.sort(list, function(a, b) return a[axis] < b[axis] end)
+      local gaps = {}
+      for i = 1, #list - 1 do
+        local g = list[i + 1][axis] - list[i][axis]
+        if g > 0 then gaps[#gaps + 1] = { i = i, g = g } end
+      end
+      table.sort(gaps, function(a, b) return a.g > b.g end)
+      local minSize = math.max(1, math.floor(#list * 0.15))
+      -- widest pair of gaps that leaves every group at least 15% of the talents
+      for a = 1, #gaps do
+        for b = a + 1, #gaps do
+          local c1, c2 = math.min(gaps[a].i, gaps[b].i), math.max(gaps[a].i, gaps[b].i)
+          local s1, s2, s3 = c1, c2 - c1, #list - c2
+          if s1 >= minSize and s2 >= minSize and s3 >= minSize then
+            local score = (gaps[a].g + gaps[b].g) * (math.min(s1, s2, s3) / math.max(s1, s2, s3))
+            if not best or score > best.score then best = { score = score, axis = axis, list = list, c1 = c1, c2 = c2 } end
+          end
+        end
+        if best and best.axis == axis then break end
+      end
+    end
+  end
+  if not best then return nil end
+  local groups = { {}, {}, {} }
+  for i, n in ipairs(best.list) do
+    local g = groups[(i <= best.c1) and 1 or (i <= best.c2) and 2 or 3]
+    g[#g + 1] = n
+  end
+  return groups, best.axis
+end
+local function traitTrees()
+  local out = {}
+  if not (C_ClassTalents and C_ClassTalents.GetActiveConfigID and C_Traits and C_Traits.GetConfigInfo) then
+    slog("trait API: missing (C_ClassTalents", C_ClassTalents ~= nil, "C_Traits", C_Traits ~= nil, ")")
+    return out
+  end
+  local configID = pc(C_ClassTalents.GetActiveConfigID)
+  slog("trait config:", configID)
+  if not configID then return out end
+  local ci = pc(C_Traits.GetConfigInfo, configID)
+  local trees = type(ci) == "table" and ci.treeIDs or {}
+  local _, cls = UnitClass("player")
+  for _, treeID in ipairs(trees) do
+    local nodes = nodeList(configID, treeID)
+    local total = 0
+    for _, n in ipairs(nodes) do total = total + n.pts end
+    -- named sub trees (hero talents style)
+    local subs, subOrder = {}, {}
+    for _, n in ipairs(nodes) do
+      if n.sub then
+        if not subs[n.sub] then subs[n.sub] = { pts = 0 }; subOrder[#subOrder + 1] = n.sub end
+        subs[n.sub].pts = subs[n.sub].pts + n.pts
+      end
+    end
+    slog("tree", treeID, "talents", #nodes, "points", total, "sub trees", #subOrder)
+    for _, sid in ipairs(subOrder) do
+      local si = pc(C_Traits.GetSubTreeInfo, configID, sid)
+      local name = type(si) == "table" and si.name
+      slog("  sub tree", sid, tostring(name), "points", subs[sid].pts)
+      if type(name) == "string" and not isClassName(name) then out[#out + 1] = { name = name, points = subs[sid].pts } end
+    end
+    if #out == 0 and #nodes >= 6 then
+      local groups, axis = splitTree(nodes)
+      local names = CLASS_TREES[cls] or { "Tree 1", "Tree 2", "Tree 3" }
+      if groups then
+        for gi, grp in ipairs(groups) do
+          local pts, sample = 0, {}
+          for _, n in ipairs(grp) do
+            pts = pts + n.pts
+            if specLog and #sample < 4 then sample[#sample + 1] = talentName(configID, n.entry) end
+          end
+          slog("  group", gi, "(" .. axis .. ")", names[gi], "talents", #grp, "points", pts, "e.g.", table.concat(sample, ", "))
+          out[#out + 1] = { name = names[gi], points = pts }
+        end
+      else
+        slog("  could not split the tree into 3")
+      end
     end
   end
   return out
 end
-local function mainSpec()
+
+-- Reading the talent tree builds a lot of tables (5.7 KB a time), and the talent events below come
+-- often on Forever, so they only mark the copy out of date: it's read again at most twice a second
+-- (a spec switch shows within half a second), and every 30 s at the latest.
+local specCache, specCacheAt, specDirty = nil, -99, false
+function S:RotSpecs(fresh)
+  if specCache then
+    local age = now() - specCacheAt
+    if age < 0.5 or (not fresh and not specDirty and age < 30) then return specCache end
+  end
+  local out = talentTabs()
+  if #out == 0 then out = specAPI() end
+  if #out == 0 then out = traitTrees() end
+  specCache, specCacheAt, specDirty = out, now(), false
+  return out
+end
+-- the specialization you play: most points (or the one the game says is active)
+function S.CurrentSpec()
   local best
-  for _, sp in ipairs(S:RotSpecs()) do if not best or sp.points > best.points then best = sp end end
+  for _, sp in ipairs(S:RotSpecs()) do if (sp.points or 0) > 0 and (not best or sp.points > best.points) then best = sp end end
   return best and best.name
 end
+for _, ev in ipairs({ "TRAIT_CONFIG_UPDATED", "TRAIT_CONFIG_LIST_UPDATED", "ACTIVE_COMBAT_CONFIG_CHANGED", "CHARACTER_POINTS_CHANGED",
+  "PLAYER_TALENT_UPDATE", "PLAYER_SPECIALIZATION_CHANGED", "ACTIVE_TALENT_GROUP_CHANGED" }) do
+  pcall(S.On, S, ev, function() specDirty = true end)
+end
+function S:RotSpecsReport()
+  specLog = {}
+  local _, cls = UnitClass("player")
+  slog("class", cls, "| APIs: GetNumTalentTabs", GetNumTalentTabs ~= nil, "GetSpecializationInfo", GetSpecializationInfo ~= nil,
+    "C_SpecializationInfo", C_SpecializationInfo ~= nil, "C_ClassTalents", C_ClassTalents ~= nil, "C_Traits", C_Traits ~= nil)
+  local ok, err = pcall(function()
+    local a = talentTabs(); local b = specAPI(); local c = traitTrees()
+    local use = (#a > 0 and a) or (#b > 0 and b) or c
+    local parts = {}
+    for _, sp in ipairs(use) do parts[#parts + 1] = sp.name .. " " .. tostring(sp.points) end
+    slog("=> specs:", #parts > 0 and table.concat(parts, ", ") or "none", "| you're:", tostring(S.CurrentSpec()))
+  end)
+  if not ok then slog("error:", tostring(err)) end
+  specCache = nil
+  local lines = specLog
+  specLog = nil
+  if S.db then G().specsDiag = lines end
+  for _, l in ipairs(lines) do print("|cff4fd1c5Command Center|r specs: " .. l) end
+end
+S:AddCommand("specs", "", "Show which talent specializations the game reports", function() S:RotSpecsReport() end)
+local function mainSpec() return S.CurrentSpec() end
+
 local function newProfile()
   return { enabled = true, prio = {}, opener = {}, procs = {}, buffs = {}, purge = {}, cleanse = {}, cleanses = {},
     look = { strong = 0.9, soft = 0.45, color = "gold", next = true } }
@@ -221,7 +432,7 @@ local function readCooldown(id)
   local start, dur
   if C_Spell and C_Spell.GetSpellCooldown then
     local ok, t = pcall(C_Spell.GetSpellCooldown, id)
-    if ok and type(t) == "table" then start, dur = t.startTime, t.duration end
+    if ok and readable(t) then start, dur = t.startTime, t.duration end
   elseif GetSpellCooldown then
     local ok, a, b = pcall(GetSpellCooldown, id)
     if ok then start, dur = a, b end
@@ -555,6 +766,7 @@ function S:RotHappened(kind)
   local t = now()
   recent[kind] = t; recent.seen = t
   if not S.db then return end
+  if not S.RotationalOn() then return end   -- (removed / switched off: no pop-ups, sounds or glows)
   local p = P()
   if not p.enabled then return end
   for _, pr in ipairs(p.procs) do
@@ -579,6 +791,7 @@ end
 function S:RotNameReported(nm) return S:RotSpellReported(nil, nm) end
 function S:RotSpellReported(id, byName)
   if not S.db then return end
+  if not S.RotationalOn() then return end   -- (removed / switched off: no pop-ups, sounds or glows)
   local p = P()
   if not p.enabled then return end
   local nm = byName or spellName(id)
@@ -749,6 +962,7 @@ end
 S.RotPopupFreeSpot = freeSpot
 
 local function showPopup(opts)
+  if not S.RotationalOn() then return end   -- (removed / switched off: no pop-ups, sounds or glows)
   if type(opts) == "string" then opts = { text = opts } end
   local popup = getPopup()
   local c = POP_COLORS[opts.color or "gold"] or POP_COLORS.gold
@@ -838,19 +1052,23 @@ end
 -- Action buttons
 ---------------------------------------------------------------------------
 local buttons = {}            -- list of action buttons found
+local bfCache, bfAt = {}, 0   -- spell -> its visible buttons (buttonsFor; cleared on bar changes, kept 0.5 s)
 local function slotOf(btn)
   local a = btn.action
   if type(a) ~= "number" and btn.GetAttribute then local ok, v = pcall(btn.GetAttribute, btn, "action"); if ok then a = tonumber(v) end end
   if type(a) == "number" and not secret(a) then return a end
+end
+-- (one plain function for every frame - no new function per frame, the UI has thousands)
+local function isActionButton(f)
+  return f.IsObjectType and (f:IsObjectType("CheckButton") or f:IsObjectType("Button")) and slotOf(f) and f:GetName() and true or false
 end
 local function scanButtons()
   if combat() then return end
   local out = {}
   local f = EnumerateFrames and EnumerateFrames()
   while f do
-    local ok = pcall(function()
-      if f.IsObjectType and (f:IsObjectType("CheckButton") or f:IsObjectType("Button")) and slotOf(f) and f:GetName() then out[#out + 1] = f end
-    end)
+    local ok, yes = pcall(isActionButton, f)
+    if ok and yes then out[#out + 1] = f end
     f = EnumerateFrames(f)
   end
   if #out == 0 then
@@ -860,6 +1078,7 @@ local function scanButtons()
     end
   end
   buttons = out
+  wipe(bfCache)
 end
 S.RotScanButtons = scanButtons
 
@@ -871,8 +1090,15 @@ local function slotSpell(slot)
   if kind == "spell" then return id end
   if kind == "macro" and GetMacroSpell then local ok2, sid = pcall(GetMacroSpell, id); if ok2 and not secret(sid) then return sid end end
 end
+-- (20 times a second: the answer is kept per spell for half a second, and dropped at once when a
+-- bar or a spell changes - it used to check every button's slot and spell on each call)
 local function buttonsFor(spellID)
+  local t = GetTime()
+  if t - bfAt > 0.5 then wipe(bfCache); bfAt = t end
+  local hit = spellID and bfCache[spellID]
+  if hit then return hit end
   local out = {}
+  if spellID then bfCache[spellID] = out end
   local nm = spellName(spellID)
   for _, b in ipairs(buttons) do
     local ok, vis = pcall(b.IsVisible, b)
@@ -1286,6 +1512,7 @@ end
 
 local function apply()
   for _, g in pairs(glows) do g:Hide() end
+  if not S.RotationalOn() then if nextIcon then nextIcon:Hide() end return end
   local p = P()
   local strong, soft = S:RotDecide()
   lastPick = strong
@@ -1306,6 +1533,7 @@ end
 S.RotApply = apply
 
 local driver = CreateFrame("Frame")
+local acc_off   -- (switched off: glows already cleared)
 local cacheTick
 local acc = 0
 driver:SetScript("OnUpdate", function(_, el)
@@ -1313,6 +1541,11 @@ driver:SetScript("OnUpdate", function(_, el)
   if acc < 0.05 then return end
   acc = 0
   if not S.db then return end
+  if not S.RotationalOn() then
+    if not acc_off then for _, g in pairs(glows) do g:Hide() end; if nextIcon then nextIcon:Hide() end; acc_off = true end
+    return
+  end
+  acc_off = nil
   local p = P()
   if not p.enabled or (#p.prio == 0 and #p.buffs == 0 and not p.opener.near and not p.opener.far and not (p.opener.rules and #p.opener.rules > 0) and #p.procs == 0 and #p.cleanses == 0 and not p.purge.spell and not (p.lowhp and p.lowhp.on)) then
     for _, g in pairs(glows) do g:Hide() end
@@ -1360,18 +1593,18 @@ S:On("UNIT_AURA", function(_, unit, info)
   if unit ~= "player" or not S.db then return end
   if spyUntil and now() < spyUntil then
     pcall(S.RotSpyScanBuffs, S)
-    if type(info) == "table" and type(info.addedAuras) ~= "table" then
+    if readable(info) and not readable(info.addedAuras) then
       local keys = {}
-      for k, v in pairs(info) do keys[#keys + 1] = tostring(k) .. "=" .. (secret(v) and "SECRET" or (type(v) == "table" and ("[" .. #v .. "]") or tostring(v))) end
+      for k, v in pairs(info) do keys[#keys + 1] = tostring(k) .. "=" .. (secret(v) and "SECRET" or (readable(v) and ("[" .. #v .. "]") or tostring(v))) end
       logEvent("UNIT_AURA-INFO", table.concat(keys, " "))
     end
   end
   -- recording: every buff that appears on you (name / ID when the game shows them)
   if spyUntil and now() < spyUntil then
-    local n = (type(info) == "table" and type(info.addedAuras) == "table") and #info.addedAuras or -1
+    local n = (readable(info) and readable(info.addedAuras)) and #info.addedAuras or -1
     if n ~= 0 then logEvent("UNIT_AURA", type(info), "added=" .. n) end
   end
-  if spyUntil and now() < spyUntil and type(info) == "table" and type(info.addedAuras) == "table" then
+  if spyUntil and now() < spyUntil and readable(info) and readable(info.addedAuras) then
     for _, a in ipairs(info.addedAuras) do
       local ok, err = pcall(function()
         local nm, id = a.name, a.spellId
@@ -1404,7 +1637,7 @@ S:On("UNIT_AURA", function(_, unit, info)
     end)
   end
   -- buffs that pop for an instant (weapon procs): their spell counts as "reported"
-  if type(info) == "table" and type(info.addedAuras) == "table" then
+  if readable(info) and readable(info.addedAuras) then
     for _, a in ipairs(info.addedAuras) do
       pcall(function() local id = a.spellId; if id ~= nil and not secret(id) then S:RotSpellReported(id) end end)
     end
@@ -1494,8 +1727,19 @@ S:On("PLAYER_REGEN_DISABLED", function()
   local ok, hp = pcall(UnitHealth, "player")
   logEvent("HP", ok and (secret(hp) and "SECRET" or tostring(hp)) or "error")
 end)
+-- Switching specs fires ACTIONBAR_SLOT_CHANGED for every slot (~120 times at once): each one used to
+-- start its own full scan of every frame in the game half a second later = a 7 s freeze. Now all of
+-- them share one scan.
+local scanPending
+local timedScan = S.PerfWrap and S.PerfWrap("Rotational  scan action buttons", scanButtons) or scanButtons
+local function scanSoon()
+  wipe(bfCache)                    -- (a bar / spell changed: which button holds what is looked at again)
+  if scanPending then return end
+  scanPending = true
+  C_Timer.After(0.5, function() scanPending = nil; timedScan() end)
+end
 for _, ev in ipairs({ "PLAYER_ENTERING_WORLD", "ACTIONBAR_SLOT_CHANGED", "UPDATE_BONUS_ACTIONBAR", "ACTIONBAR_PAGE_CHANGED", "PLAYER_REGEN_ENABLED", "SPELLS_CHANGED" }) do
-  S:On(ev, function() C_Timer.After(0.5, scanButtons) end)
+  S:On(ev, scanSoon)
 end
 -- read base cooldowns while it's allowed (out of combat), and your typed overrides
 -- names of buffs you've had (passives like Maelstrom Weapon can't be looked up by
@@ -1531,7 +1775,13 @@ function S:RotCacheCooldowns()
   if p.lowhp then for _, id in ipairs(lowSeq(p.lowhp)) do if baseCD[id] == nil then cacheBase(id) end end end
 end
 S:On("PLAYER_REGEN_ENABLED", function() S:RotCacheCooldowns() end)
-S:On("SPELLS_CHANGED", function() wipe(baseCD); C_Timer.After(1, function() S:RotCacheCooldowns() end) end)
+local cdPending   -- (SPELLS_CHANGED comes in bursts too: one cooldown read for all of them)
+S:On("SPELLS_CHANGED", function()
+  wipe(baseCD)
+  if cdPending then return end
+  cdPending = true
+  C_Timer.After(1, function() cdPending = nil; S:RotCacheCooldowns() end)
+end)
 S:On("PLAYER_ENTERING_WORLD", function() C_Timer.After(2, function() S:RotCacheCooldowns() end) end)
 
 ---------------------------------------------------------------------------
@@ -2256,6 +2506,7 @@ local function build()
 end
 
 function S:ShowRotational()
+  if S.ROTATIONAL_REMOVED then S:Print("Rotational has been removed from Command Center for now.") return end
   if not win then build() end
   win:Show(); win:Raise()
   S:RefreshRotational()

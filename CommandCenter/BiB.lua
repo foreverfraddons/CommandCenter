@@ -7,6 +7,7 @@
 -- work in combat. Sorting only changes how the window shows them - nothing in your
 -- real bags is moved.
 local _, S = ...
+if S.ModuleRev then S:ModuleRev("BiB", 25) end
 local UI = S.UI
 
 local CC = C_Container
@@ -35,6 +36,8 @@ local DEF = {
   -- behaviour
   hold = false, lock = false, autoJunk = false,
   openVendor = true, openMail = true, openBank = true, openAH = true, openTrade = true,
+  bankMemory = true,                 -- remember the bank so it can be seen from anywhere
+  bankWindow = true,                 -- at the banker: BiB's bank window instead of the game's
 }
 local function copy(v) if type(v) ~= "table" then return v end local c = {} for k, x in pairs(v) do c[k] = copy(x) end return c end
 local function cfg()
@@ -513,10 +516,10 @@ local function hideBit(b, k)
   if type(v) == "table" and type(v.Hide) == "function" then v:Hide() end
 end
 
-local function makeButton(bag, slot)
+local function makeButton(bag, slot, parent)
   nextBtn = nextBtn + 1
   local name = "CC_BiBItem" .. nextBtn
-  local parent = holder(bag)
+  parent = parent or holder(bag)
   local ok, b = pcall(CreateFrame, "ItemButton", name, parent, "ContainerFrameItemButtonTemplate")
   if not ok or not b then ok, b = pcall(CreateFrame, "Button", name, parent, "ContainerFrameItemButtonTemplate") end
   if not ok or not b then
@@ -737,10 +740,21 @@ local function repaint()
   return true
 end
 
+-- money as gold / silver / copper in their own colours ("79g 50s 55c")
+function S.BiBMoney(m)
+  m = math.floor(tonumber(m) or 0)
+  local neg = m < 0
+  if neg then m = -m end
+  local g, sv, c = math.floor(m / 10000), math.floor(m / 100) % 100, m % 100
+  local out = {}
+  local function n(v) return BreakUpLargeNumbers and BreakUpLargeNumbers(v) or tostring(v) end
+  if g > 0 then out[#out + 1] = "|cffffd100" .. n(g) .. "g|r" end
+  if sv > 0 or (g > 0 and c > 0) then out[#out + 1] = "|cffc7c7cf" .. sv .. "s|r" end
+  if c > 0 or #out == 0 then out[#out + 1] = "|cffeda55f" .. c .. "c|r" end
+  return (neg and "-" or "") .. table.concat(out, " ")
+end
 local function moneyText()
-  local m = GetMoney and GetMoney() or 0
-  if GetCoinTextureString then local ok, s = pcall(GetCoinTextureString, m); if ok and s then return s end end
-  return string.format("%dg %ds %dc", math.floor(m / 10000), math.floor(m / 100) % 100, m % 100)
+  return S.BiBMoney(GetMoney and GetMoney() or 0)
 end
 
 local refreshBagBar
@@ -753,7 +767,13 @@ local function layout()
   local secs = sections(list, c, onlyBag)
   local size, sp = c.size, c.spacing
   local cell = size + sp
+  -- a window you sized yourself (corner grip) keeps its size: the columns follow its width
+  local sz = c.bagSize
+  local sizing = win.sizing
+  local W = sizing and win:GetWidth() or (type(sz) == "table" and tonumber(sz[1])) or nil
+  local H = sizing and win:GetHeight() or (type(sz) == "table" and tonumber(sz[2])) or nil
   local cols = math.max(4, math.min(40, c.cols))
+  if W then cols = math.max(4, math.min(40, math.floor((W - c.pad * 2 + sp) / cell))) end
   local fullW = cols * cell - sp
   local hdrH = (c.headers and (c.group or c.split)) and HDR_H or 0
   for _, b in pairs(btns) do b:Hide() end
@@ -827,10 +847,19 @@ local function layout()
   end
   -- frame around it
   local top = HEAD + 6 + (c.search and SEARCH_H or 0) + (c.bagBar and BAGBAR_H or 0)
-  win.content:ClearAllPoints()
-  win.content:SetPoint("TOPLEFT", c.pad, -top)
   win.content:SetSize(fullW, math.max(1, y))
-  win:SetSize(fullW + c.pad * 2, top + y + c.pad + FOOT)
+  win.inner:SetSize(fullW + 12, math.max(1, y) + 12)
+  win.scroll:ClearAllPoints()
+  win.scroll:SetPoint("TOPLEFT", c.pad - 6, -(top - 6)); win.scroll:SetPoint("BOTTOMRIGHT", -(c.pad - 6), c.pad + FOOT - 6)
+  local bodyH = y
+  if W then
+    if not sizing then win:SetSize(W, H) end
+    bodyH = math.max(20, H - (top + c.pad + FOOT))
+  else
+    win:SetSize(fullW + c.pad * 2, top + y + c.pad + FOOT)
+  end
+  win.scrollMax = math.max(0, y - bodyH)
+  win.scroll:SetVerticalScroll(math.min(win.scroll:GetVerticalScroll() or 0, win.scrollMax))
   win.search:SetShown(c.search)
   win.freeText:SetText(c.free and (free .. " / " .. total .. " free") or "")
   win.gold:SetText(c.gold and moneyText() or "")
@@ -879,7 +908,7 @@ function S:BiBSellJunk(quiet)
   if not ok then if not quiet then S:Print("The game didn't let Command Center sell the junk - use the vendor's \"Sell junk\" button.") end return end
   local m = value
   S:Print(string.format("Selling %d junk item%s for %s.", #queue, #queue == 1 and "" or "s",
-    GetCoinTextureString and GetCoinTextureString(m) or (math.floor(m / 10000) .. "g")))
+    S.BiBMoney(m)))
 end
 
 ---------------------------------------------------------------------------
@@ -1005,6 +1034,8 @@ local function sortMenu(self)
   items[#items + 1] = { text = "One section per bag", checked = c.split, keep = true,
     func = function() c.split = not c.split; S:RefreshBiB(true) end }
   items[#items + 1] = { text = "Section order...", tip = "Pick which kinds of items come first and which go last.", func = function() S:ShowBiBOptions(2) end }
+  items[#items + 1] = { text = "Currencies to show...", tip = "Pick currencies to show along the bottom, next to your gold.",
+    func = function() if S.BiBCurrencyMenu then C_Timer.After(0, function() S.BiBCurrencyMenu(win and win.currBtn or self) end) end end }
   items[#items + 1] = { text = "More options...", func = function() S:ShowBiBOptions() end }
   UI:Menu(self, items)
 end
@@ -1027,11 +1058,23 @@ local function build()
     if not cc.bagBar then onlyBag = nil end
     S:RefreshBiB(true)
   end)
+  win:HeaderButton("chest", "Your bank", "See your bank from anywhere - BiB remembers it every time you visit a banker. Your other characters' banks too.", function()
+    S:ToggleBiBBank()
+  end)
   win.search = UI:Edit(win, 200, 20, "Search  (name, type, epic, boe, ilvl>100...)")
   win.search:SetPoint("TOPLEFT", 10, -(HEAD + 6)); win.search:SetPoint("RIGHT", -10, 0)
   win.search:HookScript("OnTextChanged", function() dimAll() end)
   win.bagBar = CreateFrame("Frame", nil, win); win.bagBar:SetSize(200, 22)
-  win.content = CreateFrame("Frame", nil, win)
+  -- the slots sit in a scroll frame, so a window you sized yourself can be smaller than the bags
+  win.scroll = CreateFrame("ScrollFrame", nil, win)
+  win.inner = CreateFrame("Frame", nil, win.scroll); win.inner:SetSize(1, 1)
+  win.scroll:SetScrollChild(win.inner)
+  win.scroll:EnableMouseWheel(true)
+  win.scroll:SetScript("OnMouseWheel", function(self, d)
+    self:SetVerticalScroll(math.max(0, math.min(win.scrollMax or 0, self:GetVerticalScroll() - d * (cfg().size + cfg().spacing) * 2)))
+  end)
+  win.content = CreateFrame("Frame", nil, win.inner)
+  win.content:SetPoint("TOPLEFT", win.inner, "TOPLEFT", 6, -6)
   win.emptyText = UI:Text(win.content, "|cff888888Nothing here.|r", "small"); win.emptyText:SetPoint("TOPLEFT")
   win.freeText = UI:Text(win, "", "small"); win.freeText:SetPoint("BOTTOMLEFT", 12, 8)
   win.gold = UI:Text(win, "", "small", "RIGHT"); win.gold:SetPoint("BOTTOMRIGHT", -12, 8)
@@ -1056,6 +1099,7 @@ local function build()
     end
     if PlaySound and SOUNDKIT and SOUNDKIT.IG_BACKPACK_CLOSE then PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) end
   end)
+  if S.BiBOnBuild then pcall(S.BiBOnBuild, win) end
   -- new-item glow pulse, and catch-up refreshes
   local acc, t = 0, 0
   win:HookScript("OnUpdate", function(_, el)
@@ -1151,6 +1195,7 @@ function S:SetBiBOn(on)
     S:HideBiB()
     S:Print("BiB off - the game's own bags are back.")
   end
+  if S.BiBApplyBankTakeover then S.BiBApplyBankTakeover() end
   if S.RefreshCurrent then pcall(S.RefreshCurrent, S) end
   if S.QuickBarLayout then pcall(S.QuickBarLayout, S) end
 end
@@ -1404,18 +1449,20 @@ function S:ShowBiBOptions(tab)
   check(p, "autoJunk", "Sell junk by itself at vendors")
   check(p, "hold", "Don't reshuffle while BiB is open", "Items keep their spot until you close and open BiB again - nothing jumps around under your mouse.")
   check(p, "lock", "Lock the window in place")
+  check(p, "bankWindow", "Use BiB's bank window at the banker", "The banker opens BiB's bank window (with your boxes, tabs and sorting) instead of the game's bank. Its \"Game's bank\" button brings the game's window back for one visit (to buy bag slots, say).", function() if S.BiBApplyBankTakeover then S.BiBApplyBankTakeover() end end)
+  check(p, "bankMemory", "Remember my bank (see it from anywhere)", "Each time you open the bank BiB keeps a copy, so the bank button / /ccenter bank shows it wherever you are - your other characters' banks too.")
   y = y - 8
   local reset = UI:Button(p, "Reset look and sorting", 170, 22, function()
     UI:Confirm("Put every BiB look and sorting option back to how it started?", function()
       local c = cfg()
-      for k, v in pairs(DEF) do if k ~= "on" and not k:find("^open") then c[k] = copy(v) end end
+      for k, v in pairs(DEF) do if k ~= "on" and k ~= "bankMemory" and k ~= "bankWindow" and not k:find("^open") then c[k] = copy(v) end end
       opts.refresh(); re()
     end, "Reset")
   end)
   reset:SetPoint("TOPLEFT", 0, y)
 
   opts.refresh = function() for _, f in ipairs(ctl) do pcall(f) end end
-  local foot = UI:Text(opts, "|cff888888Changes show straight away. /ccenter bib opens your bags.|r", "small")
+  local foot = UI:Text(opts, "|cff888888Changes show straight away. /ccenter bib opens your bags, /ccenter bank your bank.|r", "small")
   foot:SetPoint("BOTTOMLEFT", 18, 16)
   local openB = UI:Button(opts, "Open BiB", 90, 22, function() S:ShowBiB() end)
   openB:SetPoint("BOTTOMRIGHT", -16, 12)
@@ -1426,6 +1473,2324 @@ function S:ShowBiBOptions(tab)
 end
 
 S:AddCommand("bib", "", "BiB: all your bags in one window", function() S:ToggleBiB() end)
+
+-- (the bank part is one function of its own, so its locals stay under Lua's 200-per-function limit)
+local function bankSection()
+---------------------------------------------------------------------------
+-- Bank from anywhere: every time you're at the bank BiB remembers what's in it
+-- (each character on this account, plus the warband bank if the game has one),
+-- and the Bank window shows it wherever you are - read-only, it's a copy.
+---------------------------------------------------------------------------
+local bankWin
+-- the key ring is never part of the bank (it showed every key twice: key ring + "bank")
+local KEYRING_ID = KEYRING_CONTAINER or (Enum and Enum.BagIndex and Enum.BagIndex.Keyring) or -2
+local bankOpen = false
+local bankView                       -- which character the Bank window shows (nil = you)
+local BANK_COLS_MIN = 8
+
+local function charKey()
+  local n = clean(UnitName and UnitName("player"))
+  if not n then return nil end
+  local r = clean(GetRealmName and GetRealmName()) or "?"
+  return n .. "-" .. r
+end
+local function bankStore()
+  local g = G()
+  g.bibBank = type(g.bibBank) == "table" and g.bibBank or {}
+  local st = g.bibBank
+  st.chars = type(st.chars) == "table" and st.chars or {}
+  st.guilds = type(st.guilds) == "table" and st.guilds or {}
+  return st
+end
+S.BiBBankStore = bankStore
+S.BiBCharKey = charKey
+
+-- every bag the bank can have, on old and new clients alike
+local function bankBags()
+  local out, seen = {}, {}
+  local BI = Enum and Enum.BagIndex
+  local function add(b, kind, name)
+    if type(b) == "number" and b ~= KEYRING_ID and not seen[b] then seen[b] = true; out[#out + 1] = { bag = b, kind = kind, name = name } end
+  end
+  add(BANK_CONTAINER or (BI and BI.Bank) or -1, "char", BANK or "Bank")
+  local first = (tonumber(NUM_BAG_SLOTS) or 4) + 1
+  if BI and type(BI.ReagentBag) == "number" and BI.ReagentBag >= first then first = BI.ReagentBag + 1 end
+  local nb = tonumber(NUM_BANKBAGSLOTS) or 7
+  local rb = BI and BI.ReagentBag
+  for b = (tonumber(NUM_BAG_SLOTS) or 4) + 1, first + nb - 1 do if b ~= rb then add(b, "char") end end
+  add(REAGENTBANK_CONTAINER or (BI and BI.Reagentbank), "char", REAGENT_BANK or "Reagent bank")
+  if BI then
+    for i = 1, 8 do add(BI["CharacterBankTab_" .. i], "char", "Bank tab " .. i) end
+    for i = 1, 8 do add(BI["AccountBankTab_" .. i], "account", "Warband tab " .. i) end
+  end
+  return out
+end
+S.BiBBankBags = bankBags
+
+local function recordBank()
+  if not bankOpen or not S.db or cfg().bankMemory == false then return end
+  local key = charKey(); if not key then return end
+  local st = bankStore()
+  local mine, acct = { at = time(), bags = {} }, { at = time(), bags = {} }
+  for _, e in ipairs(bankBags()) do
+    local n = numSlots(e.bag)
+    if n > 0 then
+      local rec = { bag = e.bag, n = n, name = e.name or bagName(e.bag), items = {} }
+      for slot = 1, n do
+        local info = slotInfo(e.bag, slot)
+        if info and (info.link or info.id or info.icon) then
+          rec.items[slot] = { id = info.id, link = info.link, count = tonumber(info.count) or 1, icon = info.icon,
+            q = info.quality, b = info.bound and true or nil }
+        end
+      end
+      local into = e.kind == "account" and acct or mine
+      into.bags[#into.bags + 1] = rec
+    end
+  end
+  if #mine.bags > 0 then
+    local _, cls = UnitClass("player")
+    mine.class = clean(cls)
+    local old = st.chars[key]
+    if old then mine.inv, mine.money, mine.moneyAt, mine.rules = old.inv, old.money, old.moneyAt, old.rules end
+    st.chars[key] = mine
+  end
+  if #acct.bags > 0 then st.account = acct end
+  if bankWin and bankWin:IsShown() then S:RefreshBiBBank() end
+end
+S.BiBRecordBank = recordBank
+
+local recPending = false
+local function recordSoon(delay)
+  if not bankOpen or recPending then return end
+  recPending = true
+  C_Timer.After(delay or 0.5, function() recPending = false; recordBank() end)
+end
+S:On("BANKFRAME_OPENED", function()
+  bankOpen = true; recordSoon(0.4); C_Timer.After(2, recordBank)
+  if S.BiBBankArrived then S.BiBBankArrived() end
+end)
+S:On("BANKFRAME_CLOSED", function()               -- nothing is recorded after this (the bank can't be read then)
+  bankOpen = false
+  if S.BiBBankLeft then S.BiBBankLeft() end
+end)
+S:On("PLAYERBANKSLOTS_CHANGED", function() recordSoon() end)
+S:On("PLAYERREAGENTBANKSLOTS_CHANGED", function() recordSoon() end)
+S:On("PLAYERBANKBAGSLOTS_CHANGED", function() recordSoon() end)
+S:On("BAG_UPDATE_DELAYED", function() recordSoon() end)
+
+-- Guild bank: remembered the same way each time you're at the guild vault (per guild).
+-- Tabs load lazily, so every viewable tab is asked for when the vault opens and the
+-- copy is only taken once they've had time to arrive.
+local guildOpen, guildLoaded = false, false
+local function guildName()
+  if not (IsInGuild and IsInGuild()) then return nil end
+  local n = clean(GetGuildInfo and GetGuildInfo("player"))
+  return n
+end
+local function guildItemId(link)
+  if not link then return nil end
+  return tonumber(link:match("item:(%d+)"))
+end
+local function recordGuild()
+  if not guildOpen or not guildLoaded or not S.db or cfg().bankMemory == false then return end
+  local gname = guildName()
+  if not gname or not GetNumGuildBankTabs then return end
+  local okN, ntabs = pcall(GetNumGuildBankTabs)
+  ntabs = okN and tonumber(clean(ntabs)) or 0
+  local st = bankStore()
+  local old = st.guilds[gname]
+  local rec = { at = time(), bags = {} }
+  -- no tabs (none bought / none you may see): keep what was seen before, but still take the gold
+  if ntabs == 0 and old and old.bags then rec.bags = old.bags end
+  local per = tonumber(MAX_GUILDBANK_SLOTS_PER_TAB) or 98
+  for tab = 1, ntabs do
+    local ok, name, _, viewable = pcall(GetGuildBankTabInfo, tab)
+    name, viewable = ok and clean(name), ok and clean(viewable)
+    local bagRec = { bag = tab, n = per, name = name or ("Tab " .. tab), items = {} }
+    if viewable then
+      for slot = 1, per do
+        local ok2, tex, count, _, _, quality = pcall(GetGuildBankItemInfo, tab, slot)
+        local okL, link = pcall(GetGuildBankItemLink, tab, slot)
+        tex, link = ok2 and clean(tex), okL and clean(link)
+        if tex or link then
+          bagRec.items[slot] = { id = guildItemId(link), link = link, count = tonumber(ok2 and clean(count)) or 1, icon = tex, q = ok2 and clean(quality) or nil }
+        end
+      end
+    elseif old and old.bags then
+      -- a tab you can't see right now: keep what was seen before
+      for _, ob in ipairs(old.bags) do if ob.bag == tab then bagRec = ob end end
+    end
+    rec.bags[#rec.bags + 1] = bagRec
+  end
+  if GetGuildBankMoney then local okm, m = pcall(GetGuildBankMoney); rec.money = okm and tonumber(clean(m)) or nil end
+  if rec.money == nil and old then rec.money = old.money end
+  rec.log = old and old.log
+  st.guilds[gname] = rec
+  if bankWin and bankWin:IsShown() then S:RefreshBiBBank() end
+end
+S.BiBRecordGuild = recordGuild
+-- the guild bank log (item moves per tab + the gold log), when the game gives it
+local MONEY_TAB = (tonumber(MAX_GUILDBANK_TABS) or 8) + 1
+local function recordGuildLog()
+  if not guildOpen or not S.db or cfg().bankMemory == false then return end
+  local gname = guildName()
+  if not gname then return end
+  local st = bankStore()
+  local g = st.guilds[gname]
+  if not g then g = { at = time(), bags = {} }; st.guilds[gname] = g end
+  if GetGuildBankMoney then local okm, m = pcall(GetGuildBankMoney); m = okm and tonumber(clean(m)); if m then g.money = m end end
+  local now = time()
+  local function when(y, mo, d, h)
+    return now - ((((tonumber(y) or 0) * 12 + (tonumber(mo) or 0)) * 30 + (tonumber(d) or 0)) * 24 + (tonumber(h) or 0)) * 3600
+  end
+  local oldLog = g.log or {}
+  local log = { at = now, tabs = {}, money = oldLog.money or {} }
+  local okN, ntabs = pcall(GetNumGuildBankTabs)
+  ntabs = okN and tonumber(clean(ntabs)) or 0
+  for tab = 1, ntabs do
+    local list = {}
+    local okc, n = pcall(GetNumGuildBankTransactions, tab)
+    n = okc and tonumber(clean(n)) or 0
+    for i = 1, n do
+      local ok, typ, who, link, count, t1, t2, y, mo, d, h = pcall(GetGuildBankTransaction, tab, i)
+      if ok and typ then list[#list + 1] = { t = clean(typ), who = clean(who), link = clean(link), n = tonumber(clean(count)) or 1, from = clean(t1), to = clean(t2), at = when(y, mo, d, h), i = i } end
+    end
+    log.tabs[tab] = (#list > 0 or not (oldLog.tabs and oldLog.tabs[tab])) and list or oldLog.tabs[tab]
+  end
+  if GetNumGuildBankMoneyTransactions then
+    local okc, n = pcall(GetNumGuildBankMoneyTransactions)
+    n = okc and tonumber(clean(n)) or 0
+    if n > 0 then
+      local list = {}
+      for i = 1, n do
+        local ok, typ, who, amount, y, mo, d, h = pcall(GetGuildBankMoneyTransaction, i)
+        if ok and typ then list[#list + 1] = { t = clean(typ), who = clean(who), money = tonumber(clean(amount)) or 0, at = when(y, mo, d, h), i = i } end
+      end
+      log.money = list
+    end
+  end
+  g.log = log
+  if S.BiBRefreshGuildLog then S.BiBRefreshGuildLog() end
+end
+local logPending = false
+S:On("GUILDBANKLOG_UPDATE", function()
+  if not guildOpen or logPending then return end
+  logPending = true
+  C_Timer.After(0.5, function() logPending = false; pcall(recordGuildLog) end)
+end)
+
+local guildPending = false
+local function guildSoon()
+  if not guildOpen or guildPending then return end
+  guildPending = true
+  C_Timer.After(0.6, function() guildPending = false; recordGuild() end)
+end
+local function guildOpened()
+  guildOpen, guildLoaded = true, false
+  pcall(function()
+    local n = GetNumGuildBankTabs and GetNumGuildBankTabs() or 0
+    for tab = 1, n do if QueryGuildBankTab then QueryGuildBankTab(tab) end end
+  end)
+  pcall(function()
+    local n = GetNumGuildBankTabs and GetNumGuildBankTabs() or 0
+    if QueryGuildBankLog then
+      for tab = 1, n do QueryGuildBankLog(tab) end
+      QueryGuildBankLog(MONEY_TAB)
+    end
+  end)
+  C_Timer.After(1.5, function() if guildOpen then guildLoaded = true; recordGuild(); pcall(recordGuildLog) end end)
+end
+S:On("GUILDBANKFRAME_OPENED", guildOpened)
+S:On("GUILDBANKFRAME_CLOSED", function() guildOpen = false end)
+S:On("PLAYER_INTERACTION_MANAGER_FRAME_SHOW", function(_, kind)   -- (handlers get the event name first)
+  local gb = Enum and Enum.PlayerInteractionType and Enum.PlayerInteractionType.GuildBanker
+  if gb and kind == gb then guildOpened() end
+end)
+S:On("PLAYER_INTERACTION_MANAGER_FRAME_HIDE", function(_, kind)
+  local gb = Enum and Enum.PlayerInteractionType and Enum.PlayerInteractionType.GuildBanker
+  if gb and kind == gb then guildOpen = false end
+end)
+S:On("GUILDBANKBAGSLOTS_CHANGED", guildSoon)
+S:On("GUILDBANK_UPDATE_MONEY", guildSoon)
+
+-- the records the Bank window shows for one character (or "account")
+local function bankRecords(who)
+  local st = bankStore()
+  local src
+  if who == "account" then src = st.account
+  elseif type(who) == "string" and who:find("^guild:") then src = st.guilds[who:sub(7)]
+  elseif type(who) == "string" and who:find("^bags:") then src = st.chars[who:sub(6)]; src = src and src.inv
+  else src = st.chars[who or charKey() or ""]; if src and not src.bags then src = nil end end
+  local list, total, used, empties = {}, 0, 0, {}
+  if not src then return list, 0, 0, nil, empties end
+  for bi, bag in ipairs(src.bags or {}) do
+   if bag.bag ~= KEYRING_ID or type(who) == "string" and who:find("^guild:") then
+    total = total + (bag.n or 0)
+    for slot = 1, bag.n or 0 do
+      local it = bag.items and bag.items[slot]
+      if not it then
+        empties[#empties + 1] = { bag = bi, slot = slot, bagName = bag.name, empty = true, family = 0, kind = "saved" }
+      else
+        used = used + 1
+        local r = { bag = bi, slot = slot, bagName = bag.name, id = it.id, link = it.link, count = it.count or 1, icon = it.icon,
+          quality = it.q, bound = it.b }
+        itemData(r)
+        if not r.icon and r.id and GetItemIcon then local ok, t = pcall(GetItemIcon, r.id); if ok then r.icon = t end end
+        r.quality = r.quality or 1
+        r.quest = r.classID == 12
+        r.cat = category(r, cfg(), true)
+        list[#list + 1] = r
+      end
+    end
+   end
+  end
+  return list, total, used, src, empties
+end
+S.BiBBankRecords = bankRecords
+
+local function ago(t)
+  if not t then return "never" end
+  local d = time() - t
+  if d < 90 then return "just now" end
+  if d < 3600 then return math.floor(d / 60) .. " min ago" end
+  if d < 86400 * 2 then return math.floor(d / 3600) .. " h ago" end
+  return math.floor(d / 86400) .. " days ago"
+end
+S.BiBAgo = ago
+
+local function whoLabel(who)
+  if who == "account" then return "Warband bank" end
+  if type(who) == "string" and who:find("^guild:") then return "|cff40ff40" .. who:sub(7) .. "|r guild bank" end
+  if type(who) == "string" and who:find("^bags:") then who = who:sub(6) end
+  local r = bankStore().chars[who]
+  local hex = S.ClassHex and S.ClassHex(r and r.class) or "ffffff"
+  return "|cff" .. hex .. (S.Short and S.Short(who) or who) .. "|r"
+end
+
+---------------------------------------------------------------------------
+-- Bank view settings (its own sorting, separate from the bags) and boxes:
+-- your own groups (sets, mats, collectables...) shown as a bordered box in the
+-- bank or on a tab of their own, so they don't mingle with the rest.
+---------------------------------------------------------------------------
+local TAB_H = 24
+local unpack = unpack or table.unpack
+local BANK_DEF = { sort = "type", desc = false, group = "sections", tab = "main", free = "one" }
+-- guild banks have their own sorting, boxes, tabs and tracked items (separate from yours)
+local function isGuildView() return type(bankView) == "string" and bankView:find("^guild:") ~= nil end
+S.BiBBankIsGuildView = isGuildView
+-- Each character (and the warband bank) has its own boxes, tracked items and bank
+-- sorting: cfg().charBank[key] = { view, boxes, track }. The boxes / tracked items made
+-- before rev 20 (one set for everyone) went to the character you were playing then.
+local function ownerKey()
+  local who = bankView
+  if who == nil then return charKey() or "?" end
+  if who:find("^bags:") then return who:sub(6) end
+  return who                                   -- another character's key, or "account"
+end
+S.BiBBankOwner = ownerKey
+local function perChar(key)
+  local c = cfg()
+  c.charBank = type(c.charBank) == "table" and c.charBank or {}
+  local me = charKey()
+  if me and not c.charBankMoved then
+    c.charBankMoved = true
+    if not c.charBank[me] then c.charBank[me] = { view = c.bankView, boxes = c.bankBoxes, track = c.bankTrack } end
+  end
+  local r = c.charBank[key]
+  if type(r) ~= "table" then r = {}; c.charBank[key] = r end
+  if type(r.view) ~= "table" then
+    -- a character seen for the first time starts with your sorting (not your boxes)
+    r.view = {}
+    local base = me and c.charBank[me] and c.charBank[me].view
+    if type(base) == "table" and base ~= r.view then for k, v in pairs(base) do if k ~= "tabOrder" and k ~= "tab" then r.view[k] = v end end end
+  end
+  r.boxes = type(r.boxes) == "table" and r.boxes or {}
+  r.track = type(r.track) == "table" and r.track or {}
+  return r
+end
+S.BiBPerChar = perChar
+local function bcfg()
+  local c = cfg()
+  local vk, bk = "view", "boxes"
+  if isGuildView() then vk, bk = "gbankView", "gbankBoxes" else c = perChar(ownerKey()) end
+  c[vk] = type(c[vk]) == "table" and c[vk] or {}
+  for k, v in pairs(BANK_DEF) do if c[vk][k] == nil then c[vk][k] = v end end
+  c[bk] = type(c[bk]) == "table" and c[bk] or {}
+  for _, bx in ipairs(c[bk]) do
+    bx.items = type(bx.items) == "table" and bx.items or {}
+    bx.out = type(bx.out) == "table" and bx.out or {}
+    bx.color = type(bx.color) == "table" and bx.color or { 0.9, 0.75, 0.3 }
+    bx.mode = bx.mode == "tab" and "tab" or "box"
+  end
+  return c[vk], c[bk]
+end
+S.BiBBankView = bcfg
+
+local BOX_COLORS = {
+  { "Gold", { 0.9, 0.75, 0.3 } }, { "Green", { 0.3, 0.8, 0.4 } }, { "Blue", { 0.3, 0.6, 1 } }, { "Purple", { 0.7, 0.4, 1 } },
+  { "Red", { 0.95, 0.35, 0.3 } }, { "Orange", { 1, 0.55, 0.15 } }, { "Teal", { 0.2, 0.8, 0.8 } }, { "Grey", { 0.6, 0.6, 0.6 } },
+}
+local GROUPS = {
+  { value = "sections", text = "Sections (equipment, trade goods...)", tip = "The same sections as your bags." },
+  { value = "bag", text = "One section per bank bag" },
+  { value = "none", text = "No sections - one grid" },
+}
+
+-- items that are in one of your equipment sets
+local setItems, setItemsAt = {}, 0
+local function inSet(id)
+  if not id then return false end
+  if GetTime() - setItemsAt > 5 then
+    setItemsAt = GetTime(); wipe(setItems)
+    pcall(function()
+      local ES = C_EquipmentSet
+      if not (ES and ES.GetEquipmentSetIDs and ES.GetItemIDs) then return end
+      for _, sid in ipairs(ES.GetEquipmentSetIDs() or {}) do
+        for _, iid in pairs(ES.GetItemIDs(sid) or {}) do if type(iid) == "number" and iid > 0 then setItems[iid] = true end end
+      end
+    end)
+  end
+  return setItems[id] and true or false
+end
+local function isToy(id)
+  if not (id and C_ToyBox and C_ToyBox.GetToyInfo) then return false end
+  local ok, tid = pcall(C_ToyBox.GetToyInfo, id)
+  return ok and tid ~= nil
+end
+
+local RULES = {
+  { value = "", text = "Only the items I put in" },
+  { value = "mats", text = "Crafting materials", tip = "Trade goods and reagents.", test = function(r) return r.classID == 7 or r.classID == 5 end },
+  { value = "sets", text = "Gear from my equipment sets", tip = "Items saved in any of your equipment sets (character window).", test = function(r) return inSet(r.id) end },
+  { value = "collect", text = "Collectables", tip = "Pets, mounts, toys and cosmetic items.",
+    test = function(r) return r.classID == 17 or (r.classID == 15 and (r.subID == 2 or r.subID == 5)) or (r.classID == 4 and r.subID == 5) or isToy(r.id) end },
+  { value = "gear", text = "All weapons and armour", test = function(r) return r.classID == 2 or r.classID == 4 end },
+  { value = "cons", text = "Consumables", test = function(r) return r.classID == 0 end },
+  { value = "quest", text = "Quest items", test = function(r) return r.classID == 12 or r.quest end },
+  { value = "recipe", text = "Recipes", test = function(r) return r.classID == 9 end },
+  { value = "name", text = "Name contains...", tip = "Every item whose name has the words you type.",
+    test = function(r, bx) local t = (bx.text or ""):lower(); return t ~= "" and r.name and r.name:lower():find(t, 1, true) ~= nil end },
+}
+local RULE = {}
+for _, x in ipairs(RULES) do RULE[x.value] = x end
+S.BiBBankRules = RULES
+
+local function boxOf(r, boxes)
+  if not r.id then return nil end
+  for _, bx in ipairs(boxes) do if bx.items[r.id] then return bx end end
+  for _, bx in ipairs(boxes) do
+    local rule = RULE[bx.rule or ""]
+    if rule and rule.test and not bx.out[r.id] then
+      local ok, hit = pcall(rule.test, r, bx)
+      if ok and hit then return bx end
+    end
+  end
+end
+S.BiBBankBoxOf = function(r) local _, boxes = bcfg(); return boxOf(r, boxes) end
+
+local function newBox(name, firstItem)
+  local c = cfg(); local _, boxes = bcfg()
+  c.bankBoxNext = (tonumber(c.bankBoxNext) or 0) + 1
+  local bx = { id = c.bankBoxNext, name = name, color = { unpack(BOX_COLORS[((c.bankBoxNext - 1) % #BOX_COLORS) + 1][2]) }, mode = "box", rule = "", items = {}, out = {} }
+  if firstItem then bx.items[firstItem] = true end
+  boxes[#boxes + 1] = bx
+  return bx
+end
+S.BiBBankNewBox = newBox
+local function putIn(id, bx)
+  local _, boxes = bcfg()
+  for _, b in ipairs(boxes) do b.items[id] = nil end
+  if bx then bx.items[id] = true; bx.out[id] = nil end
+end
+S.BiBBankPutIn = putIn
+local function takeOut(id, bx)
+  bx.items[id] = nil
+  local rule = RULE[bx.rule or ""]
+  if rule and rule.test then bx.out[id] = true end
+end
+S.BiBBankTakeOut = takeOut
+
+local function hexOf(col) return string.format("%02x%02x%02x", math.floor(col[1] * 255), math.floor(col[2] * 255), math.floor(col[3] * 255)) end
+local function boxLabel(bx) return "|cff" .. hexOf(bx.color) .. (bx.name or "Box") .. "|r" end
+
+-- the sections for a list of items, with the bank view's own sorting
+local function groupItems(items, v, c)
+  local vc = {}
+  for k, x in pairs(c) do vc[k] = x end
+  vc.sort, vc.desc = v.sort, v.desc
+  vc.split, vc.reagentSplit, vc.empty = false, false, "none"
+  if v.group == "sections" then vc.group = true; return sections(items, vc) end
+  local out, by = {}, {}
+  for _, r in ipairs(items) do
+    local k = v.group == "bag" and r.bag or 0
+    local s = by[k]
+    if not s then s = { id = k, name = v.group == "bag" and (r.bagName or "Bank") or "", rank = k, items = {} }; by[k] = s; out[#out + 1] = s end
+    s.items[#s.items + 1] = r
+  end
+  table.sort(out, function(a, b) return a.rank < b.rank end)
+  for _, s in ipairs(out) do table.sort(s.items, function(a, b) return less(a, b, vc) end) end
+  return out
+end
+
+local bankBtns, bankHeads, bankBoxFrames, bankTabs = {}, {}, {}, {}
+local itemMenu
+
+-- Dragging items onto boxes and tabs. At the banker the game picks the item up
+-- (the cursor holds it); away from the bank BiB drags a picture of it. Either way,
+-- dropping it on a box or a tab only files it there - nothing moves in the bank
+-- (at the banker the item goes straight back to its slot).
+local vdrag, floater, lastDragKey
+local function dragId()
+  if vdrag then return vdrag.id end
+  local kind, id; if GetCursorInfo then kind, id = GetCursorInfo() end
+  if kind == "item" and id then return id end
+end
+S.BiBBankDragId = dragId
+local function boxOfId(id)
+  if not id then return nil end
+  local _, boxes = bcfg()
+  local r = { id = id }
+  itemData(r); r.quest = r.classID == 12
+  return boxOf(r, boxes)
+end
+local function endDrag()
+  vdrag = nil
+  if floater then floater:Hide() end
+end
+local function dropInto(bx, out)
+  local id = dragId()
+  if not id then return false end
+  local _, boxes = bcfg()
+  if bx then putIn(id, bx) elseif out then for _, b in ipairs(boxes) do takeOut(id, b) end end
+  if not vdrag and ClearCursor then ClearCursor() end      -- the item goes back to its own slot
+  endDrag()
+  lastDragKey = nil
+  S:RefreshBiBBank()
+  return true
+end
+S.BiBBankDropInto = dropInto
+local function showFloater(icon)
+  if not floater then
+    floater = CreateFrame("Frame", nil, UIParent)
+    floater:SetFrameStrata("TOOLTIP"); floater:SetSize(34, 34)
+    floater.icon = floater:CreateTexture(nil, "ARTWORK"); floater.icon:SetAllPoints(); floater.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+    floater:SetScript("OnUpdate", function(self)
+      local x, y = GetCursorPosition()
+      local sc = UIParent:GetEffectiveScale()
+      self:ClearAllPoints(); self:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x / sc + 10, y / sc - 10)
+    end)
+  end
+  floater.icon:SetTexture(icon or QMARK); floater:SetAlpha(0.85); floater:Show()
+end
+-- light up the places an item can be dropped while one is being dragged
+local function updateDrag(force)
+  if not bankWin or not bankWin:IsShown() then return end
+  local id = dragId()
+  local key = tostring(id)
+  if key == lastDragKey and not force then return end
+  lastDragKey = key
+  local th = UI:Theme()
+  for _, f in ipairs(bankBoxFrames) do
+    if f.catch then
+      if id and f:IsShown() and f.box then
+        local col = f.box.color
+        f.catch.fill:SetColorTexture(col[1], col[2], col[3], 0.22)
+        f.catch.text:SetText("Drop to put it in " .. boxLabel(f.box))
+        f.catch:Show()
+      else f.catch:Hide() end
+    end
+  end
+  for _, t in ipairs(bankTabs) do
+    if t.glow then
+      local col = t.tabBox and t.tabBox.color or th.gold
+      t.glow:SetColorTexture(col[1], col[2], col[3], 0.3)
+      t.glow:SetShown(id ~= nil and t:IsShown())
+    end
+  end
+  local outOn = id ~= nil and boxOfId(id) ~= nil
+  local trackOn = id ~= nil and not S.BiBIsTracked(id, isGuildView())
+  if bankWin.outCatch then
+    local oc = bankWin.outCatch
+    oc:ClearAllPoints(); oc:SetPoint("BOTTOMRIGHT", -6, 4); oc:SetHeight(FOOT)
+    if trackOn then oc:SetPoint("LEFT", bankWin, "BOTTOM", 2, 0) else oc:SetPoint("LEFT", bankWin, "BOTTOMLEFT", 6, 0) end
+    oc:SetShown(outOn)
+  end
+  if bankWin.trackCatch then
+    local tc = bankWin.trackCatch
+    tc:ClearAllPoints(); tc:SetPoint("BOTTOMLEFT", 6, 4); tc:SetHeight(FOOT)
+    if outOn then tc:SetPoint("RIGHT", bankWin, "BOTTOM", -2, 0) else tc:SetPoint("RIGHT", bankWin, "BOTTOMRIGHT", -6, 0) end
+    tc:SetShown(trackOn)
+  end
+end
+local function bankButton(i)
+  local b = bankBtns[i]
+  if b then return b end
+  b = CreateFrame("Button", nil, bankWin.child)
+  b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+  b.bg = b:CreateTexture(nil, "BACKGROUND"); b.bg:SetAllPoints()
+  b.icon = b:CreateTexture(nil, "ARTWORK"); b.icon:SetPoint("TOPLEFT", 1, 1); b.icon:SetPoint("BOTTOMRIGHT", -1, -1)
+  b.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+  b.edge = {}
+  for k, pts in pairs({ t = { "TOPLEFT", "TOPRIGHT" }, bo = { "BOTTOMLEFT", "BOTTOMRIGHT" }, l = { "TOPLEFT", "BOTTOMLEFT" }, r = { "TOPRIGHT", "BOTTOMRIGHT" } }) do
+    local e = b:CreateTexture(nil, "OVERLAY")
+    e:SetPoint(pts[1]); e:SetPoint(pts[2])
+    if k == "t" or k == "bo" then e:SetHeight(1) else e:SetWidth(1) end
+    b.edge[k] = e
+  end
+  b.count = b:CreateFontString(nil, "OVERLAY", "NumberFontNormal"); b.count:SetPoint("BOTTOMRIGHT", -2, 2)
+  b.dim = b:CreateTexture(nil, "OVERLAY", nil, 2); b.dim:SetAllPoints(); b.dim:SetColorTexture(0, 0, 0, 0.7); b.dim:Hide()
+  b.hl = b:CreateTexture(nil, "HIGHLIGHT"); b.hl:SetAllPoints(); b.hl:SetColorTexture(1, 1, 1, 0.15)
+  b:SetScript("OnEnter", function(self)
+    local r = self.rec; if not r then return end
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    if r.empty then
+      GameTooltip:AddLine((r.freeCount or 0) > 1 and (r.freeCount .. " free slots") or "Free slot")
+      if r.bagName and (r.freeCount or 0) <= 1 then GameTooltip:AddLine("|cff888888" .. r.bagName .. "|r") end
+      GameTooltip:Show()
+      return
+    end
+    local ok = r.link and pcall(GameTooltip.SetHyperlink, GameTooltip, r.link)
+    if not ok and r.id and GameTooltip.SetItemByID then ok = pcall(GameTooltip.SetItemByID, GameTooltip, r.id) end
+    if not ok then GameTooltip:AddLine(r.name or "?") end
+    GameTooltip:AddLine("|cff888888In the bank" .. (r.bagName and (" - " .. r.bagName) or "") .. (r.count > 1 and (" - " .. r.count) or "") .. "|r")
+    if r.box then GameTooltip:AddLine("|cff888888Box: |r" .. boxLabel(r.box)) end
+    GameTooltip:AddLine("|cff888888Drag onto a box or tab - or right-click - to file it|r")
+    GameTooltip:Show()
+  end)
+  b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+  b:RegisterForDrag("LeftButton")
+  b:SetScript("OnDragStart", function(self)
+    local r = self.rec; if not (r and r.id) then return end
+    vdrag = r; showFloater(r.icon); GameTooltip:Hide(); updateDrag(true)
+  end)
+  b:SetScript("OnDragStop", function()
+    if not vdrag then return end
+    local target, out
+    for _, f in ipairs(bankBoxFrames) do if f:IsShown() and f.box and f:IsMouseOver() then target = f.box end end
+    if not target then
+      for _, t in ipairs(bankTabs) do if t:IsShown() and t:IsMouseOver() then if t.tabBox then target = t.tabBox else out = true end end end
+    end
+    if not target and not out and bankWin.outCatch and bankWin.outCatch:IsShown() and bankWin.outCatch:IsMouseOver() then out = true end
+    if target or out then dropInto(target, out) else endDrag(); updateDrag(true) end
+  end)
+  b:SetScript("OnClick", function(self, btn)
+    local r = self.rec; if not r or r.empty then return end
+    if btn == "RightButton" then itemMenu(self, r) return end
+    if not r.link then return end
+    if IsModifiedClick and IsModifiedClick("CHATLINK") and ChatEdit_InsertLink then ChatEdit_InsertLink(r.link)
+    elseif IsModifiedClick and IsModifiedClick("DRESSUP") and DressUpItemLink then DressUpItemLink(r.link) end
+  end)
+  bankBtns[i] = b
+  return b
+end
+-- at the banker: the game's own bag-slot buttons, so items can be moved, dragged,
+-- right-clicked into your bags... exactly like the game's bank
+local liveBtns, bankHolders = {}, {}
+local function bankHolder(bag)
+  local h = bankHolders[bag]
+  if not h then
+    h = CreateFrame("Frame", "CC_BiBBankBag" .. (bag < 0 and ("M" .. -bag) or bag), bankWin.child)
+    h:SetID(bag); h:SetSize(1, 1); h:SetPoint("TOPLEFT")
+    bankHolders[bag] = h
+  end
+  return h
+end
+local function invSlotFor(bag, slot)
+  if bag == (BANK_CONTAINER or -1) and BankButtonIDToInvSlotID then return BankButtonIDToInvSlotID(slot) end
+  if REAGENTBANK_CONTAINER and bag == REAGENTBANK_CONTAINER and ReagentBankButtonIDToInvSlotID then return ReagentBankButtonIDToInvSlotID(slot) end
+end
+local function liveButton(bag, slot)
+  local key = bag .. ":" .. slot
+  local b = liveBtns[key]
+  if b then return b end
+  b = makeButton(bag, slot, bankHolder(bag))
+  b:HookScript("OnEnter", function(self)
+    if not self.hasItem then return end
+    local inv = invSlotFor(self.bag, self.slot)
+    if inv and GameTooltip.SetInventoryItem and (not GameTooltip:IsShown() or (GameTooltip.NumLines and GameTooltip:NumLines() == 0)) then
+      GameTooltip:SetOwner(self, "ANCHOR_RIGHT"); pcall(GameTooltip.SetInventoryItem, GameTooltip, "player", inv)
+    end
+    if GameTooltip:IsShown() and (not GameTooltip.IsOwned or GameTooltip:IsOwned(self)) then
+      local r = self.rec
+      if r and r.box then GameTooltip:AddLine("|cff888888Box: |r" .. boxLabel(r.box)) end
+      GameTooltip:AddLine("|cff888888Drag onto a box or tab - or Ctrl+right-click - to file it|r")
+      GameTooltip:Show()
+    end
+  end)
+  b:HookScript("OnClick", function(self, btn)
+    if btn == "RightButton" and IsControlKeyDown and IsControlKeyDown() and self.rec and not self.rec.empty then itemMenu(self, self.rec) end
+  end)
+  liveBtns[key] = b
+  return b
+end
+S.BiBBankLiveButtons = liveBtns
+
+-- what the bank holds right now (only while you're at the banker)
+local function liveRecords()
+  local c = cfg()
+  local list, empties, total, used = {}, {}, 0, 0
+  for _, e in ipairs(bankBags()) do
+    local n = numSlots(e.bag)
+    if n > 0 then
+      local fam = bagFamily(e.bag)
+      local bname = e.name or bagName(e.bag)
+      for slot = 1, n do
+        total = total + 1
+        local r = { bag = e.bag, slot = slot, family = fam, kind = e.kind, bagName = bname, live = true }
+        local info = slotInfo(e.bag, slot)
+        if info and (info.link or info.id or info.icon) then
+          for k, x in pairs(info) do r[k] = x end
+          r.count = tonumber(r.count) or 1
+          itemData(r)
+          r.quality = r.quality or 1
+          r.quest, r.questStart = questInfo(e.bag, slot)
+          r.cat = category(r, c, true)
+          used = used + 1
+          list[#list + 1] = r
+        else
+          r.empty = true; r.cat = "empty"
+          empties[#empties + 1] = r
+        end
+      end
+    end
+  end
+  return list, empties, total, used
+end
+S.BiBBankLive = liveRecords
+
+local function bankHeader(i)
+  local h = bankHeads[i]
+  if not h then h = UI:Text(bankWin.child, "", "small"); bankHeads[i] = h end
+  return h
+end
+local function boxFrame(i)
+  local f = bankBoxFrames[i]
+  if not f then
+    f = CreateFrame("Frame", nil, bankWin.child)
+    edgeLines(f)
+    f.fill = f:CreateTexture(nil, "BACKGROUND", nil, -8); f.fill:SetAllPoints()
+    f.title = UI:Text(f, "", "small"); f.title:SetPoint("TOPLEFT", 6, -4)
+    f:SetFrameLevel(bankWin.child:GetFrameLevel())
+    -- drop an item from the cursor on a box: it goes in that box (nothing moves in the bank)
+    f:EnableMouse(true)
+    local function drop(self)
+      local kind, id; if GetCursorInfo then kind, id = GetCursorInfo() end
+      if kind == "item" and id and self.box then putIn(id, self.box); if ClearCursor then ClearCursor() end; S:RefreshBiBBank() end
+    end
+    f:SetScript("OnReceiveDrag", drop)
+    f:SetScript("OnMouseUp", drop)
+    -- while an item is dragged the whole box turns into a drop target (above its slots)
+    local cb = CreateFrame("Button", nil, bankWin.child)
+    cb:SetAllPoints(f); cb:SetFrameLevel(bankWin.child:GetFrameLevel() + 20)
+    cb.fill = cb:CreateTexture(nil, "OVERLAY"); cb.fill:SetAllPoints()
+    cb.text = UI:Text(cb, "", "normal", "CENTER"); cb.text:SetPoint("CENTER")
+    cb:RegisterForClicks("LeftButtonUp")
+    cb:SetScript("OnReceiveDrag", function() dropInto(f.box) end)
+    cb:SetScript("OnClick", function() dropInto(f.box) end)
+    cb:Hide()
+    f.catch = cb
+    bankBoxFrames[i] = f
+  end
+  return f
+end
+-- Tab order: your own (cfg().bankView.tabOrder = list of "main" / box ids), changed by
+-- dragging a tab along the row. Separate from box order (which decides priority).
+local function sortTabs(tabs, v)
+  local rank = {}
+  for i, k in ipairs(type(v.tabOrder) == "table" and v.tabOrder or {}) do rank[k] = i end
+  for i, t in ipairs(tabs) do t.pos = i end
+  table.sort(tabs, function(a, b)
+    local ra, rb = rank[a.key] or (1000 + a.pos), rank[b.key] or (1000 + b.pos)
+    if ra ~= rb then return ra < rb end
+    return a.pos < b.pos
+  end)
+end
+-- move the tab `key` to place `to` (1 = first) among the tabs shown now (`keys`, in order)
+local function moveTab(key, to, keys)
+  local v = bcfg()
+  local list = {}
+  for _, k in ipairs(keys) do if k ~= key then list[#list + 1] = k end end
+  to = math.max(1, math.min(#list + 1, to))
+  table.insert(list, to, key)
+  -- keep the places of tabs that aren't shown right now (boxes switched to "box")
+  for _, k in ipairs(type(v.tabOrder) == "table" and v.tabOrder or {}) do
+    local seen = false
+    for _, x in ipairs(list) do if x == k then seen = true break end end
+    if not seen then list[#list + 1] = k end
+  end
+  v.tabOrder = list
+end
+S.BiBBankMoveTab = moveTab
+S.BiBBankSortTabs = sortTabs
+
+local tabDrag, tabMarker
+local function shownTabs()
+  local out = {}
+  for _, t in ipairs(bankTabs) do if t:IsShown() then out[#out + 1] = t end end
+  -- reading order: row by row from the top, left to right
+  table.sort(out, function(a, b)
+    local ta, tb = math.floor((a:GetTop() or 0) + 0.5), math.floor((b:GetTop() or 0) + 0.5)
+    if ta ~= tb then return ta > tb end
+    return (a:GetLeft() or 0) < (b:GetLeft() or 0)
+  end)
+  return out
+end
+-- where the dragged tab would land, from the mouse position
+local function tabDropIndex()
+  local cx0, cy0 = GetCursorPosition()
+  local sc = bankWin:GetEffectiveScale()
+  local x, y = cx0 / sc, cy0 / sc
+  local idx = 1
+  for _, t in ipairs(shownTabs()) do
+    if t ~= tabDrag then
+      local cx = t:GetCenter()
+      local tp, bt = t:GetTop(), t:GetBottom()
+      -- the tab comes before the drop spot if it's on a row above the mouse,
+      -- or on the mouse's row and left of it
+      if tp and bt and cx then
+        if y < bt - 2 then idx = idx + 1
+        elseif y <= tp + 2 and x > cx then idx = idx + 1 end
+      end
+    end
+  end
+  return idx
+end
+local function placeMarker()
+  if not tabDrag then return end
+  local idx, list = tabDropIndex(), {}
+  for _, t in ipairs(shownTabs()) do if t ~= tabDrag then list[#list + 1] = t end end
+  tabMarker:ClearAllPoints()
+  if list[idx] then tabMarker:SetPoint("RIGHT", list[idx], "LEFT", -1, 0)
+  elseif list[#list] then tabMarker:SetPoint("LEFT", list[#list], "RIGHT", 1, 0)
+  else tabMarker:SetPoint("LEFT", tabDrag, "LEFT", 0, 0) end
+end
+local function startTabDrag(t)
+  if dragId() or not t.tabKey then return end
+  tabDrag = t
+  t:SetAlpha(0.45)
+  if not tabMarker then
+    tabMarker = CreateFrame("Frame", nil, bankWin)
+    tabMarker:SetSize(3, 24); tabMarker:SetFrameLevel(bankWin:GetFrameLevel() + 40)
+    tabMarker.tex = tabMarker:CreateTexture(nil, "OVERLAY"); tabMarker.tex:SetAllPoints()
+    tabMarker:SetScript("OnUpdate", function() placeMarker() end)
+  end
+  local g = UI:Theme().gold
+  tabMarker.tex:SetColorTexture(g[1], g[2], g[3], 1)
+  tabMarker:Show(); placeMarker()
+end
+local function stopTabDrag()
+  local t = tabDrag
+  if not t then return end
+  tabDrag = nil
+  t:SetAlpha(1)
+  t.justDragged = GetTime()
+  if tabMarker then tabMarker:Hide() end
+  local idx = tabDropIndex()
+  local keys = {}
+  for _, b in ipairs(shownTabs()) do keys[#keys + 1] = b.tabKey end
+  moveTab(t.tabKey, idx, keys)
+  S:RefreshBiBBank()
+end
+
+---------------------------------------------------------------------------
+-- Tracked items: how many you have, along the bottom of the bank window.
+-- Added with ItemMenu ("Track in BiB's bank" - only when BiB is on), the bank's own
+-- right-click menu, or by dropping an item on the bottom of the window.
+---------------------------------------------------------------------------
+local TRACK_CELL, TRACK_ROW = 72, 26
+-- guild = true: the guild bank's own list (the window passes isGuildView(); ItemMenu = yours)
+local function trackList(guild)
+  local c = cfg()
+  if not guild then
+    -- the character whose bank / bags the window shows; you, when it's closed (ItemMenu)
+    return perChar((bankWin and bankWin:IsShown()) and ownerKey() or (charKey() or "?")).track
+  end
+  c.gbankTrack = type(c.gbankTrack) == "table" and c.gbankTrack or {}
+  return c.gbankTrack
+end
+function S.BiBIsTracked(id, guild)
+  id = tonumber(id)
+  for _, x in ipairs(trackList(guild)) do if x == id then return true end end
+  return false
+end
+function S.BiBTrack(id, on, guild)
+  id = tonumber(id); if not id then return end
+  local l = trackList(guild)
+  for i = #l, 1, -1 do if l[i] == id then table.remove(l, i) end end
+  if on ~= false then l[#l + 1] = id end
+  if bankWin and bankWin:IsShown() then S:RefreshBiBBank() end
+end
+local function moveTracked(id, d)
+  local l = trackList(isGuildView())
+  for i, x in ipairs(l) do
+    if x == id then
+      local j = math.max(1, math.min(#l, i + d))
+      table.remove(l, i); table.insert(l, j, id)
+      break
+    end
+  end
+  S:RefreshBiBBank()
+end
+local function bagCount(id)
+  local f = (C_Item and C_Item.GetItemCount) or GetItemCount
+  if not f then return 0 end
+  local ok, n = pcall(f, id, false)
+  return ok and tonumber(clean(n)) or 0
+end
+-- every saved bank that holds the item: { {label, count} }
+local function savedCounts(id)
+  local out, st = {}, bankStore()
+  local function add(label, src)
+    local n = 0
+    for _, bag in ipairs(src.bags or {}) do for _, it in pairs(bag.items or {}) do if it.id == id then n = n + (it.count or 1) end end end
+    if n > 0 then out[#out + 1] = { label, n } end
+  end
+  local keys = {}
+  for k in pairs(st.chars) do keys[#keys + 1] = k end
+  table.sort(keys)
+  for _, k in ipairs(keys) do add(whoLabel(k), st.chars[k]) end
+  if st.account then add("Warband bank", st.account) end
+  for gname, g in pairs(st.guilds) do add("|cff40ff40" .. gname .. "|r guild bank", g) end
+  return out
+end
+S.BiBSavedCounts = savedCounts
+local function itemIcon(id)
+  if GetItemIcon then local ok, t = pcall(GetItemIcon, id); if ok and t then return t end end
+  if GIII then local ok, _, _, _, _, t = pcall(GIII, id); if ok and t then return t end end
+  return QMARK
+end
+local function dropTrack()
+  local id = dragId()
+  if not id then return end
+  S.BiBTrack(id, true, isGuildView())
+  if not vdrag and ClearCursor then ClearCursor() end
+  endDrag(); lastDragKey = nil
+  S:RefreshBiBBank()
+end
+
+local trackCells = {}
+local function trackCell(i)
+  local b = trackCells[i]
+  if b then return b end
+  b = CreateFrame("Button", nil, bankWin.track)
+  b:SetSize(TRACK_CELL - 4, 24)
+  b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+  b.icon = b:CreateTexture(nil, "ARTWORK"); b.icon:SetSize(22, 22); b.icon:SetPoint("LEFT", 1, 0); b.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+  b.num = UI:Text(b, "", "normal"); b.num:SetPoint("LEFT", b.icon, "RIGHT", 3, 0)
+  b.hl = b:CreateTexture(nil, "HIGHLIGHT"); b.hl:SetAllPoints(); b.hl:SetColorTexture(1, 1, 1, 0.08)
+  b:SetScript("OnEnter", function(self)
+    GameTooltip:SetOwner(self, "ANCHOR_TOP")
+    if not pcall(GameTooltip.SetItemByID, GameTooltip, self.id) then GameTooltip:AddLine("Item " .. self.id) end
+    GameTooltip:AddLine(" ")
+    GameTooltip:AddDoubleLine("In this bank", self.bankN, 1, 0.82, 0, 1, 1, 1)
+    if self.bagN then GameTooltip:AddDoubleLine("In your bags", self.bagN, 1, 0.82, 0, 1, 1, 1) end
+    for _, x in ipairs(savedCounts(self.id)) do GameTooltip:AddDoubleLine("|cff888888Bank:|r " .. x[1], x[2], 1, 1, 1, 0.8, 0.8, 0.8) end
+    GameTooltip:AddLine("|cff888888Right-click: stop tracking / move|r")
+    GameTooltip:Show()
+  end)
+  b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+  b:SetScript("OnReceiveDrag", function() dropTrack() end)
+  b:SetScript("OnClick", function(self, btn)
+    if dragId() then dropTrack() return end
+    local id = self.id
+    if btn == "RightButton" then
+      local nm = GII and select(1, GII(id)) or ("Item " .. id)
+      UI:Menu(self, {
+        { text = nm or ("Item " .. id), title = true },
+        { text = "Move left", func = function() moveTracked(id, -1) end },
+        { text = "Move right", func = function() moveTracked(id, 1) end },
+        { text = "Stop tracking", func = function() S.BiBTrack(id, false, isGuildView()) end },
+      })
+    elseif IsModifiedClick and IsModifiedClick("CHATLINK") and ChatEdit_InsertLink and GII then
+      local _, link = GII(id); if link then ChatEdit_InsertLink(link) end
+    end
+  end)
+  trackCells[i] = b
+  return b
+end
+-- lays out the strip; returns its height (0 when nothing is tracked)
+local function layoutTrack(bankCounts, isMe, w)
+  local l = trackList(isGuildView())
+  local strip = bankWin.track
+  for i = #l + 1, #trackCells do trackCells[i]:Hide() end
+  if #l == 0 then strip:Hide() return 0 end
+  -- each cell is only as wide as its icon + number (so the hover box hugs it)
+  local x, row = 0, 0
+  for i, id in ipairs(l) do
+    local b = trackCell(i)
+    b.id, b.bankN = id, bankCounts[id] or 0
+    b.bagN = isMe and bagCount(id) or nil
+    b.icon:SetTexture(itemIcon(id))
+    local total = b.bankN + (b.bagN or 0)
+    b.num:SetText(total > 0 and tostring(total) or "|cff7777770|r")
+    b.icon:SetDesaturated(total == 0)
+    local cw = 22 + 3 + math.ceil(tonumber(b.num:GetStringWidth()) or 12) + 4
+    b:SetSize(cw, 24)
+    if x > 0 and x + cw > w then x = 0; row = row + 1 end
+    b:ClearAllPoints(); b:SetPoint("TOPLEFT", strip, "TOPLEFT", x, -(4 + row * TRACK_ROW))
+    x = x + cw + 6
+    b:Show()
+  end
+  local h = (row + 1) * TRACK_ROW + 6
+  strip:SetHeight(h); strip:Show()
+  return h
+end
+
+-- ItemMenu: "Track in BiB's bank" - only offered while BiB is on (ItemMenu calls every
+-- function in S.ItemMenuExtras with its add() and the item when it builds its menu)
+S.ItemMenuExtras = S.ItemMenuExtras or {}
+table.insert(S.ItemMenuExtras, function(add, id)
+  id = tonumber(id)
+  if not (id and S.BiBIsOn and S:BiBIsOn()) then return end
+  local on = S.BiBIsTracked(id)
+  add({ text = on and "Stop tracking in BiB's bank" or "Track in BiB's bank", tip = "Shows how many you have (bank + bags) along the bottom of BiB's bank window.",
+    func = function() S.BiBTrack(id, not on); S:Print(on and "No longer tracked in BiB's bank." or "Tracked - see the bottom of BiB's bank window (/ccenter bank).") end })
+end)
+
+local function bankTab(i)
+  local t = bankTabs[i]
+  if not t then
+    t = UI:Button(bankWin, "", 80, 20, function(self)
+      if self.justDragged and GetTime() - self.justDragged < 0.3 then return end   -- the end of a tab drag isn't a click
+      -- an item on the cursor dropped on a tab goes in that box (or, on "Bank", out of its box)
+      if dragId() then dropInto(self.tabBox, not self.tabBox) return end
+      local v = bcfg(); v.tab = self.tabKey; S:RefreshBiBBank()
+    end)
+    t:SetScript("OnReceiveDrag", function(self) self:Click() end)
+    -- drag a tab along the row to change the order
+    t:RegisterForDrag("LeftButton")
+    t:SetScript("OnDragStart", function(self) startTabDrag(self) end)
+    t:SetScript("OnDragStop", function() stopTabDrag() end)
+    t:HookScript("OnEnter", function(self)
+      if dragId() then return end
+      GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+      GameTooltip:AddLine("Drag the tab left or right to change the order", 1, 1, 1)
+      GameTooltip:Show()
+    end)
+    t:HookScript("OnLeave", function() GameTooltip:Hide() end)
+    t.line = t:CreateTexture(nil, "OVERLAY"); t.line:SetPoint("BOTTOMLEFT", 2, -1); t.line:SetPoint("BOTTOMRIGHT", -2, -1); t.line:SetHeight(2)
+    t.glow = t:CreateTexture(nil, "OVERLAY", nil, 7); t.glow:SetAllPoints(); t.glow:SetBlendMode("ADD"); t.glow:Hide()
+    bankTabs[i] = t
+  end
+  return t
+end
+
+local function bankMatch(r)
+  local q = bankWin and bankWin.search and bankWin.search:GetText() or ""
+  q = q:lower():gsub("^%s+", ""):gsub("%s+$", "")
+  return q == "" or matches(r, q)
+end
+
+function S:RefreshBiBBank()
+  if not bankWin then return end
+  local c = cfg()
+  local v, boxes = bcfg()
+  local th = UI:Theme()
+  local who = bankView or charKey()
+  -- at the banker, your own bank is live (real slots you can use); anywhere else it's the saved copy
+  local live = bankOpen and who == charKey()
+  if live and combat() then bankWin.combatPending = true; return end
+  local list, total, used, src, empties
+  if live then list, empties, total, used = liveRecords(); src = { at = time() }
+  else list, total, used, src, empties = bankRecords(who) end
+  local pc = {}                          -- the look BiB's own slots are painted with
+  for k, x in pairs(c) do pc[k] = x end
+  pc.empty = v.free == "all" and "all" or "one"
+  local liveUsed = {}
+  missing = false
+  -- which box each item belongs to
+  local inBox, rest = {}, {}
+  for _, bx in ipairs(boxes) do inBox[bx] = {} end
+  for _, r in ipairs(list) do
+    local bx = boxOf(r, boxes)
+    r.box = bx
+    if bx then table.insert(inBox[bx], r) else rest[#rest + 1] = r end
+  end
+  -- tabs: Bank + every box shown on its own tab
+  local isBags = type(who) == "string" and who:find("^bags:") ~= nil
+  local tabs = { { key = "main", text = isBags and "Bags" or "Bank", n = #rest } }
+  for _, bx in ipairs(boxes) do
+    if bx.mode == "tab" then tabs[#tabs + 1] = { key = bx.id, text = boxLabel(bx), n = #inBox[bx], box = bx } end
+  end
+  sortTabs(tabs, v)
+  local active = tabs[1]
+  for _, t in ipairs(tabs) do if t.key == "main" then active = t end end
+  for _, t in ipairs(tabs) do if t.key == v.tab then active = t end end
+  v.tab = active.key
+  local showTabs = #tabs > 1
+  local tabBtns = {}                       -- placed further down, once the window width is known
+  for i, t in ipairs(tabs) do
+    local b = bankTab(i)
+    if showTabs then
+      b.tabKey = t.key; b.tabBox = t.box
+      local label = t.text .. " |cff888888" .. t.n .. "|r"
+      if b.SetText then b:SetText(label) end
+      local fs = b.GetFontString and b:GetFontString()
+      local w = math.max(50, ((fs and fs:GetStringWidth()) or 60) + 18)
+      b:SetSize(w, 20); b.tabW = w
+      tabBtns[#tabBtns + 1] = b
+      local col = t.box and t.box.color or th.gold
+      b.line:SetColorTexture(col[1], col[2], col[3], 1)
+      b.line:SetShown(t == active)
+      b:Show()
+    else b:Hide() end
+  end
+  for i = #tabs + 1, #bankTabs do bankTabs[i]:Hide() end
+
+  local size, sp = c.size, c.spacing
+  -- a window you sized yourself keeps its size: the columns follow its width
+  local sz = c.bankSize
+  local sizing = bankWin.sizing
+  local W = sizing and bankWin:GetWidth() or (type(sz) == "table" and tonumber(sz[1])) or nil
+  local H = sizing and bankWin:GetHeight() or (type(sz) == "table" and tonumber(sz[2])) or nil
+  local cols
+  if W then cols = math.max(4, math.floor((W - c.pad * 2 - 6 + sp) / (size + sp)))
+  else cols = math.max(BANK_COLS_MIN, c.cols) end
+  local fullW = cols * (size + sp) - sp
+  local winW = W or (fullW + c.pad * 2 + 6)
+  -- tabs wrap onto more rows when they don't fit across the window
+  local tabRows, tx = 0, 10
+  for _, b in ipairs(tabBtns) do
+    local w = b.tabW or 60
+    if tabRows == 0 or (tx > 10 and tx + w > winW - 10) then tabRows = tabRows + 1; tx = 10 end
+    b:ClearAllPoints(); b:SetPoint("TOPLEFT", bankWin, "TOPLEFT", tx, -(HEAD + SEARCH_H + 8 + (tabRows - 1) * TAB_H))
+    tx = tx + w + 4
+  end
+  local top = HEAD + SEARCH_H + 10 + tabRows * TAB_H
+  bankWin.scroll:ClearAllPoints()
+  bankWin.scroll:SetPoint("TOPLEFT", c.pad + 3, -top); bankWin.scroll:SetPoint("BOTTOMRIGHT", -(c.pad + 3), FOOT + 4)
+  local y, n, hn, bn = 0, 0, 0, 0
+  local drawn = 0                        -- every slot drawn (saved copy AND live slots at the banker)
+  local function drawGrid(secs, x0, showHeads)
+    for _, s in ipairs(secs) do
+      if showHeads and c.headers ~= false and s.name and s.name ~= "" and #secs > 1 then
+        hn = hn + 1
+        local h = bankHeader(hn)
+        h:ClearAllPoints(); h:SetPoint("TOPLEFT", x0, -y); h:SetText("|cff" .. hexOf(th.gold) .. s.name .. "|r"); h:Show()
+        y = y + HDR_H
+      end
+      for i, r in ipairs(s.items) do
+        local col, row = (i - 1) % cols, math.floor((i - 1) / cols)
+        drawn = drawn + 1
+        if r.live then
+          local b = liveButton(r.bag, r.slot)
+          liveUsed[b] = true
+          b:SetSize(size, size)
+          b:ClearAllPoints(); b:SetPoint("TOPLEFT", bankWin.child, "TOPLEFT", x0 + col * (size + sp), -(y + row * (size + sp)))
+          b:SetFrameLevel(bankWin.child:GetFrameLevel() + 3)
+          paint(b, r, pc)
+          b.bibDim:SetShown((not r.empty) and not bankMatch(r))
+          b:Show()
+        else
+        n = n + 1
+        local b = bankButton(n)
+        b.rec = r
+        b:SetSize(size, size)
+        b:ClearAllPoints(); b:SetPoint("TOPLEFT", x0 + col * (size + sp), -(y + row * (size + sp)))
+        b.bg:SetColorTexture(th.field[1], th.field[2], th.field[3], 0.85)
+        if r.empty then
+          -- a free slot (from the saved copy): empty, with a count when they're folded into one
+          b.icon:SetTexture(nil)
+          b.count:SetText(v.free == "one" and (r.freeCount or 0) > 1 and ("|cff888888" .. r.freeCount .. "|r") or "")
+          for _, e in pairs(b.edge) do e:SetColorTexture(th.edge[1], th.edge[2], th.edge[3], 0.5) end
+          b.dim:Hide()
+        else
+        b.icon:SetTexture(r.icon or QMARK)
+        b.count:SetText(r.count > 1 and (r.count > 9999 and (math.floor(r.count / 1000) .. "k") or r.count) or "")
+        local qr, qg, qb = th.edge[1], th.edge[2], th.edge[3]
+        if r.quest and c.questMark then qr, qg, qb = 1, 0.82, 0
+        elseif c.quality and (r.quality or 1) >= 2 then qr, qg, qb = qColor(r.quality) end
+        for _, e in pairs(b.edge) do e:SetColorTexture(qr or 0.3, qg or 0.3, qb or 0.3, 1) end
+        b.dim:SetShown(not bankMatch(r))
+        end
+        b:Show()
+        end
+      end
+      y = y + math.ceil(#s.items / cols) * (size + sp) + c.gap
+    end
+  end
+  if active.box then
+    drawGrid(groupItems(inBox[active.box], v, c), 0, true)
+  else
+    drawGrid(groupItems(rest, v, c), 0, true)
+    -- free slots after the rest: every one (like the game's bank), one per kind of bag
+    -- with a count, or none (at the banker they're real slots you can drop things into)
+    if v.free ~= "none" and empties and #empties > 0 then
+      local free = {}
+      if v.free == "all" then
+        for _, e in ipairs(empties) do e.freeCount = nil; free[#free + 1] = e end
+      else
+        local byFam = {}
+        for _, e in ipairs(empties) do
+          local k = (e.kind or "") .. ":" .. (e.family or 0)
+          local f = byFam[k]
+          if not f then f = e; f.freeCount = 0; byFam[k] = f; free[#free + 1] = f end
+          f.freeCount = f.freeCount + 1
+        end
+      end
+      drawGrid({ { name = "", items = free } }, 0, false)
+    end
+    -- boxes shown inside the bank: one bordered box each, after the rest
+    local inset = 6
+    for _, bx in ipairs(boxes) do
+      local items = inBox[bx]
+      if bx.mode == "box" and #items > 0 then
+        bn = bn + 1
+        local f = boxFrame(bn)
+        local startY = y
+        y = y + HDR_H + 2
+        drawGrid(groupItems(items, v, c), 0, v.group ~= "sections")
+        y = y - c.gap + inset
+        f:ClearAllPoints()
+        f:SetPoint("TOPLEFT", bankWin.child, "TOPLEFT", -inset + 1, -(startY - 2))
+        f:SetSize(fullW + inset * 2 - 2, y - startY + 2)
+        setEdge(f, bx.color[1], bx.color[2], bx.color[3], 0.9)
+        f.fill:SetColorTexture(bx.color[1], bx.color[2], bx.color[3], 0.07)
+        f.title:SetText(boxLabel(bx) .. " |cff888888" .. #items .. "|r")
+        f.box = bx
+        f:Show()
+        y = y + c.gap
+      end
+    end
+  end
+  for i = n + 1, #bankBtns do bankBtns[i]:Hide(); bankBtns[i].rec = nil end
+  for _, b in pairs(liveBtns) do if not liveUsed[b] then b:Hide() end end
+  for i = hn + 1, #bankHeads do bankHeads[i]:Hide() end
+  for i = bn + 1, #bankBoxFrames do bankBoxFrames[i]:Hide() end
+  bankWin.child:SetSize(fullW, math.max(1, y))
+  -- tracked items along the bottom
+  local bc = {}
+  for _, r in ipairs(list) do if r.id then bc[r.id] = (bc[r.id] or 0) + (r.count or 1) end end
+  local trackH = layoutTrack(bc, who == charKey(), winW - 20)
+  bankWin.scroll:SetPoint("BOTTOMRIGHT", -(c.pad + 3), FOOT + 4 + trackH)
+  local bodyH
+  if W then
+    if not sizing then bankWin:SetWidth(W); bankWin:SetHeight(H) end
+    bodyH = math.max(20, H - (top + FOOT + 10 + trackH))
+  else
+    bankWin:SetWidth(winW)
+    local maxH = math.floor((UIParent:GetHeight() or 800) * 0.7)
+    bodyH = math.min(math.max(y, 40), maxH - (top + FOOT + 10 + trackH))
+    bankWin:SetHeight(top + bodyH + FOOT + 10 + trackH)
+  end
+  bankWin.scroll:SetVerticalScroll(math.min(bankWin.scroll:GetVerticalScroll(), math.max(0, y - bodyH)))
+  bankWin.scrollMax = math.max(0, y - bodyH)
+  local isGuild = type(who) == "string" and who:find("^guild:") ~= nil
+  local titles = S.BiBTitles()
+  local custom = (isGuild and titles.guild[who:sub(7)]) or (who == charKey() and titles.bank) or nil
+  bankWin.title:SetText(custom or (who == "account" and "Warband bank") or (isGuild and (who:sub(7) .. " - guild bank"))
+    or (isBags and (whoLabel(who) .. "'s bags"))
+    or ((who == charKey()) and (live and "Bank" or "Your bank") or (whoLabel(who) .. "'s bank")))
+  -- the pencil only where the name is yours to change: your own bank and guild banks
+  if bankWin.titleEdit then bankWin.titleEdit:SetShown((isGuild and who ~= "guild:") or who == charKey()) end
+  if not src then
+    bankWin.empty:SetText((who == "guild:" and "|cff888888You're not in a guild.|r")
+      or (isBags and "|cff888888BiB hasn't seen this character's bags yet.\nLog in on them once (with BiB on) and they're remembered.|r")
+      or (isGuild and "|cff888888BiB hasn't seen this guild bank yet.\nOpen the guild vault once and it's remembered from then on.|r")
+      or (who == charKey() and "|cff888888BiB hasn't seen this character's bank yet.\nVisit a banker once and it's remembered from then on.|r")
+      or "|cff888888Nothing remembered for this bank.|r")
+    bankWin.empty:Show()
+  elseif drawn == 0 and isGuild and total == 0 then
+    bankWin.empty:SetText("|cff888888This guild bank has no tabs to show\n(none bought yet, or none you're allowed to see).|r")
+    bankWin.empty:Show()
+  elseif drawn == 0 then
+    bankWin.empty:SetText(active.box and "|cff888888Nothing in this box yet.\nRight-click an item in the bank to put it in.|r" or "|cff888888Everything here is in your boxes.|r")
+    bankWin.empty:Show()
+  else bankWin.empty:Hide() end
+  local foot
+  if live then foot = string.format("%d / %d slots used", used, total)
+  else foot = src and string.format("%d / %d slots used - seen %s%s", used, total, ago(src.at), bankOpen and " (you're at the bank)" or "") or "" end
+  -- how much gold is in the (guild) bank: bottom-right corner
+  if bankWin.gold then
+    local money = src and tonumber(src.money)
+    -- at your guild's vault right now: the gold as it is this moment
+    if isGuild and guildOpen and who:sub(7) == guildName() and GetGuildBankMoney then
+      local okm, m = pcall(GetGuildBankMoney); m = okm and tonumber(clean(m)); if m then money = m end
+    end
+    bankWin.gold:SetText(money and S.BiBMoney(money) or "")
+    bankWin.gold:SetShown(money and not live and true or false)
+  end
+  if bankWin.logBtn then bankWin.logBtn:SetShown(isGuild) end
+  bankWin.foot:SetText("|cff888888" .. foot .. "|r")
+  if bankWin.gameBtn then bankWin.gameBtn:SetShown(live and true or false) end
+  updateDrag(true)
+  if missing then C_Timer.After(0.6, function() if bankWin:IsShown() then S:RefreshBiBBank() end end) end
+end
+
+local function later(fn) C_Timer.After(0, fn) end
+
+-- right-click an item: which box it goes in
+itemMenu = function(btn, r)
+  local _, boxes = bcfg()
+  local items = { { text = r.name or "Item", title = true } }
+  if not r.id then UI:Menu(btn, items) return end
+  for _, bx in ipairs(boxes) do
+    items[#items + 1] = { text = "Put in " .. boxLabel(bx) .. (bx.mode == "tab" and " |cff888888(tab)|r" or ""), checked = r.box == bx,
+      func = function() putIn(r.id, bx); S:RefreshBiBBank() end }
+  end
+  items[#items + 1] = { text = "New box with this item...", func = function()
+    later(function() UI:Prompt("Name the new box (sets, mats, collectables...):", "", function(name)
+      name = name and name:gsub("^%s+", ""):gsub("%s+$", "") or ""
+      if name == "" then return end
+      local bx = newBox(name); putIn(r.id, bx); S:RefreshBiBBank()
+    end) end)
+  end }
+  if r.box then
+    items[#items + 1] = { text = "Take out of " .. boxLabel(r.box), func = function() takeOut(r.id, r.box); S:RefreshBiBBank() end }
+  end
+  local gv = isGuildView()
+  local tr = S.BiBIsTracked(r.id, gv)
+  items[#items + 1] = { text = tr and "Stop tracking" or (gv and "Track how many the guild has (bottom of the window)" or "Track how many I have (bottom of the window)"),
+    func = function() S.BiBTrack(r.id, not tr, gv) end }
+  UI:Menu(btn, items)
+end
+
+local boxMenu
+local function boxesMenu(anchor)
+  local _, boxes = bcfg()
+  local items = { { text = "Boxes", title = true } }
+  items[#items + 1] = { text = "New box...", tip = "A box keeps chosen items together - in a bordered box in the bank, or on a tab of their own.", func = function()
+    later(function() UI:Prompt("Name the new box (sets, mats, collectables...):", "", function(name)
+      name = name and name:gsub("^%s+", ""):gsub("%s+$", "") or ""
+      if name == "" then return end
+      local bx = newBox(name); S:RefreshBiBBank()
+      later(function() boxMenu(anchor, bx) end)
+    end) end)
+  end }
+  for _, bx in ipairs(boxes) do
+    local rule = RULE[bx.rule or ""]
+    local n = 0; for _ in pairs(bx.items) do n = n + 1 end
+    items[#items + 1] = { text = boxLabel(bx) .. "  |cff888888" .. (bx.mode == "tab" and "own tab" or "box") .. ((rule and rule.test) and (", " .. rule.text:lower()) or "") .. "|r",
+      func = function() later(function() boxMenu(anchor, bx) end) end }
+  end
+  if #boxes == 0 then items[#items + 1] = { text = "|cff888888Or right-click any item in the bank.|r", disabled = true } end
+  UI:Menu(anchor, items)
+end
+
+local function colorMenu(anchor, bx)
+  local items = { { text = "Colour of " .. boxLabel(bx), title = true } }
+  for _, pc in ipairs(BOX_COLORS) do
+    items[#items + 1] = { text = "|cff" .. hexOf(pc[2]) .. pc[1] .. "|r", func = function() bx.color = { unpack(pc[2]) }; S:RefreshBiBBank() end }
+  end
+  if UI.PickColor then
+    items[#items + 1] = { text = "Pick any colour...", func = function() later(function() UI.PickColor(bx.color, function() S:RefreshBiBBank() end) end) end }
+  end
+  UI:Menu(anchor, items)
+end
+
+boxMenu = function(anchor, bx)
+  local v, boxes = bcfg()
+  local at; for i, b in ipairs(boxes) do if b == bx then at = i end end
+  if not at then return end
+  local n = 0; for _ in pairs(bx.items) do n = n + 1 end
+  local items = { { text = boxLabel(bx), title = true } }
+  items[#items + 1] = { text = "Show as a box in the bank", checked = bx.mode == "box", tip = "A bordered box under your other bank items.",
+    func = function() bx.mode = "box"; if v.tab == bx.id then v.tab = "main" end; S:RefreshBiBBank() end }
+  items[#items + 1] = { text = "Show on its own tab", checked = bx.mode == "tab", tip = "Its items leave the main bank page and get a tab at the top.",
+    func = function() bx.mode = "tab"; S:RefreshBiBBank() end }
+  items[#items + 1] = { text = "Fill it by itself with", title = true }
+  for _, rule in ipairs(RULES) do
+    items[#items + 1] = { text = rule.text .. ((rule.value == "name" and bx.rule == "name" and bx.text) and (" |cff888888\"" .. bx.text .. "\"|r") or ""),
+      checked = (bx.rule or "") == rule.value, tip = rule.tip, func = function()
+        if rule.value == "name" then
+          later(function() UI:Prompt("Put items whose name contains:", bx.text or "", function(t)
+            t = t and t:gsub("^%s+", ""):gsub("%s+$", "") or ""
+            if t == "" then return end
+            bx.rule, bx.text = "name", t; S:RefreshBiBBank()
+          end) end)
+        else bx.rule = rule.value; S:RefreshBiBBank() end
+      end }
+  end
+  items[#items + 1] = { text = "Box", title = true }
+  items[#items + 1] = { text = "Rename...", func = function()
+    later(function() UI:Prompt("New name for the box:", bx.name or "", function(t)
+      t = t and t:gsub("^%s+", ""):gsub("%s+$", "") or ""
+      if t ~= "" then bx.name = t; S:RefreshBiBBank() end
+    end) end)
+  end }
+  items[#items + 1] = { text = "Colour...", func = function() later(function() colorMenu(anchor, bx) end) end }
+  if at > 1 then items[#items + 1] = { text = "Move up", tip = "Boxes higher up come first - and win when an item fits two boxes.",
+    func = function() table.remove(boxes, at); table.insert(boxes, at - 1, bx); S:RefreshBiBBank() end } end
+  if at < #boxes then items[#items + 1] = { text = "Move down", func = function() table.remove(boxes, at); table.insert(boxes, at + 1, bx); S:RefreshBiBBank() end } end
+  items[#items + 1] = { text = "Empty it (" .. n .. " item" .. (n == 1 and "" or "s") .. " you put in)", disabled = n == 0,
+    func = function() wipe(bx.items); wipe(bx.out); S:RefreshBiBBank() end }
+  items[#items + 1] = { text = "Delete this box...", func = function()
+    later(function() UI:Confirm("Delete the box " .. boxLabel(bx) .. "?\nIts items go back to the bank page.", function()
+      for i, b in ipairs(boxes) do if b == bx then table.remove(boxes, i) break end end
+      if v.tab == bx.id then v.tab = "main" end
+      S:RefreshBiBBank()
+    end, "Delete") end)
+  end }
+  UI:Menu(anchor, items)
+end
+S.BiBBankBoxMenu = boxMenu
+
+local function bankSortMenu(anchor)
+  local v = bcfg()
+  local c = cfg()
+  local items = { { text = "Sort the bank by", title = true } }
+  for _, s in ipairs(SORTS) do
+    items[#items + 1] = { text = s.text, tip = s.tip, checked = v.sort == s.value, func = function() v.sort = s.value; S:RefreshBiBBank() end }
+  end
+  items[#items + 1] = { text = "Reverse the order", checked = v.desc, keep = true, func = function() v.desc = not v.desc; S:RefreshBiBBank() end }
+  items[#items + 1] = { text = "Free slots", title = true }
+  for _, f in ipairs({ { "all", "Show every free slot", "Like the game's bank: each empty slot on its own." },
+                       { "one", "One per kind of bag, with a count", "Saves room: one empty slot shows how many are free." },
+                       { "none", "Hide them", "At the banker you can still drop items on your bags or tabs." } }) do
+    items[#items + 1] = { text = f[2], tip = f[3], checked = (v.free or "one") == f[1], func = function() v.free = f[1]; S:RefreshBiBBank() end }
+  end
+  items[#items + 1] = { text = "Group into", title = true }
+  for _, g in ipairs(GROUPS) do
+    items[#items + 1] = { text = g.text, tip = g.tip, checked = v.group == g.value, func = function() v.group = g.value; S:RefreshBiBBank() end }
+  end
+  items[#items + 1] = { text = "Use my bags' sorting", tip = "Copy how BiB sorts your bags.", func = function()
+    v.sort, v.desc, v.group = c.sort, c.desc, (c.split and "bag") or (c.group and "sections") or "none"; S:RefreshBiBBank()
+  end }
+  items[#items + 1] = { text = "Boxes...", tip = "Your own boxes for sets, mats, collectables...", func = function() later(function() boxesMenu(anchor) end) end }
+  if cfg().bankSize then
+    items[#items + 1] = { text = "Fit the window to the bank again", tip = "Forget the size you dragged it to.", func = function() cfg().bankSize = nil; S:RefreshBiBBank() end }
+  end
+  UI:Menu(anchor, items)
+end
+
+-- guild view: only guild banks (the one you're looking at, your own guild, every guild
+-- bank remembered from a vault visit)
+local function guildMenu(self)
+  local st = bankStore()
+  local cur = bankView and bankView:sub(7) or ""
+  local mine = guildName()
+  local names, seen = {}, {}
+  for g in pairs(st.guilds) do names[#names + 1] = g; seen[g] = true end
+  if mine and not seen[mine] then names[#names + 1] = mine end
+  table.sort(names)
+  local items = { { text = "Whose guild bank?", title = true } }
+  for _, g in ipairs(names) do
+    local rec = st.guilds[g]
+    local key = "guild:" .. g
+    items[#items + 1] = { text = "|cff40ff40" .. g .. "|r" .. (g == mine and "  (your guild)" or "") .. "  |cff888888" .. (rec and ago(rec.at) or "not seen yet") .. "|r",
+      checked = cur == g, func = function() bankView = key; S:RefreshBiBBank() end }
+  end
+  if #names == 0 then items[#items + 1] = { text = "|cff888888No guild bank seen yet - open a guild vault.|r", title = true } end
+  if st.guilds[cur] then
+    items[#items + 1] = { text = "Forget this guild bank...", func = function()
+      C_Timer.After(0, function()
+        UI:Confirm("Forget what BiB remembered of " .. cur .. "'s guild bank?\n(It's remembered again next time the guild vault is opened.)", function()
+          st.guilds[cur] = nil; S:RefreshBiBBank()
+        end, "Forget")
+      end)
+    end }
+  end
+  items[#items + 1] = { text = "Your own bank", func = function() bankView = nil; S:RefreshBiBBank() end }
+  UI:Menu(self, items)
+end
+
+local function charMenu(self)
+  if type(bankView) == "string" and bankView:find("^guild:") then guildMenu(self) return end
+  local st = bankStore()
+  local keys = {}
+  local me = charKey()
+  for k, r in pairs(st.chars) do if r.bags or k == me then keys[#keys + 1] = k end end
+  table.sort(keys, function(a, b) return a < b end)
+  local items = { { text = "Whose bank?", title = true } }
+  for _, k in ipairs(keys) do
+    local r = st.chars[k]
+    items[#items + 1] = { text = whoLabel(k) .. (k == me and "  (you)" or "") .. "  |cff888888" .. (r.bags and ago(r.at) or "not seen yet") .. "|r", checked = (bankView or me) == k,
+      func = function() bankView = (k ~= me) and k or nil; S:RefreshBiBBank() end }
+  end
+  if st.account then
+    items[#items + 1] = { text = "Warband bank  |cff888888" .. ago(st.account.at) .. "|r", checked = bankView == "account",
+      func = function() bankView = "account"; S:RefreshBiBBank() end }
+  end
+  if #keys == 0 and not st.account then items[#items + 1] = { text = "|cff888888No bank seen yet - visit a banker.|r", title = true } end
+  local who = bankView or me
+  local isGuild = type(who) == "string" and who:find("^guild:") ~= nil
+  if who and ((who == "account" and st.account) or (isGuild and st.guilds[who:sub(7)]) or (st.chars[who] and st.chars[who].bags)) then
+    items[#items + 1] = { text = "Forget this bank...", func = function()
+      C_Timer.After(0, function()
+        UI:Confirm("Forget what BiB remembered of " .. (who == "account" and "the warband bank" or isGuild and (who:sub(7) .. "'s guild bank") or (S.Short(who) .. "'s bank")) .. "?\n(It's remembered again next time that bank is opened.)", function()
+          if who == "account" then st.account = nil elseif isGuild then st.guilds[who:sub(7)] = nil else st.chars[who].bags = nil; st.chars[who].at = nil end
+          bankView = nil; S:RefreshBiBBank()
+        end, "Forget")
+      end)
+    end }
+  end
+  UI:Menu(self, items)
+end
+
+-- Window titles you can rename: a pencil right of the title opens a box; empty = default.
+-- cfg().titles = { bags = "...", bank = "...", guild = { [guild name] = "..." } }
+function S.BiBTitles()
+  local c = cfg()
+  c.titles = type(c.titles) == "table" and c.titles or {}
+  c.titles.guild = type(c.titles.guild) == "table" and c.titles.guild or {}
+  return c.titles
+end
+function S.BiBAddTitleEdit(f, onClick)
+  local b = CreateFrame("Button", nil, f)
+  b:SetSize(16, 16)
+  b:SetPoint("LEFT", f.title, "RIGHT", 6, 0)
+  b:SetFrameLevel(f:GetFrameLevel() + 5)
+  b.icon = UI:Icon(b, "edit", 12); b.icon:SetPoint("CENTER")
+  UI:Skin(b, function(self, th) self.icon:SetVertexColor(th.muted[1], th.muted[2], th.muted[3], 1) end)
+  b:SetScript("OnEnter", function(self)
+    local g = UI:Theme().gold; self.icon:SetVertexColor(g[1], g[2], g[3], 1)
+    GameTooltip:SetOwner(self, "ANCHOR_BOTTOM"); GameTooltip:AddLine("Rename this window"); GameTooltip:AddLine("|cff888888Leave it empty to go back to the usual name.|r"); GameTooltip:Show()
+  end)
+  b:SetScript("OnLeave", function(self) local m = UI:Theme().muted; self.icon:SetVertexColor(m[1], m[2], m[3], 1); GameTooltip:Hide() end)
+  b:SetScript("OnClick", function() if onClick then onClick() end end)
+  f.titleEdit = b
+  return b
+end
+function S.BiBAskTitle(current, onSet)
+  UI:Prompt("Name this window (leave it empty for the usual name):", current or "", function(t)
+    t = (t or ""):gsub("^%s+", ""):gsub("%s+$", "")
+    if #t > 40 then t = t:sub(1, 40) end
+    onSet(t ~= "" and t or nil)
+  end)
+end
+
+local function buildBank()
+  bankWin = UI:Window("CC_BiBBank", "Your bank", 420, 300, { header = HEAD })
+  bankWin:SetFrameStrata("MEDIUM")
+  bankWin:HeaderButton("roster", "Whose bank?", "Pick another character (or the warband bank). Every character's bank is remembered after you open it once.", function(self) charMenu(self) end)
+  bankWin:HeaderButton("bag", "Your bags", "Open BiB.", function() S:ShowBiB() end)
+  bankWin:HeaderButton("box", "Boxes", "Make your own boxes (sets, mats, collectables...) - shown as a bordered box in the bank or on a tab of their own. Right-click an item to put it in one.", function(self) boxesMenu(self) end)
+  bankWin:HeaderButton("sort", "Sort the bank", "How the bank view is sorted and grouped (separate from your bags; the guild bank has its own).", function(self) bankSortMenu(self) end)
+  bankWin.logBtn = bankWin:HeaderButton("book", "Guild bank log", "Who put in and took out what (and the gold log), from your last visit to the guild vault.", function()
+    if S.ToggleBiBGuildLog then S:ToggleBiBGuildLog() end
+  end)
+  bankWin.logBtn:Hide()
+  S.BiBAddTitleEdit(bankWin, function()
+    local who = bankView or charKey()
+    local titles = S.BiBTitles()
+    if type(who) == "string" and who:find("^guild:") then
+      local g = who:sub(7)
+      S.BiBAskTitle(titles.guild[g] or bankWin.title:GetText(), function(t) titles.guild[g] = t; S:RefreshBiBBank() end)
+    else
+      S.BiBAskTitle(titles.bank or bankWin.title:GetText(), function(t) titles.bank = t; S:RefreshBiBBank() end)
+    end
+  end)
+  bankWin.search = UI:Edit(bankWin, 200, 20, "Search the bank  (name, type, epic, ilvl>100...)")
+  bankWin.search:SetPoint("TOPLEFT", 10, -(HEAD + 6)); bankWin.search:SetPoint("RIGHT", -10, 0)
+  bankWin.search:HookScript("OnTextChanged", function()
+    for _, b in ipairs(bankBtns) do if b.rec then b.dim:SetShown(not bankMatch(b.rec)) end end
+    for _, b in pairs(liveBtns) do if b.rec and b:IsShown() then b.bibDim:SetShown((not b.rec.empty) and not bankMatch(b.rec)) end end
+  end)
+  -- at the banker: bring the game's own bank window back for this visit (buying slots, bank bags...)
+  bankWin.gameBtn = UI:Button(bankWin, "Game's bank", 90, 18, function() if S.BiBUseGameBank then S.BiBUseGameBank() end end,
+    "Show the game's own bank window for this visit - to buy bank slots or change bank bags. BiB's window comes back next time.")
+  bankWin.gameBtn:SetPoint("BOTTOMRIGHT", -24, 4); bankWin.gameBtn:Hide()
+  -- tracked items strip (above the footer)
+  local tk = CreateFrame("Frame", nil, bankWin)
+  tk:SetPoint("BOTTOMLEFT", 10, FOOT + 2); tk:SetPoint("BOTTOMRIGHT", -10, FOOT + 2); tk:SetHeight(1)
+  tk.line = tk:CreateTexture(nil, "ARTWORK"); tk.line:SetPoint("TOPLEFT"); tk.line:SetPoint("TOPRIGHT"); tk.line:SetHeight(1)
+  UI:Skin(tk.line, function(self, th) self:SetColorTexture(th.edge[1], th.edge[2], th.edge[3], 1) end)
+  tk:EnableMouse(true)
+  tk:SetScript("OnReceiveDrag", function() dropTrack() end)
+  tk:SetScript("OnMouseUp", function() if dragId() then dropTrack() end end)
+  tk:Hide()
+  bankWin.track = tk
+  -- drop strip: track a dragged item
+  local tc = CreateFrame("Button", nil, bankWin)
+  tc:SetFrameLevel(bankWin:GetFrameLevel() + 30)
+  tc.fill = tc:CreateTexture(nil, "OVERLAY"); tc.fill:SetAllPoints(); tc.fill:SetColorTexture(0.3, 0.6, 1, 0.25)
+  tc.text = UI:Text(tc, "Drop here to track how many you have", "small", "CENTER"); tc.text:SetPoint("CENTER")
+  tc:RegisterForClicks("LeftButtonUp")
+  tc:SetScript("OnReceiveDrag", function() dropTrack() end)
+  tc:SetScript("OnClick", function() dropTrack() end)
+  tc:Hide()
+  bankWin.trackCatch = tc
+  -- resize from the bottom-right corner (the columns follow the width)
+  bankWin:SetResizable(true)
+  if bankWin.SetResizeBounds then bankWin:SetResizeBounds(250, 200, 1800, 1300) elseif bankWin.SetMinResize then bankWin:SetMinResize(250, 200) end
+  local grip = CreateFrame("Button", nil, bankWin)
+  grip:SetSize(16, 16); grip:SetPoint("BOTTOMRIGHT", -3, 3)
+  grip:SetFrameLevel(bankWin:GetFrameLevel() + 35)
+  grip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+  grip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+  grip:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+  grip:RegisterForClicks("RightButtonUp")
+  grip:SetScript("OnEnter", function(self)
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT"); GameTooltip:AddLine("Drag to resize")
+    GameTooltip:AddLine("|cff888888Right-click: fit the window to the bank again|r"); GameTooltip:Show()
+  end)
+  grip:SetScript("OnLeave", function() GameTooltip:Hide() end)
+  grip:SetScript("OnMouseDown", function(_, btn)
+    if btn ~= "LeftButton" or (cfg().lock) then return end
+    bankWin.sizing = true
+    bankWin:StartSizing("BOTTOMRIGHT")
+  end)
+  grip:SetScript("OnMouseUp", function()
+    if not bankWin.sizing then return end
+    bankWin:StopMovingOrSizing()
+    bankWin.sizing = false
+    cfg().bankSize = { math.floor(bankWin:GetWidth() + 0.5), math.floor(bankWin:GetHeight() + 0.5) }
+    local l, t = bankWin:GetLeft(), bankWin:GetTop()
+    if l and t then cfg().bankAt = { l, t }; bankWin:ClearAllPoints(); bankWin:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", l, t) end
+    S:RefreshBiBBank()
+  end)
+  grip:SetScript("OnClick", function() cfg().bankSize = nil; S:RefreshBiBBank() end)
+  bankWin.grip = grip
+  bankWin:HookScript("OnSizeChanged", function()
+    if bankWin.sizing and not bankWin.sizePending then
+      bankWin.sizePending = true
+      C_Timer.After(0.05, function() bankWin.sizePending = false; if bankWin:IsShown() then S:RefreshBiBBank() end end)
+    end
+  end)
+  -- drop strip along the bottom: take a dragged item out of its box
+  local oc = CreateFrame("Button", nil, bankWin)
+  oc:SetPoint("BOTTOMLEFT", 6, 4); oc:SetPoint("BOTTOMRIGHT", -6, 4); oc:SetHeight(FOOT)
+  oc:SetFrameLevel(bankWin:GetFrameLevel() + 30)
+  oc.fill = oc:CreateTexture(nil, "OVERLAY"); oc.fill:SetAllPoints(); oc.fill:SetColorTexture(0.9, 0.3, 0.25, 0.25)
+  oc.text = UI:Text(oc, "Drop here to take it out of its box", "small", "CENTER"); oc.text:SetPoint("CENTER")
+  oc:RegisterForClicks("LeftButtonUp")
+  oc:SetScript("OnReceiveDrag", function() dropInto(nil, true) end)
+  oc:SetScript("OnClick", function() dropInto(nil, true) end)
+  oc:Hide()
+  bankWin.outCatch = oc
+  -- watch the cursor: an item picked up lights up the boxes and tabs
+  local acc = 0
+  bankWin:HookScript("OnUpdate", function(_, el)
+    acc = acc + el
+    if acc < 0.08 then return end
+    acc = 0
+    updateDrag()
+  end)
+  bankWin.scroll = CreateFrame("ScrollFrame", nil, bankWin)
+  bankWin.scroll:SetPoint("TOPLEFT", cfg().pad + 3, -(HEAD + SEARCH_H + 10)); bankWin.scroll:SetPoint("BOTTOMRIGHT", -(cfg().pad + 3), FOOT + 4)
+  bankWin.child = CreateFrame("Frame", nil, bankWin.scroll); bankWin.child:SetSize(1, 1)
+  bankWin.scroll:SetScrollChild(bankWin.child)
+  bankWin.scroll:EnableMouseWheel(true)
+  bankWin.scroll:SetScript("OnMouseWheel", function(self, d)
+    local val = math.max(0, math.min(bankWin.scrollMax or 0, self:GetVerticalScroll() - d * (cfg().size + cfg().spacing) * 2))
+    self:SetVerticalScroll(val)
+  end)
+  bankWin.empty = UI:Text(bankWin, "", "small", "CENTER"); bankWin.empty:SetPoint("CENTER", 0, -10); bankWin.empty:SetWidth(360)
+  bankWin.foot = UI:Text(bankWin, "", "small"); bankWin.foot:SetPoint("BOTTOMLEFT", 12, 8)
+  bankWin.gold = UI:Text(bankWin, "", "small", "RIGHT"); bankWin.gold:SetPoint("BOTTOMRIGHT", -24, 8)
+  local at = cfg().bankAt
+  bankWin:ClearAllPoints()
+  if type(at) == "table" and at[1] then bankWin:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", at[1], at[2])
+  else bankWin:SetPoint("CENTER", -200, 60) end
+  bankWin:SetScript("OnDragStart", function(self) if not cfg().lock then self:StartMoving() end end)
+  bankWin:HookScript("OnDragStop", function(self)
+    local l, t = self:GetLeft(), self:GetTop(); if l and t then cfg().bankAt = { l, t } end
+  end)
+  bankWin:HookScript("OnShow", function() S:RefreshBiBBank() end)
+  bankWin:HookScript("OnHide", function()
+    bankWin.search:SetText(""); bankWin.search:ClearFocus(); bankView = nil
+    endDrag()
+    if tabDrag then tabDrag:SetAlpha(1); tabDrag = nil; if tabMarker then tabMarker:Hide() end end
+    -- closing BiB's bank at the banker ends the visit, like closing the game's bank
+    if bankOpen and S.BiBBankTakingOver and S.BiBBankTakingOver() and CloseBankFrame then pcall(CloseBankFrame) end
+  end)
+end
+
+---------------------------------------------------------------------------
+-- At the banker: BiB's bank window instead of the game's. The game's BankFrame is
+-- parked under a hidden frame BEFORE the bank opens (hiding it while it's showing
+-- would end the visit), so it "opens" without ever being seen.
+---------------------------------------------------------------------------
+local bankPark = CreateFrame("Frame"); bankPark:Hide()
+local gameBankThisVisit = false
+local bankAutoOpened = false
+local function takingOver() return S.db ~= nil and S:BiBIsOn() and cfg().bankWindow ~= false and not gameBankThisVisit end
+S.BiBBankTakingOver = takingOver
+local function applyTakeover()
+  local f = _G.BankFrame
+  if not f or not f.SetParent or combat() then return end
+  if takingOver() then
+    if f:GetParent() ~= bankPark and not f:IsVisible() then f:SetParent(bankPark) end
+  elseif f:GetParent() == bankPark then
+    f:SetParent(UIParent)
+  end
+end
+S.BiBApplyBankTakeover = applyTakeover
+S.BiBUseGameBank = function()
+  gameBankThisVisit = true
+  applyTakeover()
+  local f = _G.BankFrame
+  if f and bankOpen and not f:IsShown() and ShowUIPanel then pcall(ShowUIPanel, f) end
+  if bankWin then bankAutoOpened = false; bankWin:Hide() end   -- (taking over is off now, so this doesn't end the visit)
+end
+S.BiBBankArrived = function()
+  applyTakeover()
+  if takingOver() then
+    bankView = nil
+    if not (bankWin and bankWin:IsShown()) then bankAutoOpened = true end
+    S:ShowBiBBank()
+  elseif bankWin and bankWin:IsShown() then S:RefreshBiBBank() end
+end
+S.BiBBankLeft = function()
+  gameBankThisVisit = false
+  if bankWin and bankWin:IsShown() then
+    if bankAutoOpened then bankWin:Hide() else S:RefreshBiBBank() end
+  end
+  bankAutoOpened = false
+  C_Timer.After(0, applyTakeover)
+end
+S:Listen("LOGIN", function() applyTakeover() end)
+S:On("PLAYER_REGEN_ENABLED", function()
+  applyTakeover()
+  if bankWin and bankWin.combatPending then bankWin.combatPending = false; if bankWin:IsShown() then S:RefreshBiBBank() end end
+end)
+-- live bank: redraw quickly when things move, lock (picked up) or cool down
+local livePending = false
+local function liveSoon()
+  if not (bankOpen and bankWin and bankWin:IsShown()) or livePending then return end
+  livePending = true
+  C_Timer.After(0.05, function() livePending = false; if bankWin:IsShown() then S:RefreshBiBBank() end end)
+end
+for _, ev in ipairs({ "BAG_UPDATE_DELAYED", "PLAYERBANKSLOTS_CHANGED", "PLAYERREAGENTBANKSLOTS_CHANGED", "ITEM_LOCK_CHANGED", "BAG_UPDATE_COOLDOWN", "PLAYERBANKBAGSLOTS_CHANGED" }) do
+  S:On(ev, liveSoon)
+end
+
+-- Guild bank log window: item moves (per tab or all tabs) and the gold log
+local logWin
+local LOG_ROWS_MAX = 300
+local function coins(m) return S.BiBMoney(m or 0) end
+local function logLine(e, tabNames)
+  local who = e.who or "Someone"
+  local t = e.t or ""
+  if e.money then
+    if t == "deposit" then return who .. " deposited " .. coins(e.money) end
+    if t == "withdraw" then return who .. " withdrew " .. coins(e.money) end
+    if t == "repair" then return who .. " withdrew " .. coins(e.money) .. " for repairs" end
+    if t == "withdrawForTab" then return who .. " withdrew " .. coins(e.money) .. " to buy a tab" end
+    if t == "buyTab" then return who .. " bought a bank tab for " .. coins(e.money) end
+    if t == "depositSummary" then return "Gold from guild members' sales: " .. coins(e.money) end
+    return who .. " " .. t .. " " .. coins(e.money)
+  end
+  local item = (e.link or "an item") .. ((e.n or 1) > 1 and (" x" .. e.n) or "")
+  if t == "deposit" then return who .. " deposited " .. item end
+  if t == "withdraw" then return who .. " withdrew " .. item end
+  if t == "move" then
+    return who .. " moved " .. item .. " from " .. (tabNames[e.from] or ("tab " .. tostring(e.from))) .. " to " .. (tabNames[e.to] or ("tab " .. tostring(e.to)))
+  end
+  return who .. " " .. t .. " " .. item
+end
+local function logEntries(g, which)
+  local out, tabNames = {}, {}
+  for _, b in ipairs(g.bags or {}) do tabNames[b.bag] = b.name end
+  local log = g.log or {}
+  if which == "money" then
+    for _, e in ipairs(log.money or {}) do out[#out + 1] = e end
+  else
+    for tab, list in pairs(log.tabs or {}) do
+      if which == "all" or which == tab then
+        for _, e in ipairs(list) do e.tab = tab; out[#out + 1] = e end
+      end
+    end
+  end
+  -- newest first (the game numbers each tab's log oldest -> newest)
+  table.sort(out, function(a, b)
+    if (a.at or 0) ~= (b.at or 0) then return (a.at or 0) > (b.at or 0) end
+    if (a.tab or 0) ~= (b.tab or 0) then return (a.tab or 0) < (b.tab or 0) end
+    return (a.i or 0) > (b.i or 0)
+  end)
+  return out, tabNames, log.at
+end
+S.BiBGuildLogEntries = logEntries
+local function refreshLog()
+  if not (logWin and logWin:IsShown()) then return end
+  local key = (type(bankView) == "string" and bankView:find("^guild:")) and bankView:sub(7) or guildName()
+  local g = key and bankStore().guilds[key]
+  local which = logWin.which or "all"
+  logWin.title:SetText((key or "Guild") .. " - bank log")
+  if not g or not g.log then
+    for _, r in ipairs(logWin.rows) do r:Hide() end
+    logWin.empty:SetText(g and "|cff888888No log yet - open the guild vault (the game sends the log while you're there).|r"
+      or "|cff888888BiB hasn't seen this guild bank yet.|r")
+    logWin.empty:Show(); logWin.foot:SetText(""); logWin.child:SetHeight(1)
+    logWin.whichBtn:SetText("Show: All tabs")
+    return
+  end
+  local list, tabNames, at = logEntries(g, which)
+  logWin.whichBtn:SetText("Show: " .. ((which == "all" and "All tabs") or (which == "money" and "Gold") or (tabNames[which] or ("Tab " .. tostring(which)))))
+  local y = 0
+  local w = logWin.scroll:GetWidth() or 420
+  for i = 1, math.min(#list, LOG_ROWS_MAX) do
+    local e = list[i]
+    local r = logWin.rows[i]
+    if not r then
+      r = CreateFrame("Button", nil, logWin.child)
+      r.text = UI:Text(r, "", "small"); r.text:SetPoint("TOPLEFT", 4, -3); r.text:SetJustifyH("LEFT")
+      r.hl = r:CreateTexture(nil, "HIGHLIGHT"); r.hl:SetAllPoints(); r.hl:SetColorTexture(1, 1, 1, 0.06)
+      r:SetScript("OnEnter", function(self)
+        if self.link then GameTooltip:SetOwner(self, "ANCHOR_RIGHT"); pcall(GameTooltip.SetHyperlink, GameTooltip, self.link); GameTooltip:Show() end
+      end)
+      r:SetScript("OnLeave", function() GameTooltip:Hide() end)
+      r:SetScript("OnClick", function(self)
+        if self.link and IsModifiedClick and IsModifiedClick("CHATLINK") and ChatEdit_InsertLink then ChatEdit_InsertLink(self.link) end
+      end)
+      logWin.rows[i] = r
+    end
+    local tabTag = (which == "all" and e.tab) and ("|cff666666[" .. (tabNames[e.tab] or ("Tab " .. e.tab)) .. "]|r ") or ""
+    r.text:SetWidth(w - 8)
+    r.text:SetText("|cff888888" .. ago(e.at) .. "|r  " .. tabTag .. logLine(e, tabNames))
+    local h = math.max(18, (r.text:GetStringHeight() or 12) + 6)
+    r:SetHeight(h); r:SetWidth(w)
+    r:ClearAllPoints(); r:SetPoint("TOPLEFT", logWin.child, "TOPLEFT", 0, -y)
+    r.link = e.link
+    r:Show()
+    y = y + h
+  end
+  for i = math.min(#list, LOG_ROWS_MAX) + 1, #logWin.rows do logWin.rows[i]:Hide() end
+  logWin.child:SetSize(w, math.max(1, y))
+  logWin.scrollMax = math.max(0, y - (logWin.scroll:GetHeight() or 300))
+  logWin.scroll:SetVerticalScroll(math.min(logWin.scroll:GetVerticalScroll(), logWin.scrollMax))
+  logWin.empty:SetShown(#list == 0)
+  logWin.empty:SetText("|cff888888Nothing in this log.|r")
+  logWin.foot:SetText("|cff888888" .. #list .. " entr" .. (#list == 1 and "y" or "ies") .. " - log from " .. ago(at) .. " (times are rounded to the hour)|r")
+end
+S.BiBRefreshGuildLog = refreshLog
+local function logMenu(anchor)
+  local key = (type(bankView) == "string" and bankView:find("^guild:")) and bankView:sub(7) or guildName()
+  local g = key and bankStore().guilds[key]
+  local items = { { text = "Show", title = true },
+    { text = "All tabs", checked = (logWin.which or "all") == "all", func = function() logWin.which = "all"; refreshLog() end } }
+  for _, b in ipairs(g and g.bags or {}) do
+    items[#items + 1] = { text = b.name or ("Tab " .. b.bag), checked = logWin.which == b.bag, func = function() logWin.which = b.bag; refreshLog() end }
+  end
+  items[#items + 1] = { text = "Gold", checked = logWin.which == "money", func = function() logWin.which = "money"; refreshLog() end }
+  UI:Menu(anchor, items)
+end
+function S:ToggleBiBGuildLog()
+  if logWin and logWin:IsShown() then logWin:Hide() return end
+  if not logWin then
+    logWin = UI:Window("CC_BiBGuildLog", "Guild bank log", 460, 420)
+    logWin:SetFrameStrata("HIGH")
+    logWin.rows = {}
+    logWin.whichBtn = UI:Button(logWin, "Show: All tabs", 160, 20, function(self) logMenu(self) end, "Pick a tab, all tabs, or the gold log.")
+    logWin.whichBtn:SetPoint("TOPLEFT", 12, -36)
+    logWin.scroll = CreateFrame("ScrollFrame", nil, logWin)
+    logWin.scroll:SetPoint("TOPLEFT", 12, -62); logWin.scroll:SetPoint("BOTTOMRIGHT", -12, 30)
+    logWin.child = CreateFrame("Frame", nil, logWin.scroll); logWin.child:SetSize(1, 1)
+    logWin.scroll:SetScrollChild(logWin.child)
+    logWin.scroll:EnableMouseWheel(true)
+    logWin.scroll:SetScript("OnMouseWheel", function(self, d)
+      self:SetVerticalScroll(math.max(0, math.min(logWin.scrollMax or 0, self:GetVerticalScroll() - d * 40)))
+    end)
+    logWin.empty = UI:Text(logWin, "", "small", "CENTER"); logWin.empty:SetPoint("CENTER", 0, 0); logWin.empty:SetWidth(400)
+    logWin.foot = UI:Text(logWin, "", "small"); logWin.foot:SetPoint("BOTTOMLEFT", 12, 10)
+    logWin:ClearAllPoints()
+    if bankWin and bankWin:IsShown() then logWin:SetPoint("TOPLEFT", bankWin, "TOPRIGHT", 8, 0) else logWin:SetPoint("CENTER") end
+  end
+  logWin:Show(); logWin:Raise()
+  refreshLog()
+end
+S:AddCommand("glog", "", "BiB: the guild bank log (from your last visit to the guild vault)", function() S:ToggleBiBGuildLog() end)
+
+function S:ShowBiBBank(who)
+  if not S.db then return end
+  if not bankWin then buildBank() end
+  if who then bankView = who end
+  if bankWin:IsShown() then S:RefreshBiBBank() else bankWin:Show(); bankWin:Raise() end
+end
+function S:ToggleBiBBank() if bankWin and bankWin:IsShown() then bankWin:Hide() else S:ShowBiBBank() end end
+-- your guild's bank (the copy from the last visit to the guild vault), in the same window
+function S:ShowBiBGuildBank()
+  local key = "guild:" .. (guildName() or "")
+  if bankWin and bankWin:IsShown() and bankView == key then bankWin:Hide() return end
+  S:ShowBiBBank(key)
+end
+S:AddCommand("gbank", "", "BiB: see your guild bank from anywhere", function() S:ShowBiBGuildBank() end)
+S:AddCommand("bank", "", "BiB: see your bank (and your other characters' banks) from anywhere", function() S:ToggleBiBBank() end)
+end
+bankSection()
+
+---------------------------------------------------------------------------
+-- Extras on BiB's bags window (its own function, like the bank part):
+--  * key ring button on the bottom edge: every key you own, and where it is
+--  * currencies you pick, shown along the bottom next to your gold
+--  * a guild bank button in the header, next to "Your bank"
+---------------------------------------------------------------------------
+local function extrasSection()
+  local KEYRING = KEYRING_CONTAINER or (Enum and Enum.BagIndex and Enum.BagIndex.Keyring) or -2
+  local KEY_ICON = "Interface\\Icons\\INV_Misc_Key_04"
+
+  -- every key you own: the key ring, keys in your bags (item class 13), keys in your bank
+  local function ownedKeys()
+    local out, byId = {}, {}
+    local function add(r, where, count)
+      local k = r.id or r.link
+      if not k then return end
+      local e = byId[k]
+      if not e then
+        e = { id = r.id, link = r.link, icon = r.icon, quality = r.quality, name = r.name, bags = 0, ring = 0, bank = 0 }
+        byId[k] = e; out[#out + 1] = e
+      end
+      e[where] = e[where] + (tonumber(count) or 1)
+      e.name = e.name or r.name
+    end
+    for slot = 1, numSlots(KEYRING) do
+      local i = slotInfo(KEYRING, slot)
+      if i and (i.id or i.link) then local r = { id = i.id, link = i.link, icon = i.icon, quality = i.quality }; itemData(r); add(r, "ring", i.count) end
+    end
+    for _, bag in ipairs(bagList()) do
+      if bag ~= KEYRING then
+        for slot = 1, numSlots(bag) do
+          local i = slotInfo(bag, slot)
+          if i and (i.id or i.link) then
+            local r = { id = i.id, link = i.link, icon = i.icon, quality = i.quality }
+            itemData(r)
+            if r.classID == 13 then add(r, "bags", i.count) end
+          end
+        end
+      end
+    end
+    if S.BiBBankRecords then
+      local ok, list = pcall(S.BiBBankRecords)
+      for _, r in ipairs(ok and list or {}) do if r.classID == 13 then add(r, "bank", r.count) end end
+    end
+    table.sort(out, function(a, b) return (a.name or "") < (b.name or "") end)
+    return out
+  end
+  S.BiBOwnedKeys = ownedKeys
+
+  local kwin
+  local function keyRow(i)
+    local r = kwin.rows[i]
+    if r then return r end
+    r = CreateFrame("Button", nil, kwin)
+    r:SetHeight(24); r:SetPoint("LEFT", 12, 0); r:SetPoint("RIGHT", -12, 0)
+    r.icon = r:CreateTexture(nil, "ARTWORK"); r.icon:SetSize(20, 20); r.icon:SetPoint("LEFT"); r.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+    r.name = UI:Text(r, "", "normal"); r.name:SetPoint("LEFT", r.icon, "RIGHT", 6, 0)
+    r.where = UI:Text(r, "", "small", "RIGHT"); r.where:SetPoint("RIGHT", -2, 0)
+    r.name:SetPoint("RIGHT", r.where, "LEFT", -6, 0); r.name:SetJustifyH("LEFT")
+    r.hl = r:CreateTexture(nil, "HIGHLIGHT"); r.hl:SetAllPoints(); r.hl:SetColorTexture(1, 1, 1, 0.07)
+    r:SetScript("OnEnter", function(self)
+      local e = self.e; if not e then return end
+      GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+      local ok = e.link and pcall(GameTooltip.SetHyperlink, GameTooltip, e.link)
+      if not ok and e.id then pcall(GameTooltip.SetItemByID, GameTooltip, e.id) end
+      GameTooltip:AddLine(" ")
+      if e.ring > 0 then GameTooltip:AddDoubleLine("On your key ring", e.ring, 1, 0.82, 0, 1, 1, 1) end
+      if e.bags > 0 then GameTooltip:AddDoubleLine("In your bags", e.bags, 1, 0.82, 0, 1, 1, 1) end
+      if e.bank > 0 then GameTooltip:AddDoubleLine("In your bank", e.bank, 0.3, 0.8, 1, 1, 1, 1) end
+      GameTooltip:Show()
+    end)
+    r:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    r:SetScript("OnClick", function(self)
+      local e = self.e
+      if e and e.link and IsModifiedClick and IsModifiedClick("CHATLINK") and ChatEdit_InsertLink then ChatEdit_InsertLink(e.link) end
+    end)
+    kwin.rows[i] = r
+    return r
+  end
+  local function refreshKeys()
+    if not (kwin and kwin:IsShown()) then return end
+    local keys = ownedKeys()
+    local y = -40
+    for i, e in ipairs(keys) do
+      local r = keyRow(i)
+      r.e = e
+      r:ClearAllPoints(); r:SetPoint("TOPLEFT", 12, y); r:SetPoint("RIGHT", -12, 0)
+      r.icon:SetTexture(e.icon or QMARK)
+      local qc = ITEM_QUALITY_COLORS and e.quality and ITEM_QUALITY_COLORS[e.quality]
+      r.name:SetText((qc and qc.hex or "|cffffffff") .. (e.name or ("Item " .. tostring(e.id))) .. "|r")
+      local parts = {}
+      if e.ring > 0 then parts[#parts + 1] = "Key ring" end
+      if e.bags > 0 then parts[#parts + 1] = "Bags" end
+      if e.bank > 0 then parts[#parts + 1] = "|cff4dccffBank|r" end
+      local total = e.ring + e.bags + e.bank
+      r.where:SetText(table.concat(parts, ", ") .. (total > 1 and ("  |cff888888x" .. total .. "|r") or ""))
+      r:Show()
+      y = y - 26
+    end
+    for i = #keys + 1, #kwin.rows do kwin.rows[i]:Hide() end
+    kwin.empty:SetShown(#keys == 0)
+    kwin.foot:SetText("|cff888888" .. #keys .. " key" .. (#keys == 1 and "" or "s") .. " - bank keys are from your last bank visit|r")
+    kwin:SetHeight(math.max(130, -y + 34))
+  end
+  function S:ToggleBiBKeys()
+    if kwin and kwin:IsShown() then kwin:Hide() return end
+    if not kwin then
+      kwin = UI:Window("CC_BiBKeys", "Keys", 320, 160)
+      kwin:SetFrameStrata("HIGH")
+      kwin.rows = {}
+      kwin.empty = UI:Text(kwin, "|cff888888You don't have any keys.|r", "small", "CENTER"); kwin.empty:SetPoint("TOP", 0, -56)
+      kwin.foot = UI:Text(kwin, "", "small"); kwin.foot:SetPoint("BOTTOMLEFT", 12, 10)
+    end
+    kwin:ClearAllPoints()
+    if win and win:IsShown() and win.keyBtn then kwin:SetPoint("BOTTOMLEFT", win, "BOTTOMLEFT", 0, 34) else kwin:SetPoint("CENTER") end
+    kwin:Show(); kwin:Raise()
+    refreshKeys()
+  end
+  S:On("BAG_UPDATE_DELAYED", function() refreshKeys() end)
+
+  -- currencies: pick which ones show along the bottom of BiB
+  local function currencyList()
+    local out = {}
+    pcall(function()
+      local CI = C_CurrencyInfo
+      local n = (CI and CI.GetCurrencyListSize and CI.GetCurrencyListSize()) or (GetCurrencyListSize and GetCurrencyListSize()) or 0
+      for i = 1, (tonumber(n) or 0) do
+        local name, isHeader, qty, icon, id
+        if CI and CI.GetCurrencyListInfo then
+          local info = CI.GetCurrencyListInfo(i)
+          if info then name, isHeader, qty, icon, id = info.name, info.isHeader, info.quantity, info.iconFileID, info.currencyID end
+          if not id and not isHeader and CI.GetCurrencyListLink and CI.GetCurrencyIDFromLink then
+            local l = CI.GetCurrencyListLink(i); if l then id = CI.GetCurrencyIDFromLink(l) end
+          end
+        elseif GetCurrencyListInfo then
+          local a, b, _, _, _, c, d = GetCurrencyListInfo(i)
+          name, isHeader, qty, icon = a, b, c, d
+        end
+        if name and not isHeader then out[#out + 1] = { key = id or name, id = id, name = name, qty = tonumber(qty) or 0, icon = icon } end
+      end
+    end)
+    return out
+  end
+  S.BiBCurrencyList = currencyList
+  -- each character picks its own (cfg().charBank[key].currencies); the list picked before
+  -- rev 22 (one for everyone) went to the character logged in when rev 22 first ran
+  local function tracked()
+    local c = cfg()
+    local key = S.BiBCharKey and S.BiBCharKey()
+    if not key or not S.BiBPerChar then
+      c.currencies = type(c.currencies) == "table" and c.currencies or {}
+      return c.currencies
+    end
+    local r = S.BiBPerChar(key)
+    if type(r.currencies) ~= "table" then
+      if not c.currMoved and type(c.currencies) == "table" then r.currencies = c.currencies else r.currencies = {} end
+      c.currMoved = true
+    end
+    return r.currencies
+  end
+  local function isTracked(key) for _, k in ipairs(tracked()) do if k == key then return true end end return false end
+  function S.BiBTrackCurrency(key, on)
+    local l = tracked()
+    for i = #l, 1, -1 do if l[i] == key then table.remove(l, i) end end
+    if on ~= false then l[#l + 1] = key end
+    if S.BiBUpdateCurrencies then S.BiBUpdateCurrencies() end
+  end
+  local function currencyNow(key, list)
+    if type(key) == "number" and C_CurrencyInfo and C_CurrencyInfo.GetCurrencyInfo then
+      local ok, i = pcall(C_CurrencyInfo.GetCurrencyInfo, key)
+      if ok and type(i) == "table" and i.name then return tonumber(i.quantity) or 0, i.iconFileID, i.name end
+    end
+    for _, c in ipairs(list) do if c.key == key then return c.qty, c.icon, c.name end end
+  end
+  local function updateCurrencies()
+    if not (win and win.currBtn) then return end
+    local list = currencyList()
+    local parts = {}
+    for _, key in ipairs(tracked()) do
+      local qty, icon, name = currencyNow(key, list)
+      if name then parts[#parts + 1] = (icon and ("|T" .. icon .. ":14:14:0:0|t ") or "") .. (BreakUpLargeNumbers and BreakUpLargeNumbers(qty) or qty) end
+    end
+    local b = win.currBtn
+    if #parts > 0 then b.text:SetText(table.concat(parts, "   "))
+    elseif #list > 0 then b.text:SetText("|cff666666Currencies|r")
+    else b.text:SetText("") end
+    b:SetWidth(math.max(10, (b.text:GetStringWidth() or 0) + 4))
+    b:SetShown(#parts > 0 or #list > 0)
+  end
+  S.BiBUpdateCurrencies = updateCurrencies
+  local function currencyMenu(anchor)
+    local list = currencyList()
+    local items = { { text = "Show along the bottom of BiB", title = true } }
+    for _, c in ipairs(list) do
+      local key = c.key
+      items[#items + 1] = { text = (c.icon and ("|T" .. c.icon .. ":14:14:0:0|t ") or "") .. c.name .. "  |cff888888" .. c.qty .. "|r",
+        checked = isTracked(key), keep = true, func = function() S.BiBTrackCurrency(key, not isTracked(key)) end }
+    end
+    if #list == 0 then items[#items + 1] = { text = "|cff888888This character has no currencies yet.|r", disabled = true } end
+    UI:Menu(anchor, items)
+  end
+  S.BiBCurrencyMenu = currencyMenu
+  S:On("CURRENCY_DISPLAY_UPDATE", function() if win and win:IsShown() then updateCurrencies() end end)
+
+  -----------------------------------------------------------------------
+  -- Your other characters: their gold (per ruleset) and a copy of their bags
+  -- from the last time you played them. Kept in G().bibBank.chars[key]:
+  --   money, moneyAt, class, rules, inv = { at, money, bags }
+  -----------------------------------------------------------------------
+  -- a character's ruleset: saved by meRec() each time it logs in (read from the game)
+  local function rulesOf(key, rec) return rec and rec.rules or nil end
+  -- the logged-in character's ruleset, straight from the game: game rules PvPRuleset /
+  -- RPRuleset are 0 or 1 (Normal 0/0, PvP 1/0, Roleplay 0/1, RP-PvP 1/1), Hardcore has its
+  -- own check; backup: the Battle.net status text ("Forever - Roleplay PvP - ...")
+  local function myRules()
+    local ok, hc = pcall(function() return C_GameRules and C_GameRules.IsHardcoreActive and C_GameRules.IsHardcoreActive() end)
+    if ok and clean(hc) == true then return "Hardcore" end
+    local GR = Enum and Enum.GameRule
+    if C_GameRules and C_GameRules.GetGameRuleAsFloat and GR and GR.PvPRuleset and GR.RPRuleset then
+      local ok1, pvp = pcall(C_GameRules.GetGameRuleAsFloat, GR.PvPRuleset)
+      local ok2, rp = pcall(C_GameRules.GetGameRuleAsFloat, GR.RPRuleset)
+      pvp, rp = ok1 and tonumber(clean(pvp)), ok2 and tonumber(clean(rp))
+      if pvp and rp then
+        if pvp > 0 and rp > 0 then return "RP-PvP" end
+        if pvp > 0 then return "PvP" end
+        if rp > 0 then return "Roleplay" end
+        return "Normal"
+      end
+    end
+    local okb, pres = pcall(function()
+      local info = C_BattleNet and C_BattleNet.GetAccountInfoByGUID and UnitGUID and C_BattleNet.GetAccountInfoByGUID(UnitGUID("player"))
+      return info and info.gameAccountInfo and info.gameAccountInfo.richPresence
+    end)
+    pres = okb and clean(pres)
+    if type(pres) == "string" then
+      local l = pres:lower()
+      if l:find("hardcore") then return "Hardcore" end
+      if l:find("roleplay pvp") or l:find("rp%-pvp") or l:find("rppvp") then return "RP-PvP" end
+      if l:find("roleplay") then return "Roleplay" end
+      if l:find("pvp") then return "PvP" end
+      if l:find("normal") then return "Normal" end
+    end
+    return nil
+  end
+  S.BiBRulesOf = function(key, rec) return rulesOf(key, rec) end
+  local function meRec()
+    local key = S.BiBCharKey and S.BiBCharKey()
+    if not key or not S.db then return nil end
+    local st = S.BiBBankStore()
+    local rec = st.chars[key] or {}
+    st.chars[key] = rec
+    local _, cls = UnitClass("player")
+    rec.class = clean(cls) or rec.class
+    rec.rules = myRules() or rec.rules
+    return rec, key, st
+  end
+  local function recordMoney()
+    if not S.db or not S:BiBIsOn() or (S.BiBLeaving and S.BiBLeaving()) then return end
+    local rec = meRec(); if not rec then return end
+    local m = tonumber(clean(GetMoney and GetMoney()))
+    if m then rec.money, rec.moneyAt = m, time(); if rec.inv then rec.inv.money = m end end
+  end
+  local function recordInv()
+    if not S.db or not S:BiBIsOn() or cfg().bankMemory == false or (S.BiBLeaving and S.BiBLeaving()) then return end
+    local rec = meRec(); if not rec then return end
+    local inv = { at = time(), money = tonumber(clean(GetMoney and GetMoney())), bags = {} }
+    for _, bag in ipairs(bagList()) do
+      local n = numSlots(bag)
+      if n > 0 then
+        local b = { bag = bag, n = n, name = bagName(bag), items = {} }
+        for slot = 1, n do
+          local info = slotInfo(bag, slot)
+          if info and (info.link or info.id or info.icon) then
+            b.items[slot] = { id = info.id, link = info.link, count = tonumber(info.count) or 1, icon = info.icon, q = info.quality, b = info.bound and true or nil }
+          end
+        end
+        inv.bags[#inv.bags + 1] = b
+      end
+    end
+    if #inv.bags == 0 then return end            -- bags not loaded (yet / any more): keep the last good copy
+    rec.inv = inv
+    if inv.money then rec.money, rec.moneyAt = inv.money, time() end
+  end
+  S.BiBRecordInv = recordInv
+  local invPending = false
+  local function invSoon()
+    if invPending then return end
+    invPending = true
+    C_Timer.After(2, function() invPending = false; pcall(recordInv) end)
+  end
+  S:On("PLAYER_ENTERING_WORLD", function() C_Timer.After(3, function() pcall(recordInv) end) end)
+  S:On("BAG_UPDATE_DELAYED", invSoon)
+  S:On("PLAYER_MONEY", function() pcall(recordMoney) end)
+  -- (nothing is taken at PLAYER_LOGOUT: by then the game reports 0 gold and empty bags)
+  local leaving = false
+  S:On("PLAYER_LOGOUT", function() leaving = true end)
+  S:On("PLAYER_LEAVING_WORLD", function() leaving = true end)
+  S:On("PLAYER_ENTERING_WORLD", function() leaving = false end)
+  S.BiBLeaving = function() return leaving end
+
+  -- every other character BiB knows (gold and / or bags), sorted by name
+  local function otherChars()
+    local st = S.BiBBankStore()
+    local me = S.BiBCharKey and S.BiBCharKey()
+    local out = {}
+    for k, r in pairs(st.chars) do if k ~= me and (r.money or r.inv) then out[#out + 1] = k end end
+    table.sort(out)
+    return out, st, me
+  end
+  local function nameOf(k, r)
+    local hex = S.ClassHex and S.ClassHex(r and r.class) or "ffffff"
+    return "|cff" .. hex .. ((S.Short and S.Short(k)) or k) .. "|r"
+  end
+  -- hover your gold: your characters' gold on the same ruleset
+  local function goldTip(owner)
+    local keys, st, me = otherChars()
+    local mine = st.chars[me or ""]
+    local myR = rulesOf(me, mine)
+    local myMoney = tonumber(clean(GetMoney and GetMoney())) or 0
+    GameTooltip:SetOwner(owner, "ANCHOR_TOP")
+    GameTooltip:AddLine("Gold" .. (myR and (" - " .. myR) or ""))
+    GameTooltip:AddDoubleLine(nameOf(me or "You", mine) .. "  |cff888888(you)|r", S.BiBMoney(myMoney), 1, 1, 1, 1, 1, 1)
+    local total, unknown, other = myMoney, {}, 0
+    for _, k in ipairs(keys) do
+      local r = st.chars[k]
+      local rr = rulesOf(k, r)
+      if r.money then
+        if myR and rr and rr ~= myR then other = other + 1
+        elseif myR and not rr then unknown[#unknown + 1] = k
+        else
+          total = total + r.money
+          GameTooltip:AddDoubleLine(nameOf(k, r) .. "  |cff888888" .. S.BiBAgo(r.moneyAt) .. "|r", S.BiBMoney(r.money), 1, 1, 1, 1, 1, 1)
+        end
+      end
+    end
+    GameTooltip:AddDoubleLine("Total", S.BiBMoney(total), 1, 0.82, 0, 1, 1, 1)
+    if #unknown > 0 then
+      GameTooltip:AddLine(" ")
+      GameTooltip:AddLine("Ruleset not known yet - log in on them once (not in the total)", 0.6, 0.6, 0.6)
+      for _, k in ipairs(unknown) do local r = st.chars[k]; GameTooltip:AddDoubleLine(nameOf(k, r), S.BiBMoney(r.money), 1, 1, 1, 1, 1, 1) end
+    end
+    if other > 0 then GameTooltip:AddLine("|cff888888" .. other .. " character" .. (other == 1 and "" or "s") .. " on other rulesets not counted|r") end
+    if #keys == 0 then GameTooltip:AddLine("|cff888888Log in on your other characters once and their gold shows here.|r", nil, nil, nil, true) end
+    GameTooltip:Show()
+  end
+  -- the characters button: open another character's bags (as last seen)
+  local function charsMenu(anchor)
+    local keys, st, me = otherChars()
+    local myR = rulesOf(me, st.chars[me or ""])
+    local items = { { text = "Whose bags?", title = true } }
+    local any = false
+    for _, k in ipairs(keys) do
+      local r = st.chars[k]
+      local rr = rulesOf(k, r)
+      if r.inv then
+        any = true
+        items[#items + 1] = { text = nameOf(k, r) .. "  |cff888888" .. S.BiBAgo(r.inv.at) .. ((rr and rr ~= myR) and ("  (" .. rr .. ")") or "") .. "|r",
+          tip = r.money and ("Gold: " .. S.BiBMoney(r.money)) or nil,
+          func = function() S:ShowBiBBank("bags:" .. k) end }
+      end
+    end
+    if not any then items[#items + 1] = { text = "|cff888888No other characters seen yet - log in on them once with BiB on.|r", title = true } end
+    UI:Menu(anchor, items)
+  end
+  S.BiBCharsMenu = charsMenu
+  S.BiBGoldTip = goldTip
+
+  -- tidy up what earlier revisions left behind: the ruleset probe answers (rev 21-24) and
+  -- the shared box / tracked / currency lists already moved to each character (rev 20, 22)
+  local function tidy()
+    local g, c = G(), cfg()
+    g.bibRuleProbe = nil
+    if c.charBankMoved then c.bankView, c.bankBoxes, c.bankTrack = nil, nil, nil end
+    if c.currMoved then c.currencies = nil end
+  end
+  -- the ruleset is read once the game has settled after logging in
+  S:On("PLAYER_ENTERING_WORLD", function() C_Timer.After(4, function() if S.db then pcall(tidy); if S:BiBIsOn() then pcall(meRec) end end end) end)
+
+  -- added to BiB's window when it's built
+  S.BiBOnBuild = function(w)
+    -- your own name for the bags window
+    local function applyTitle() w.title:SetText(S.BiBTitles().bags or "BiB") end
+    applyTitle()
+    S.BiBAddTitleEdit(w, function()
+      S.BiBAskTitle(S.BiBTitles().bags or w.title:GetText(), function(t) S.BiBTitles().bags = t; applyTitle() end)
+    end)
+    -- guild bank: next to "Your bank" in the header
+    w:HeaderButton("vault", "Guild bank", "See your guild bank from anywhere - BiB remembers it every time you open the guild vault.", function()
+      if S.ShowBiBGuildBank then S:ShowBiBGuildBank() end
+    end)
+    -- key ring button on the bottom edge
+    local kb = CreateFrame("Button", nil, w)
+    kb:SetSize(18, 18); kb:SetPoint("BOTTOMLEFT", 9, 5)
+    kb.icon = kb:CreateTexture(nil, "ARTWORK"); kb.icon:SetAllPoints(); kb.icon:SetTexture(KEY_ICON); kb.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+    kb.hl = kb:CreateTexture(nil, "HIGHLIGHT"); kb.hl:SetAllPoints(); kb.hl:SetColorTexture(1, 1, 1, 0.2)
+    kb:SetScript("OnEnter", function(self)
+      GameTooltip:SetOwner(self, "ANCHOR_TOP")
+      local keys = ownedKeys()
+      local inBank = 0
+      for _, e in ipairs(keys) do if e.bank > 0 then inBank = inBank + 1 end end
+      GameTooltip:AddLine("Keys")
+      GameTooltip:AddLine(#keys .. " key" .. (#keys == 1 and "" or "s") .. (inBank > 0 and (" (" .. inBank .. " in the bank)") or ""), 1, 1, 1)
+      GameTooltip:AddLine("|cff888888Click to see them all|r")
+      GameTooltip:Show()
+    end)
+    kb:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    kb:SetScript("OnClick", function() S:ToggleBiBKeys() end)
+    w.keyBtn = kb
+    w.freeText:ClearAllPoints(); w.freeText:SetPoint("BOTTOMLEFT", 32, 8)
+    -- currencies next to the gold
+    local cb = CreateFrame("Button", nil, w)
+    cb:SetHeight(18); cb:SetPoint("BOTTOMRIGHT", w.gold, "BOTTOMLEFT", -12, -3)
+    cb.text = UI:Text(cb, "", "small", "RIGHT"); cb.text:SetPoint("RIGHT")
+    cb:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    cb:SetScript("OnEnter", function(self)
+      GameTooltip:SetOwner(self, "ANCHOR_TOP")
+      GameTooltip:AddLine("Currencies")
+      local list = currencyList()
+      for _, key in ipairs(tracked()) do
+        local qty, icon, name = currencyNow(key, list)
+        if name then GameTooltip:AddDoubleLine((icon and ("|T" .. icon .. ":14:14:0:0|t ") or "") .. name, BreakUpLargeNumbers and BreakUpLargeNumbers(qty) or qty, 1, 1, 1, 1, 1, 1) end
+      end
+      GameTooltip:AddLine("|cff888888Click: choose which currencies show here|r")
+      GameTooltip:Show()
+    end)
+    cb:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    cb:SetScript("OnClick", function(self) currencyMenu(self) end)
+    w.currBtn = cb
+    w:HookScript("OnShow", function() updateCurrencies() end)
+    updateCurrencies()
+    -- characters button in the bottom-right corner (other characters' bags), gold just left of it
+    local ch = CreateFrame("Button", nil, w)
+    ch:SetSize(18, 18); ch:SetPoint("BOTTOMRIGHT", -22, 5)
+    ch:SetFrameLevel(w:GetFrameLevel() + 6)
+    ch.icon = UI:Icon(ch, "roster", 14); ch.icon:SetPoint("CENTER")
+    UI:Skin(ch, function(self, th) self.icon:SetVertexColor(th.muted[1], th.muted[2], th.muted[3], 1) end)
+    ch:SetScript("OnEnter", function(self)
+      local g = UI:Theme().gold; self.icon:SetVertexColor(g[1], g[2], g[3], 1)
+      GameTooltip:SetOwner(self, "ANCHOR_TOP"); GameTooltip:AddLine("Your other characters")
+      GameTooltip:AddLine("|cff888888Click to open one's bags as they were the last time you played them.|r", nil, nil, nil, true); GameTooltip:Show()
+    end)
+    ch:SetScript("OnLeave", function(self) local m = UI:Theme().muted; self.icon:SetVertexColor(m[1], m[2], m[3], 1); GameTooltip:Hide() end)
+    ch:SetScript("OnClick", function(self) charsMenu(self) end)
+    w.charsBtn = ch
+    w.gold:ClearAllPoints(); w.gold:SetPoint("BOTTOMRIGHT", w, "BOTTOMRIGHT", -46, 8)
+    -- hover the gold: every character's gold on this ruleset
+    local gh = CreateFrame("Frame", nil, w)
+    gh:SetPoint("TOPLEFT", w.gold, "TOPLEFT", -3, 4); gh:SetPoint("BOTTOMRIGHT", w.gold, "BOTTOMRIGHT", 3, -4)
+    gh:SetFrameLevel(w:GetFrameLevel() + 5)
+    gh:EnableMouse(true)
+    gh:SetScript("OnEnter", function(self) goldTip(self) end)
+    gh:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    w.goldHit = gh
+    -- resize from the bottom-right corner, like the bank (the columns follow the width)
+    w:SetResizable(true)
+    if w.SetResizeBounds then w:SetResizeBounds(200, 150, 1800, 1300) elseif w.SetMinResize then w:SetMinResize(200, 150) end
+    local grip = CreateFrame("Button", nil, w)
+    grip:SetSize(16, 16); grip:SetPoint("BOTTOMRIGHT", -3, 3)
+    grip:SetFrameLevel(w:GetFrameLevel() + 35)
+    grip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+    grip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+    grip:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+    grip:RegisterForClicks("RightButtonUp")
+    grip:SetScript("OnEnter", function(self)
+      GameTooltip:SetOwner(self, "ANCHOR_RIGHT"); GameTooltip:AddLine("Drag to resize")
+      GameTooltip:AddLine("|cff888888Right-click: fit the window to your bags again|r"); GameTooltip:Show()
+    end)
+    grip:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    grip:SetScript("OnMouseDown", function(_, btn)
+      if btn ~= "LeftButton" or cfg().lock or combat() then return end   -- slots can't be moved in combat
+      w.sizing = true
+      w:StartSizing("BOTTOMRIGHT")
+    end)
+    grip:SetScript("OnMouseUp", function()
+      if not w.sizing then return end
+      w:StopMovingOrSizing()
+      w.sizing = false
+      cfg().bagSize = { math.floor(w:GetWidth() + 0.5), math.floor(w:GetHeight() + 0.5) }
+      S:RefreshBiB(true)
+    end)
+    grip:SetScript("OnClick", function() if combat() then return end cfg().bagSize = nil; S:RefreshBiB(true) end)
+    w.grip = grip
+    w:HookScript("OnSizeChanged", function()
+      if w.sizing and not w.sizePending then
+        w.sizePending = true
+        C_Timer.After(0.05, function() w.sizePending = false; if w:IsShown() and not combat() then S:RefreshBiB(true) end end)
+      end
+    end)
+  end
+end
+extrasSection()
+
 
 ---------------------------------------------------------------------------
 -- Type order window: drag the types (or use the arrows), tick "Bottom" to keep
